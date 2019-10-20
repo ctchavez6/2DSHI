@@ -126,7 +126,7 @@ while True:
                            interpolation=cv2.INTER_AREA)
 
     # Normalize histograms based on number of pixels per frame.
-    numPixels = np.prod(frame.shape[:2])
+    numPixels = np.prod(frame.shape[:2]) #(1200, 1200, 3)
     if color == 'rgb':
         cv2.imshow('RGB', frame)
         (b, g, r) = cv2.split(frame)
