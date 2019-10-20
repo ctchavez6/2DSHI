@@ -1,12 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="" />
+    <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/IS_Stream_Attempt/10_19_2019_SingleStream_RealTimeVieoHistogram_a1.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IS_Stream_Attempt/10_19_2019_Single_Stream_a1.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IS_Stream_Attempt/10_20_2019_Dual_Stream_a1.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IS_Stream_Attempt/original_realTimeVideoHistogram.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IS_Stream_Attempt/simplified_realTimeVideoHistogram.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IS_Stream_Attempt/stream_a52.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IS_Stream_Attempt/stream_b24.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IS_Stream_Attempt/try_grab_mult_cameras.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/working_files_dont_edit/grab_multiple_cameras.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigFiles/23170624_setup_Oct15.pfs" beforeDir="false" afterPath="$PROJECT_DIR$/ConfigFiles/23170624_setup_Oct15.pfs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pypylon" beforeDir="false" afterPath="$PROJECT_DIR$/pypylon" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pypylon/samples/callback.py" beforeDir="false" afterPath="$PROJECT_DIR$/pypylon/samples/callback.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pypylon/samples/grabmultiplecameras.py" beforeDir="false" afterPath="$PROJECT_DIR$/pypylon/samples/grabmultiplecameras.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pypylon/samples/opencv.py" beforeDir="false" afterPath="$PROJECT_DIR$/pypylon/samples/opencv.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -19,7 +42,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$USER_HOME$/AppData/Local/GitHubDesktop/app-2.2.1/resources/app/git/cmd/git.exe" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -33,8 +56,8 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.opencv">
-    <configuration name="displayPhoto" type="PythonConfigurationType" factoryName="Python" temporary="true">
+  <component name="RunManager" selected="Python.try_grab_mult_cameras">
+    <configuration name="captureDualVideo" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="2DSHI" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -42,12 +65,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/RelevantFiles" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/displayPhoto.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/RelevantFiles/captureDualVideo.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -56,7 +79,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="opencv" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="grab_multiple_cameras" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="2DSHI" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -64,12 +87,78 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pypylon/samples" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/working_files_dont_edit" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pypylon/samples/opencv.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/working_files_dont_edit/grab_multiple_cameras.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="stream_a52" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="2DSHI" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/IS_Stream_Attempt" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/IS_Stream_Attempt/stream_a52.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="stream_b24" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="2DSHI" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/IS_Stream_Attempt" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/IS_Stream_Attempt/stream_b24.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="try_grab_mult_cameras" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="2DSHI" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/IS_Stream_Attempt" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/IS_Stream_Attempt/try_grab_mult_cameras.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -80,8 +169,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.opencv" />
-        <item itemvalue="Python.displayPhoto" />
+        <item itemvalue="Python.try_grab_mult_cameras" />
+        <item itemvalue="Python.grab_multiple_cameras" />
+        <item itemvalue="Python.stream_b24" />
+        <item itemvalue="Python.stream_a52" />
+        <item itemvalue="Python.captureDualVideo" />
       </list>
     </recent_temporary>
   </component>
@@ -95,7 +187,14 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1571505701235</updated>
-      <workItem from="1571505705698" duration="1076000" />
+      <workItem from="1571505705698" duration="1321000" />
+      <workItem from="1571507144702" duration="3682000" />
+      <workItem from="1571512060105" duration="6232000" />
+      <workItem from="1571523975954" duration="54000" />
+      <workItem from="1571524075724" duration="3000" />
+      <workItem from="1571525593985" duration="91000" />
+      <workItem from="1571591032866" duration="158000" />
+      <workItem from="1571591295725" duration="7543000" />
     </task>
     <task id="LOCAL-00001" summary="this is a test commit">
       <created>1571506272404</created>
@@ -118,7 +217,21 @@
       <option name="project" value="LOCAL" />
       <updated>1571506620914</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="this is a test commit 2">
+      <created>1571506813497</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1571506813497</updated>
+    </task>
+    <task id="LOCAL-00005" summary="this is a test commit 2">
+      <created>1571506838340</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1571506838340</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -129,7 +242,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
@@ -141,7 +256,21 @@
     <option name="LAST_COMMIT_MESSAGE" value="this is a test commit 2" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/2DSHI$stream_b24.coverage" NAME="stream_b24 Coverage Results" MODIFIED="1571596424724" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$stream_a52.coverage" NAME="stream_a52 Coverage Results" MODIFIED="1571596416299" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$grab_multiple_cameras.coverage" NAME="grab_multiple_cameras Coverage Results" MODIFIED="1571602093837" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/working_files_dont_edit" />
+    <SUITE FILE_PATH="coverage/2DSHI$captureDualVideo.coverage" NAME="captureDualVideo Coverage Results" MODIFIED="1571596084807" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/RelevantFiles" />
+    <SUITE FILE_PATH="coverage/2DSHI$callback.coverage" NAME="callback Coverage Results" MODIFIED="1571510342858" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
+    <SUITE FILE_PATH="coverage/2DSHI$grabmultiplecameras.coverage" NAME="grabmultiplecameras Coverage Results" MODIFIED="1571594597344" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
     <SUITE FILE_PATH="coverage/2DSHI$displayPhoto.coverage" NAME="displayPhoto Coverage Results" MODIFIED="1571505715036" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/2DSHI$opencv.coverage" NAME="opencv Coverage Results" MODIFIED="1571505731558" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
+    <SUITE FILE_PATH="coverage/2DSHI$simplified_realTimeVideoHistogram.coverage" NAME="simplified_realTimeVideoHistogram Coverage Results" MODIFIED="1571591111756" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$10_20_2019_Dual_Stream_a1.coverage" NAME="10_20_2019_Dual_Stream_a1 Coverage Results" MODIFIED="1571593699104" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$opencv.coverage" NAME="opencv Coverage Results" MODIFIED="1571513256014" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
+    <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_Single_Stream_a1.coverage" NAME="10_19_2019_Single_Stream_a1 Coverage Results" MODIFIED="1571591549303" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_a2.coverage" NAME="10_19_2019_a2 Coverage Results" MODIFIED="1571513108879" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$try_grab_mult_cameras.coverage" NAME="try_grab_mult_cameras Coverage Results" MODIFIED="1571602555116" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$realTimeVideoHistogram.coverage" NAME="realTimeVideoHistogram Coverage Results" MODIFIED="1571520289143" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="G:/" />
+    <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_SingleStream_RealTimeVieoHistogram_a1.coverage" NAME="10_19_2019_SingleStream_RealTimeVieoHistogram_a1 Coverage Results" MODIFIED="1571591560695" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_a1.coverage" NAME="10_19_2019_a1 Coverage Results" MODIFIED="1571519715697" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
   </component>
 </project>
