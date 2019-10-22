@@ -2,11 +2,134 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/IS_Stream_Attempt/10_20_2019_Two_Streams_One_Histogram.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IS_Stream_Attempt/original_realTimeVideoHistogram.py" beforeDir="false" afterPath="$PROJECT_DIR$/IS_Stream_Attempt/original_realTimeVideoHistogram.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IS_Stream_Attempt/try_grab_mult_cameras.py" beforeDir="false" afterPath="$PROJECT_DIR$/IS_Stream_Attempt/try_grab_mult_cameras.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/working_files_dont_edit/grab_multiple_cameras.py" beforeDir="false" afterPath="$PROJECT_DIR$/working_files_dont_edit/grab_multiple_cameras.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigFiles/23097552_setup_Oct15.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigFiles/23097752_DisplayedImage__2019-10-15__11-35-27.bmp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigFiles/23170624_DisplayedImage__2019-10-15__11-36-07.bmp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigFiles/23170624_setup_Oct15.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigFiles/ExtPulsed.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigFiles/ExtPulsed_NewCables.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigFiles/acA1920-40um_23097552.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigFiles/acA1920-40um_23097552_LED.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigFiles/acA1920-40um_23170624.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigFiles/acA1920-40um_ext_pulsed.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigFiles/startup acA1920-40um_23097552.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigFiles/startup acA1920-40um_23170624.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IS_Stream_Attempt/10_19_2019_SingleStream_RealTimeVieoHistogram_a1.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IS_Stream_Attempt/10_19_2019_Single_Stream_a1.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IS_Stream_Attempt/10_20_2019_Dual_Stream_a1.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IS_Stream_Attempt/10_20_2019_Two_Streams_One_Histogram.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IS_Stream_Attempt/original_realTimeVideoHistogram.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IS_Stream_Attempt/simplified_realTimeVideoHistogram.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IS_Stream_Attempt/stream_a52.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IS_Stream_Attempt/stream_b24.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IS_Stream_Attempt/try_grab_mult_cameras.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V1/VolumeConfig.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/.store.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.directoryStoreFile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.directoryStoreFile.shadow" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.indexArrays" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.indexBigDates" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.indexCompactDirectory" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.indexDirectory" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.indexGroups" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.indexHead" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.indexIds" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.indexPositionTable" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.indexPositions" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.indexPostings" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.indexTermIds" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.indexUpdates" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.shadowIndexGroups" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/0.shadowIndexHead" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/Cab.created" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/Lion.created" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/indexState" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/journalExclusion" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/journals.live_user/journal.1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/journals.live_user/journal.2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/journals.scan/retire.5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.directoryStoreFile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.directoryStoreFile.shadow" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.indexArrays" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.indexBigDates" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.indexCompactDirectory" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.indexDirectory" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.indexGroups" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.indexHead" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.indexIds" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.indexPositionTable" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.indexPositions" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.indexPostings" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.indexTermIds" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.indexUpdates" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.shadowIndexArrays" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.shadowIndexCompactDirectory" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.shadowIndexDirectory" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.shadowIndexGroups" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.shadowIndexHead" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.shadowIndexPositionTable" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/live.0.shadowIndexTermIds" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/permStore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/psid.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/reverseDirectoryStore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/reverseDirectoryStore.shadow" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/reverseStore.updates" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/shutdown_time" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/store.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/store.updates" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/store_generation" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/tmp.Cab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/tmp.Lion" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/tmp.SnowLeopard" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/tmp.spotlight.loc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/Store-V2/964BC042-A36C-4442-8464-569E0C4AA865/tmp.spotlight.state" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.Spotlight-V100/VolumeConfiguration.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/._average.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/._histogramAverage.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/._imageEqualizedByHistogram.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/._realTimeVideoHistogram.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/._textLabelHistogram.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/._videoOut.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.fseventsd/000000010ca794f2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.fseventsd/000000010ca794f3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/.fseventsd/fseventsd-uuid" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/average.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/captureDualVideo.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/histogramAverage.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/imageEqualizedByHistogram.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/realTimeVideoHistogram.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/textLabelHistogram.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RelevantFiles/videoOut.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/captureDualVideo.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/displayPhoto.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/get_cwd.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageEqualizedByHistogram.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/Screen Shot 2019-10-11 at October 11, 2019 11.25.39 AM.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/crystal.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/dragon.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/dragon.png.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/fw.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/fw.png.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/heroCamera.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/installing miniconda &amp; runtime_notes.rtf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/photoBorderPadding.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/python_working/captureDualVideo.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/python_working/displayPhoto.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/python_working/imageEqualizedByHistogram.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/python_working/photoBorderPadding.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/python_working/realTimeVideoHistogram_bak.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/python_working/textLabelHistogram_bak.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/python_working/thMB6GNLBY.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/python_working/videoOut_bak.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/python_working/workfile.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/realTimeVideoHistogram_bak.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/textLabelHistogram_bak.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/videoOut_bak.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workfile.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/working_files_dont_edit/grab_multiple_cameras.py" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,7 +155,13 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$USER_HOME$/AppData/Local/GitHubDesktop/app-2.2.1/resources/app/git/cmd/git.exe" />
-    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\reference" />
+      <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\previous_versions_and_reference" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -46,7 +175,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.grab_multiple_cameras">
+  <component name="RunManager" selected="Python.10_20_2019_Two_Streams_One_Histogram">
     <configuration name="10_19_2019_Single_Stream_a1" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="2DSHI" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -69,6 +198,28 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="10_20_2019_Two_Streams_One_Histogram (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="2DSHI" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/previous_versions_and_reference/IS_Stream_Attempt" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/previous_versions_and_reference/IS_Stream_Attempt/10_20_2019_Two_Streams_One_Histogram.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="10_20_2019_Two_Streams_One_Histogram" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="2DSHI" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -77,12 +228,34 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/IS_Stream_Attempt" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/current_scripts" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/IS_Stream_Attempt/10_20_2019_Two_Streams_One_Histogram.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/current_scripts/10_20_2019_Two_Streams_One_Histogram.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="__init__" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="2DSHI" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pypylon" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pypylon/__init__.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -113,57 +286,13 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="stream_b24" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="2DSHI" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/IS_Stream_Attempt" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/IS_Stream_Attempt/stream_b24.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="try_grab_mult_cameras" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="2DSHI" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/IS_Stream_Attempt" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/IS_Stream_Attempt/try_grab_mult_cameras.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.grab_multiple_cameras" />
         <item itemvalue="Python.10_20_2019_Two_Streams_One_Histogram" />
-        <item itemvalue="Python.10_19_2019_Single_Stream_a1" />
-        <item itemvalue="Python.try_grab_mult_cameras" />
-        <item itemvalue="Python.stream_b24" />
+        <item itemvalue="Python.10_20_2019_Two_Streams_One_Histogram" />
+        <item itemvalue="Python.__init__" />
+        <item itemvalue="Python.10_20_2019_Two_Streams_One_Histogram (1)" />
+        <item itemvalue="Python.grab_multiple_cameras" />
       </list>
     </recent_temporary>
   </component>
@@ -185,6 +314,12 @@
       <workItem from="1571525593985" duration="91000" />
       <workItem from="1571591032866" duration="158000" />
       <workItem from="1571591295725" duration="16744000" />
+      <workItem from="1571611749219" duration="866000" />
+      <workItem from="1571704818138" duration="596000" />
+      <workItem from="1571705488804" duration="91000" />
+      <workItem from="1571706071474" duration="203000" />
+      <workItem from="1571706330060" duration="144000" />
+      <workItem from="1571706509435" duration="43000" />
     </task>
     <task id="LOCAL-00001" summary="this is a test commit">
       <created>1571506272404</created>
@@ -228,7 +363,14 @@
       <option name="project" value="LOCAL" />
       <updated>1571602596807</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="able to simultaneously stream two basler cameras">
+      <created>1571611768381</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1571611768381</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -248,16 +390,21 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
+      <path value="$PROJECT_DIR$/pypylon" />
+    </ignored-roots>
     <MESSAGE value="this is a test commit" />
     <MESSAGE value="this is a test commit 2" />
     <MESSAGE value="able to simultaneously stream two basler cameras" />
     <option name="LAST_COMMIT_MESSAGE" value="able to simultaneously stream two basler cameras" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/2DSHI$10_20_2019_Two_Streams_One_Histogram.coverage" NAME="10_20_2019_Two_Streams_One_Histogram Coverage Results" MODIFIED="1571611550802" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$10_20_2019_Two_Streams_One_Histogram__1_.coverage" NAME="10_20_2019_Two_Streams_One_Histogram (1) Coverage Results" MODIFIED="1571705497549" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/previous_versions_and_reference/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$10_20_2019_Two_Streams_One_Histogram.coverage" NAME="10_20_2019_Two_Streams_One_Histogram Coverage Results" MODIFIED="1571706186544" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$stream_b24.coverage" NAME="stream_b24 Coverage Results" MODIFIED="1571596424724" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$stream_a52.coverage" NAME="stream_a52 Coverage Results" MODIFIED="1571596416299" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
-    <SUITE FILE_PATH="coverage/2DSHI$grab_multiple_cameras.coverage" NAME="grab_multiple_cameras Coverage Results" MODIFIED="1571611632584" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/working_files_dont_edit" />
+    <SUITE FILE_PATH="coverage/2DSHI$grab_multiple_cameras.coverage" NAME="grab_multiple_cameras Coverage Results" MODIFIED="1571617337430" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/working_files_dont_edit" />
     <SUITE FILE_PATH="coverage/2DSHI$captureDualVideo.coverage" NAME="captureDualVideo Coverage Results" MODIFIED="1571596084807" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/RelevantFiles" />
     <SUITE FILE_PATH="coverage/2DSHI$callback.coverage" NAME="callback Coverage Results" MODIFIED="1571510342858" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
     <SUITE FILE_PATH="coverage/2DSHI$grabmultiplecameras.coverage" NAME="grabmultiplecameras Coverage Results" MODIFIED="1571594597344" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
@@ -265,6 +412,7 @@
     <SUITE FILE_PATH="coverage/2DSHI$simplified_realTimeVideoHistogram.coverage" NAME="simplified_realTimeVideoHistogram Coverage Results" MODIFIED="1571591111756" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$10_20_2019_Dual_Stream_a1.coverage" NAME="10_20_2019_Dual_Stream_a1 Coverage Results" MODIFIED="1571593699104" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$opencv.coverage" NAME="opencv Coverage Results" MODIFIED="1571513256014" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
+    <SUITE FILE_PATH="coverage/2DSHI$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1571705669835" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon" />
     <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_Single_Stream_a1.coverage" NAME="10_19_2019_Single_Stream_a1 Coverage Results" MODIFIED="1571607762259" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_a2.coverage" NAME="10_19_2019_a2 Coverage Results" MODIFIED="1571513108879" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$try_grab_mult_cameras.coverage" NAME="try_grab_mult_cameras Coverage Results" MODIFIED="1571602816966" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />

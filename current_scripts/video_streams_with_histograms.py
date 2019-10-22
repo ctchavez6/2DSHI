@@ -19,7 +19,7 @@ import argparse
 
 cwd = os.getcwd()
 parent_directory = os.path.dirname(os.getcwd())
-configurations_folder = parent_directory + "\ConfigFiles"
+configurations_folder = parent_directory + "\camera_configuration_files"
 configurations_file_a = configurations_folder + "\/23170624_setup_Oct15.pfs"
 configurations_file_b = configurations_folder + "\/23170624_setup_Oct15.pfs"
 
