@@ -9,6 +9,8 @@ from pypylon import genicam, pylon  # Import relevant pypylon packages/modules
 import matplotlib.pyplot as plt  # For plotting live histogram
 import os, sys, cv2, argparse  # Need for reading files, exiting system, streaming video, and command line arguments
 import numpy as np  # Pixel math, among other array operations
+import traceback # exception handling
+from numpy.linalg import inv
 
 
 def foo(param1):
@@ -46,16 +48,7 @@ this topic. The bandwidth used by a FireWire camera device can be limited by adj
 maxCamerasToUse = 2 # Number of cameras we plan on using
 exitCode = 0 # The exit code of the sample application.
 
-y_avg_a = 0
-y_avg_b = 0
 
-y_max_a = 0
-y_max_b = 0
-x_of_y_max_a = 0
-x_of_y_max_b = 0
-
-y_stdev_a = 0
-y_stdev_b = 0
 count = 0
 try:
     tlFactory = pylon.TlFactory.GetInstance() # Get the transport layer factory.
@@ -83,8 +76,8 @@ try:
         elif i > 1:
             print("You have connected an additional camera, but have not provided a third configuration file.")
 
-    fig, (cam_a_hist, cam_b_hist) = plt.subplots(1, 2)  # Initialize plots/subplots
 
+    fig, (cam_a_hist, cam_b_hist) = plt.subplots(1, 2, figsize = (12, 9))  # Initialize plots/subplots
     cam_a_hist.set_title('Camera A')
     cam_a_hist.set_xlabel('Bin')
     cam_a_hist.set_ylabel('Frequency')
@@ -123,6 +116,10 @@ try:
     cam_b_hist.set_ylim(0, 1)
     legend_lines_b = cam_b_hist.legend(loc=1)
     cam_b_hist.grid(True)
+
+    vertline_x_of_y_max_a = cam_a_hist.axvline(0, color='b', linestyle='solid', linewidth=2)
+    vertline_x_of_y_max_b = cam_b_hist.axvline(0, color='b', linestyle='solid', linewidth=2)
+
     # ax.annotate(maximum)
     plt.ion()  # Turn the interactive mode on.
     # plt.text()
@@ -151,7 +148,6 @@ try:
         grabResult_a = cam_a.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
         grabResult_b = cam_b.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
         if grabResult_a.GrabSucceeded() and grabResult_b.GrabSucceeded():
-            count += 1
 
             # Access the image data
             image_a = converter.Convert(grabResult_a)
@@ -168,11 +164,38 @@ try:
             histogram_a = cv2.calcHist([gray_img_a], [0], None, [bins], [0, 255]) / numPixels_a
             histogram_b = cv2.calcHist([gray_img_b], [0], None, [bins], [0, 255]) / numPixels_b
 
-            lineGray_a.set_ydata(histogram_a)
-            lineGray_b.set_ydata(histogram_b)
+
+
+            lineGray_a.set_ydata(histogram_a)  # Camera A intensity
+            lineGray_b.set_ydata(histogram_b)  # Camera B intensity
 
             maximum_a = np.nanmax(histogram_a)
             maximum_b = np.nanmax(histogram_b)
+
+            indices_a = list(range(0, bins))
+            indices_b = list(range(0, bins))
+
+            # Convert histogram to simple list
+            hist_a = [val[0] for val in histogram_a]
+            hist_b = [val[0] for val in histogram_b]
+
+            # Descending sort-by-key with histogram value as key
+            s_a = [(x, y) for y, x in sorted(zip(hist_a, indices_a), reverse=True)]
+            s_b = [(x, y) for y, x in sorted(zip(hist_b, indices_b), reverse=True)]
+
+            # Index of highest peak in histogram
+            index_of_highest_peak_a = s_a[0][0]
+            index_of_highest_peak_b = s_b[0][0]
+            #print("index_of_highest_peak_a %s" % index_of_highest_peak_a)
+            #print("index_of_highest_peak_b %s" % index_of_highest_peak_b)
+
+
+            #print(as_lst_hist_a)
+            #print(maximum_a)
+            #print(np.amax(histogram_a))
+            #print(np.where(histogram_a == np.amax(histogram_a)))
+            #x_of_max_a = as_lst_hist_a[index_of_maximum_a]
+            #x_of_max_b = as_lst_hist_b[index_of_maximum_b]
 
             average_a = np.average(histogram_a)
             average_b = np.average(histogram_b)
@@ -190,19 +213,30 @@ try:
             lineStdev_b.set_ydata(stdev_b)
 
 
-            cam_a_hist.legend(labels = (
-                "intensity",
-                "maximum %.2f" % maximum_a,
-                "average %.2f" % average_a,
-                "stdev %.2f" % stdev_a,
-            ))
+            vertline_x_of_y_max_a.set_xdata(index_of_highest_peak_a)
+            vertline_x_of_y_max_b.set_xdata(index_of_highest_peak_b)
 
-            cam_b_hist.legend(labels = (
-                "intensity",
-                "maximum %.2f" % maximum_b,
-                "average %.2f" % average_b,
-                "stdev %.2f" % stdev_b,
-            ))
+            # Labels must be in the following order: intensity, max, avg, stdev (same order their y values are set)
+            # Additionally, if location is not specified, legend will jump around
+            cam_a_hist.legend(
+                labels = (
+                    "intensity",
+                    "maximum %.2f" % maximum_a,
+                    "average %.2f" % average_a,
+                    "stdev %.2f" % stdev_a,),
+                loc = "upper right"
+            )
+
+            cam_b_hist.legend(
+                labels = (
+                    "intensity",
+                    "maximum %.2f" % maximum_b,
+                    "average %.2f" % average_b,
+                    "stdev %.2f" % stdev_b),
+                loc = "upper right"
+            )
+
+
 
 
             fig.canvas.draw()
@@ -224,7 +258,8 @@ try:
 
 except Exception as e:
     # Error handling
-    print("An exception occurred.")
+    print("An exception occurred:")
+    traceback.print_exc()
     exitCode = 1
 
 # Comment the following two lines to disable waiting on exit.
