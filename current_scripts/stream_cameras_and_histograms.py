@@ -151,6 +151,8 @@ try:
         grabResult_a = cam_a.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
         grabResult_b = cam_b.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
         if grabResult_a.GrabSucceeded() and grabResult_b.GrabSucceeded():
+            count += 1
+
             # Access the image data
             image_a = converter.Convert(grabResult_a)
             img_a = image_a.GetArray()
@@ -170,20 +172,38 @@ try:
             lineGray_b.set_ydata(histogram_b)
 
             maximum_a = np.nanmax(histogram_a)
-            lineMaximum_a.set_ydata(maximum_a)
+            maximum_b = np.nanmax(histogram_b)
+
             average_a = np.average(histogram_a)
+            average_b = np.average(histogram_b)
+
             stdev_a = np.nanstd(histogram_a)
+            stdev_b = np.nanstd(histogram_b)
+
+            lineMaximum_a.set_ydata(maximum_a)
             lineAverage_a.set_ydata(average_a)
             lineStdev_a.set_ydata(stdev_a)
 
-            maximum_b = np.nanmax(histogram_b)
+
             lineMaximum_b.set_ydata(maximum_b)
-            average_b = np.average(histogram_b)
-            stdev_b = np.nanstd(histogram_b)
             lineAverage_b.set_ydata(average_b)
             lineStdev_b.set_ydata(stdev_b)
 
-            # add statistical data to plot
+
+            cam_a_hist.legend(labels = (
+                "intensity",
+                "maximum %.2f" % maximum_a,
+                "average %.2f" % average_a,
+                "stdev %.2f" % stdev_a,
+            ))
+
+            cam_b_hist.legend(labels = (
+                "intensity",
+                "maximum %.2f" % maximum_b,
+                "average %.2f" % average_b,
+                "stdev %.2f" % stdev_b,
+            ))
+
 
             fig.canvas.draw()
 

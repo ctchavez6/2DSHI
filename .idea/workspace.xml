@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/camera_configuration_files/23097552_setup_Oct21.pfs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/camera_configuration_files/23170624_setup_Oct21.pfs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/reference/updating_legend.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/current_scripts/video_streams_with_histograms.py" beforeDir="false" afterPath="$PROJECT_DIR$/current_scripts/stream_cameras_and_histograms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pypylon" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/current_scripts/stream_cameras_and_histograms.py" beforeDir="false" afterPath="$PROJECT_DIR$/current_scripts/stream_cameras_and_histograms.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -55,29 +53,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.interactive_legend">
-    <configuration name="10_20_2019_Two_Streams_One_Histogram (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="2DSHI" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/previous_versions_and_reference/IS_Stream_Attempt" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/previous_versions_and_reference/IS_Stream_Attempt/10_20_2019_Two_Streams_One_Histogram.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Python.updating_legend">
     <configuration name="10_20_2019_Two_Streams_One_Histogram" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="2DSHI" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -94,28 +70,6 @@
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/current_scripts/10_20_2019_Two_Streams_One_Histogram.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="__init__" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="2DSHI" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pypylon" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pypylon/__init__.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
@@ -166,13 +120,57 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="textLabelHistogram" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="2DSHI" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/reference/RelevantFiles" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/reference/RelevantFiles/textLabelHistogram.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="updating_legend" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="2DSHI" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/reference" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/reference/updating_legend.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.updating_legend" />
+        <item itemvalue="Python.textLabelHistogram" />
         <item itemvalue="Python.interactive_legend" />
         <item itemvalue="Python.10_20_2019_Two_Streams_One_Histogram" />
         <item itemvalue="Python.10_20_2019_Two_Streams_One_Histogram" />
-        <item itemvalue="Python.__init__" />
-        <item itemvalue="Python.10_20_2019_Two_Streams_One_Histogram (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -209,7 +207,8 @@
       <workItem from="1571710239347" duration="118000" />
       <workItem from="1571710493276" duration="44000" />
       <workItem from="1571710579323" duration="56000" />
-      <workItem from="1571711264265" duration="3867000" />
+      <workItem from="1571711264265" duration="5086000" />
+      <workItem from="1571792825795" duration="2394000" />
     </task>
     <task id="LOCAL-00001" summary="this is a test commit">
       <created>1571506272404</created>
@@ -267,7 +266,14 @@
       <option name="project" value="LOCAL" />
       <updated>1571706741108</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="double histogram">
+      <created>1571715180206</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1571715180206</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -295,7 +301,8 @@
     <MESSAGE value="this is a test commit 2" />
     <MESSAGE value="able to simultaneously stream two basler cameras" />
     <MESSAGE value="file management" />
-    <option name="LAST_COMMIT_MESSAGE" value="file management" />
+    <MESSAGE value="double histogram" />
+    <option name="LAST_COMMIT_MESSAGE" value="double histogram" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/2DSHI$10_20_2019_Two_Streams_One_Histogram__1_.coverage" NAME="10_20_2019_Two_Streams_One_Histogram (1) Coverage Results" MODIFIED="1571705497549" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/previous_versions_and_reference/IS_Stream_Attempt" />
@@ -309,10 +316,12 @@
     <SUITE FILE_PATH="coverage/2DSHI$grabmultiplecameras.coverage" NAME="grabmultiplecameras Coverage Results" MODIFIED="1571594597344" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
     <SUITE FILE_PATH="coverage/2DSHI$displayPhoto.coverage" NAME="displayPhoto Coverage Results" MODIFIED="1571505715036" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/2DSHI$simplified_realTimeVideoHistogram.coverage" NAME="simplified_realTimeVideoHistogram Coverage Results" MODIFIED="1571591111756" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$updating_legend.coverage" NAME="updating_legend Coverage Results" MODIFIED="1571793667974" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/reference" />
     <SUITE FILE_PATH="coverage/2DSHI$10_20_2019_Dual_Stream_a1.coverage" NAME="10_20_2019_Dual_Stream_a1 Coverage Results" MODIFIED="1571593699104" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$opencv.coverage" NAME="opencv Coverage Results" MODIFIED="1571513256014" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
     <SUITE FILE_PATH="coverage/2DSHI$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1571705669835" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon" />
     <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_Single_Stream_a1.coverage" NAME="10_19_2019_Single_Stream_a1 Coverage Results" MODIFIED="1571607762259" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$textLabelHistogram.coverage" NAME="textLabelHistogram Coverage Results" MODIFIED="1571793638211" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/reference/RelevantFiles" />
     <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_a2.coverage" NAME="10_19_2019_a2 Coverage Results" MODIFIED="1571513108879" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$try_grab_mult_cameras.coverage" NAME="try_grab_mult_cameras Coverage Results" MODIFIED="1571602816966" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$realTimeVideoHistogram.coverage" NAME="realTimeVideoHistogram Coverage Results" MODIFIED="1571520289143" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="G:/" />
