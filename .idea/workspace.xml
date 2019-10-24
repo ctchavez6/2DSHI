@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/current_scripts/stream_cameras_and_histograms_10_23_2019.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/current_scripts/stream_cameras_and_histograms.py" beforeDir="false" afterPath="$PROJECT_DIR$/current_scripts/stream_cameras_and_histograms.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -207,7 +207,8 @@
       <workItem from="1571710493276" duration="44000" />
       <workItem from="1571710579323" duration="56000" />
       <workItem from="1571711264265" duration="5086000" />
-      <workItem from="1571792825795" duration="8755000" />
+      <workItem from="1571792825795" duration="8771000" />
+      <workItem from="1571880023511" duration="5093000" />
     </task>
     <task id="LOCAL-00001" summary="this is a test commit">
       <created>1571506272404</created>
@@ -279,7 +280,14 @@
       <option name="project" value="LOCAL" />
       <updated>1571796220969</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="updating max,stdev, avg values on histograms">
+      <created>1571803537525</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1571803537525</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
