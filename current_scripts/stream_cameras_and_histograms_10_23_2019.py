@@ -21,8 +21,8 @@ def foo(param1):
 
 parent_directory = os.path.dirname(os.getcwd())  # String representing parent directory of current working directory
 camera_configurations_folder = parent_directory + "\camera_configuration_files"
-camera_a_configuration = camera_configurations_folder + "\/23170624_setup_Oct15.pfs"
-camera_b_configuration = camera_configurations_folder + "\/23170624_setup_Oct15.pfs"
+camera_a_configuration = camera_configurations_folder + "\/23097552_setup_Oct23_padded_12.pfs"
+camera_b_configuration = camera_configurations_folder + "\/23097552_setup_Oct23_padded_12.pfs"
 
 
 parser = argparse.ArgumentParser()
@@ -30,7 +30,7 @@ parser.add_argument('-f', '--file',
     help='Path to video file (if not using camera)')
 parser.add_argument('-c', '--color', type=str, default='gray',
     help='Color space: "gray" (default) or "rgb"')
-parser.add_argument('-b', '--bins', type=int, default=16,
+parser.add_argument('-b', '--bins', type=int, default=4096,
     help='Number of bins per channel (default 16)')
 parser.add_argument('-w', '--width', type=int, default=0,
     help='Resize video to specified width in pixels (maintains aspect)')
@@ -129,15 +129,20 @@ try:
     converter = pylon.ImageFormatConverter()
 
     # Converting to opencv bgr format
-    converter.OutputPixelFormat = pylon.PixelType_BGR8packed
+    #converter.OutputPixelFormat = pylon.PixelType_BGR12packed
+    #converter.OutputPixelFormat = pylon.PixelType_Mono12packed
+    #converter.OutputPixelFormat = pylon.PixelType_BGR8packed
+    converter.OutputPixelFormat = pylon.PixelType_RGB16packed
     converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
 
     while cameras.IsGrabbing():
         # Configure video capture
         capture_a = cv2.VideoCapture(0)
+        capture_a.set(cv2.CAP_PROP_FORMAT, cv2.CV_16U)
         capture_a.open(0)
 
         capture_b = cv2.VideoCapture(1)
+        capture_a.set(cv2.CAP_PROP_FORMAT, cv2.CV_16U)
         capture_b.open(1)
 
         grabResult_a = cam_a.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
@@ -159,9 +164,8 @@ try:
         print(grabResult_b.GetPixelType())
         print("type(grabResult_b.GetPixelType())")
         print(type(grabResult_b.GetPixelType()))
-        #print("grabResult_a.GetSizeX()")
-        #print(grabResult_a.GetSizeX())
-        print()
+
+
 
 
 
@@ -170,10 +174,20 @@ try:
 
             # Access the image data
             image_a = converter.Convert(grabResult_a)
-            img_a = image_a.GetArray()
+            image_buffer_a = image_a.GetBuffer()
+            shape_a = (image_a.GetHeight(), image_a.GetWidth(), 3)
+            img_a = np.ndarray(buffer=image_buffer_a,shape=shape_a ,dtype = np.uint16)
+
+            #img_a = image_a.GetArray()
 
             image_b = converter.Convert(grabResult_b)
-            img_b = image_b.GetArray()
+            image_buffer_b = image_b.GetBuffer()
+            shape_b = (image_b.GetHeight(), image_b.GetWidth(), 3)
+            img_b = np.ndarray(buffer=image_buffer_b,shape=shape_b ,dtype = np.uint16)
+            print("type(image_a)")
+            print(type(image_a))
+            print("img_a.dtype")
+            print(img_a.dtype)
 
             numPixels_a, numPixels_b = np.prod(img_a.shape[:2]), np.prod(img_b.shape[:2])
 
@@ -194,8 +208,8 @@ try:
 
             """According to opencv's documentation 'OpenCV function is faster than (around 40X) than np.histogram().'
             Source: https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html"""
-            histogram_a = cv2.calcHist([gray_img_a], [0], None, [16], [0, 255]) / numPixels_a
-            histogram_b = cv2.calcHist([gray_img_b], [0], None, [16], [0, 255]) / numPixels_b
+            histogram_a = cv2.calcHist([gray_img_a], [0], None, [bins], [0, 4095]) / numPixels_a
+            histogram_b = cv2.calcHist([gray_img_b], [0], None, [bins], [0, 4095]) / numPixels_b
             """
             cv2.calcHist(images, channels, mask, histSize, ranges, hist=None, accumulate=None)
             images:
@@ -223,7 +237,8 @@ try:
 
             maximum_a = np.nanmax(histogram_a)
             maximum_b = np.nanmax(histogram_b)
-
+            print("maximum_a %s" % maximum_a)
+            print("maximum_b %s" % maximum_b)
             indices_a = list(range(0, bins))
             indices_b = list(range(0, bins))
 
@@ -277,6 +292,12 @@ try:
                     "stdev %.2f" % stdev_b),
                 loc = "upper right"
             )
+
+            cam_a_hist.set_ylim(top=maximum_a)
+            cam_a_hist.set_xlim(right=5000)
+            cam_b_hist.set_xlim(right=5000)
+
+            cam_b_hist.set_ylim(top=maximum_b)
 
             fig.canvas.draw()
 
