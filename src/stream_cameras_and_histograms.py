@@ -121,7 +121,7 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
         histograms[camera_identifier].set_ylim(0, 1)
         histograms[camera_identifier].grid(True)
         histograms[camera_identifier].axvline(0, color='b', linestyle='solid', linewidth=2)
-
+        histograms[camera_identifier].set_autoscale_on(False)
 
     plt.ion()  # Turn the interactive mode on.
     plt.show()
@@ -161,6 +161,11 @@ def stream_cam_to_histograms(cams_dict, figure, histograms_dict, lines, bins=409
     converter.OutputPixelFormat = pylon.PixelType_RGB16packed
     converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
 
+    histograms_dict["a"].set_autoscale_on(False)
+    histograms_dict["b"].set_autoscale_on(False)
+    histograms_dict["a"].set_ylim(bottom=0, top=1)
+    histograms_dict["b"].set_ylim(bottom=0, top=1)
+
     while cameras.IsGrabbing():
         # Configure video capture
         capture_a = cv2.VideoCapture(0)
@@ -199,6 +204,7 @@ def stream_cam_to_histograms(cams_dict, figure, histograms_dict, lines, bins=409
             # According to opencv's documentation 'OpenCV function is faster than (around 40X) than np.histogram().'
             # Source: https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
             histogram_a = cv2.calcHist([gray_img_a], [0], None, [bins], [0, 4095]) / numPixels_a
+            #("histogram_a \n %s" % str(histogram_a))
             histogram_b = cv2.calcHist([gray_img_b], [0], None, [bins], [0, 4095]) / numPixels_b
 
             lineGray_a = lines["intensities"]["a"]
@@ -220,8 +226,9 @@ def stream_cam_to_histograms(cams_dict, figure, histograms_dict, lines, bins=409
             lineGray_b.set_ydata(histogram_b)  # Camera B intensity
 
 
-            maximum_a = np.nanmax(histogram_a)
-            maximum_b = np.nanmax(histogram_b)
+            maximum_a = np.amax(histogram_a)
+            maximum_b = np.amax(histogram_b)
+
 
             indices_a = list(range(0, bins))
             indices_b = list(range(0, bins))
@@ -260,26 +267,41 @@ def stream_cam_to_histograms(cams_dict, figure, histograms_dict, lines, bins=409
             histograms_dict["a"].legend(
                 labels=(
                     "intensity",
-                    "maximum %.2f" % maximum_a,
-                    "average %.2f" % average_a,
-                    "stdev %.2f" % stdev_a,),
+                    "maximum %.4f" % maximum_a,
+                    "average %.4f" % average_a,
+                    "stdev %.4f" % stdev_a,),
                 loc="upper right"
             )
 
             histograms_dict["b"].legend(
                 labels=(
                     "intensity",
-                    "maximum %.2f" % maximum_b,
-                    "average %.2f" % average_b,
-                    "stdev %.2f" % stdev_b),
+                    "maximum %.4f" % maximum_b,
+                    "average %.4f" % average_b,
+                    "stdev %.4f" % stdev_b),
                 loc="upper right"
             )
 
-            histograms_dict["a"].set_ylim(top=maximum_a)
-            histograms_dict["b"].set_xlim(right=5000)
+            histograms_dict["a"].set_xlim(left=0, right=4096)
+            histograms_dict["b"].set_xlim(left=0, right=4096)
 
-            histograms_dict["a"].set_xlim(right=5000)
-            histograms_dict["b"].set_ylim(top=maximum_b)
+
+            if maximum_a > 0.001:
+                histograms_dict["a"].set_ylim(bottom=0.000000, top= maximum_a*1.2)
+            else:
+                histograms_dict["a"].set_ylim(bottom=0.000000, top= 0.001)
+
+
+            if maximum_b >  0.001:
+                histograms_dict["b"].set_ylim(bottom=0.000000, top=maximum_b*1.2)
+            else:
+                histograms_dict["b"].set_ylim(bottom=0.000000, top= 0.001)
+
+            # recompute the ax.dataLim
+            #histograms_dict["a"].relim()
+            # update ax.viewLim using the new dataLim
+            #histograms_dict["a"].autoscale_view()
+
 
             figure.canvas.draw()
 

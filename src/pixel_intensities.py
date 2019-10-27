@@ -1,33 +1,41 @@
-import cv2
-import os.path
-#image = cv2.imread('images/fw.png', cv2.IMREAD_COLOR)
-print(os.getcwd())
-
-parent_directory = os.path.dirname(os.getcwd())  # String representing parent directory of current working directory
-print(parent_directory)
-print(os.path.exists(parent_directory))
-image_path = 'fw.jpg'
-print(os.path.exists(image_path))
-image = cv2.imread(image_path)
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+import  cv2
+import timeit
+from mpldatacursor import datacursor
 
 
+size = 25
+data = np.random.random((size, size))
+#data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+#gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-shape = gray.shape
-print(shape)
+shape = data.shape
 height = shape[0]
 width = shape[1]
 
-f = open("widthHeight.txt", "a")
-f.write("height =")
-f.write('{:03d}\n'.format(height))
-f.write("width =")
-f.write('{:03d}\n'.format(width))
-f.close
+fig, ax = plt.subplots(figsize=(12, 12))
 
-#for row in range(width):
-    #print("Row",row)
-    #for column in range(height):
-        #print("column ", column )
-        #print("Row: %s Column: %s\nIntesity: %s\n" % (row, column, gray[column][row]))
+
+ax.imshow(data)
+plt.ion()  # Turn the interactive mode on.
+plt.show()
+
+text = None
+for i in range(10):
+    for txt in ax.texts:
+        txt.set_visible(False)
+
+    data = np.random.random((size, size))
+    ax.imshow(data)
+    plt.title("Random Pixel Values: %s" % str(i+1))
+
+    for i in range(height):
+        for j in range(width):
+            text = ax.text(j, i, "{:.1f}".format(data[i, j]),
+                           ha="center", va="center", color="w")
+    fig.canvas.draw()
+    plt.pause(0.2)
+
+
