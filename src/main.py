@@ -141,5 +141,5 @@ if __name__ == "__main__":
         config_files=config_files_by_cam,
         num_cameras=args["num_cameras"])
 
-    fig, histograms, lines = streams.initialize_histograms(args['bins'])
-    streams.stream_cam_to_histograms(cams_dict=cameras, figure=fig, histograms_dict=histograms, lines=lines, bins=4096)
+    figs, histograms, lines = streams.initialize_histograms(args['bins'])
+    streams.stream_cam_to_histograms(cams_dict=cameras, figures=figs, histograms_dict=histograms, lines=lines, bins=4096)

@@ -2,13 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/scratch.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/scratch2.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/scratch3.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/other.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/2DSHI.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/2DSHI.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pixel_intensities.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/pixel_intensities.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/stream_cameras_and_histograms.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_cameras_and_histograms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/widthHeight.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/widthHeight.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/video_example.mov" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -46,6 +45,7 @@
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="full.screen.before.presentation.mode" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/.." />
@@ -74,6 +74,28 @@
     </option>
   </component>
   <component name="RunManager" selected="Python.scratch3">
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <module name="2DSHI" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="output_pixel" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="2DSHI" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -236,6 +258,9 @@
       <workItem from="1572052406397" duration="59000" />
       <workItem from="1572052531279" duration="6007000" />
       <workItem from="1572114730145" duration="16735000" />
+      <workItem from="1572134427398" duration="282000" />
+      <workItem from="1572201775819" duration="15582000" />
+      <workItem from="1572806701730" duration="16369000" />
     </task>
     <task id="LOCAL-00001" summary="this is a test commit">
       <created>1571506272404</created>
@@ -335,7 +360,14 @@
       <option name="project" value="LOCAL" />
       <updated>1572058102176</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="use main">
+      <created>1572134439433</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1572134439433</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

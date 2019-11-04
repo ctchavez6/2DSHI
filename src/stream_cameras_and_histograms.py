@@ -1,4 +1,7 @@
+"""
 
+
+"""
 """How to grab and process images from multiple cameras using the CInstantCameraArray class. The CInstantCameraArray
 class represents an array of instant camera objects. It provides almost the same interface as the instant camera for
 grabbing. The main purpose of the CInstantCameraArray is to simplify waiting for images and camera events of multiple
@@ -10,13 +13,18 @@ CInstantCameraArray. The grabbed images can then be processed by one or more  im
 # # import genicam
 from pypylon import genicam, pylon  # Import relevant pypylon packages/modules
 import matplotlib.pyplot as plt  # For plotting live histogram
-# import os
+import os
 # import sys
 import cv2
 import numpy as np  # Pixel math, among other array operations
 import traceback # exception handling
 # from numpy.linalg import inv
-#
+
+def grab_frame(cap):
+    ret, frame = cap.read()
+    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+    return frame
+
 def find_devices():
     """
     If devices are connected to computer and number of cameras are connected , and number of devices connected is equal
@@ -83,7 +91,7 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
     Returns:
         histograms: A dictionary of histograms with ascending lowercase alphabetical letters (that match cameras) as keys
     """
-    histograms = dict()
+    stream_subplots = dict()
     lines = {
         "intensities": dict(),
         "maxima": dict(),
@@ -91,44 +99,85 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
         "stdevs": dict(),
         "max_vert": dict(),
     }
+    #fig, (stream_subplots["a"], stream_subplots["b"]) = plt.subplots(1, 2, figsize=(12, 9))  # Initialize plots/subplots
+    fig_a = plt.figure(figsize=(5, 5))
+    stream_subplots["a"] = fig_a.add_subplot()
+    fig_b = plt.figure(figsize=(5, 5))
+    stream_subplots["b"] = fig_b.add_subplot()
 
-    fig, (histograms["a"], histograms["b"]) = plt.subplots(1, 2, figsize=(12, 9))  # Initialize plots/subplots
+    """
+    stream_subplots["cam_a"] = axs[0, 0]
+    stream_subplots["cam_a"].set_title('Camera A')
+    stream_subplots["cam_a"].tick_params(
+        axis='x',  # changes apply to the x-axis
+        which='both',  # both major and minor ticks are affected
+        bottom=False,  # ticks along the bottom edge are off
+        top=False,  # ticks along the top edge are off
+        labelbottom=False)  # labels along the bottom edge are off
+    stream_subplots["cam_a"].tick_params(
+        axis='y',  # changes apply to the x-axis
+        which='both',  # both major and minor ticks are affected
+        bottom=False,  # ticks along the bottom edge are off
+        top=False,  # ticks along the top edge are off
+        labelbottom=False)  # labels along the bottom edge are off
+
+
+
+
+    stream_subplots["cam_b"] = axs[1, 0]
+    stream_subplots["cam_b"].set_title('Camera B')
+    stream_subplots["cam_b"].tick_params(
+        axis='x',  # changes apply to the x-axis
+        which='both',  # both major and minor ticks are affected
+        bottom=False,  # ticks along the bottom edge are off
+        top=False,  # ticks along the top edge are off
+        labelbottom=False)  # labels along the bottom edge are off
+    stream_subplots["cam_b"].tick_params(
+        axis='y',  # changes apply to the x-axis
+        which='both',  # both major and minor ticks are affected
+        bottom=False,  # ticks along the bottom edge are off
+        top=False,  # ticks along the top edge are off
+        labelbottom=False)  # labels along the bottom edge are off
+    
+    """
+
+
     if num_cameras != 2:
         raise Exception("Unfortunately, this version currently only supports exactly two histograms.")
 
     for i in range(num_cameras):
         camera_identifier = chr(97 + i)
-        histograms[camera_identifier].set_title('Camera ' + camera_identifier.capitalize())
-        histograms[camera_identifier].set_xlabel('Bin')
-        histograms[camera_identifier].set_ylabel('Frequency')
+        stream_subplots[camera_identifier].set_title('Camera ' + camera_identifier.capitalize())
+        stream_subplots[camera_identifier].set_xlabel('Bin')
+        stream_subplots[camera_identifier].set_ylabel('Frequency')
 
-        lines["intensities"][camera_identifier], = histograms[camera_identifier]\
+        lines["intensities"][camera_identifier], = stream_subplots[camera_identifier]\
             .plot(np.arange(bins), np.zeros((bins, 1)), c='k', lw=line_width, label='intensity')
 
-        lines["maxima"][camera_identifier], = histograms[camera_identifier]\
+        lines["maxima"][camera_identifier], = stream_subplots[camera_identifier]\
             .plot(np.arange(bins), np.zeros((bins, 1)), c='g', lw=1, label='maximum')
 
-        lines["averages"][camera_identifier], = histograms[camera_identifier]\
+        lines["averages"][camera_identifier], = stream_subplots[camera_identifier]\
             .plot(np.arange(bins), np.zeros((bins, 1)), c='b', linestyle='dashed', lw=1, label='average')
 
-        lines["stdevs"][camera_identifier], = histograms[camera_identifier] \
+        lines["stdevs"][camera_identifier], = stream_subplots[camera_identifier] \
             .plot(np.arange(bins), np.zeros((bins, 1)), c='r', linestyle='dotted', lw=2, label='stdev')
 
-        lines["max_vert"][camera_identifier] = histograms[camera_identifier]\
+        lines["max_vert"][camera_identifier] = stream_subplots[camera_identifier]\
             .axvline(0, color='b', linestyle='solid', linewidth=2)
 
-        histograms[camera_identifier].set_xlim(0, bins - 1)
-        histograms[camera_identifier].set_ylim(0, 1)
-        histograms[camera_identifier].grid(True)
-        histograms[camera_identifier].axvline(0, color='b', linestyle='solid', linewidth=2)
-        histograms[camera_identifier].set_autoscale_on(False)
+        stream_subplots[camera_identifier].set_xlim(0, bins - 1)
+        stream_subplots[camera_identifier].set_ylim(0, 1)
+        stream_subplots[camera_identifier].grid(True)
+        stream_subplots[camera_identifier].axvline(0, color='b', linestyle='solid', linewidth=2)
+        stream_subplots[camera_identifier].set_autoscale_on(False)
 
     plt.ion()  # Turn the interactive mode on.
-    plt.show()
+    figs = dict()
+    figs["a"], figs["b"] = fig_a, fig_b
+    return figs, stream_subplots, lines
 
-    return fig, histograms, lines
-
-def stream_cam_to_histograms(cams_dict, figure, histograms_dict, lines, bins=4096):
+def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=4096):
     """
     Description.
 
@@ -153,11 +202,6 @@ def stream_cam_to_histograms(cams_dict, figure, histograms_dict, lines, bins=409
 
     cameras.StartGrabbing()
     converter = pylon.ImageFormatConverter()
-
-    # Converting to opencv bgr format
-    # converter.OutputPixelFormat = pylon.PixelType_BGR12packed
-    # converter.OutputPixelFormat = pylon.PixelType_Mono12packed
-    # converter.OutputPixelFormat = pylon.PixelType_BGR8packed
     converter.OutputPixelFormat = pylon.PixelType_RGB16packed
     converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
 
@@ -166,6 +210,52 @@ def stream_cam_to_histograms(cams_dict, figure, histograms_dict, lines, bins=409
     histograms_dict["a"].set_ylim(bottom=0, top=1)
     histograms_dict["b"].set_ylim(bottom=0, top=1)
 
+
+
+    initial_current_working_directory = os.getcwd()
+    camera_b_frames_directory = initial_current_working_directory + "/cam_b_frames"
+
+    if os.path.exists(camera_b_frames_directory):
+        filelist = [f for f in os.listdir(camera_b_frames_directory) if f.endswith(".tiff")]
+        for f in filelist:
+            os.remove(os.path.join(camera_b_frames_directory, f))
+    else:
+        try:
+            os.mkdir(camera_b_frames_directory)
+        except OSError:
+            print("Creation of the directory %s failed" % camera_b_frames_directory)
+
+    if os.path.exists('camera_a.avi'):
+        os.remove('camera_a.avi')
+    if os.path.exists('camera_b.avi'):
+        os.remove('camera_b.avi')
+    if os.path.exists('four_by_four.avi'):
+        os.remove('four_by_four.avi')
+
+
+
+
+    #fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    #fourcc = cv2.VideoWriter_fourcc(*'DIVX')
+    fourcc_iyuv = cv2.VideoWriter_fourcc('i', 'Y', 'U', 'V')
+    fourcc_hists = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
+    fourcc_ffv1 = cv2.VideoWriter_fourcc('F', 'F', 'V', '1')
+
+    #camera_a_stream_video = cv2.VideoWriter('camera_a.avi', fourcc_ffv1, 1,
+    #                           (1200, 1200), True)
+    #camera_b_stream_video = cv2.VideoWriter('camera_b.avi', fourcc_ffv1, 1,
+    #                                        (1200, 1200), True)
+
+    cams_hist_writer = cv2.VideoWriter('four_by_four.avi', fourcc_hists, 5,
+                               (1000, 1000), True)
+
+
+    frame_count = 0
+    cameras_histogram_4x4_frames = []
+    camera_a_frames = []
+    camera_b_frames = []
+
+
     while cameras.IsGrabbing():
         # Configure video capture
         capture_a = cv2.VideoCapture(0)
@@ -173,38 +263,52 @@ def stream_cam_to_histograms(cams_dict, figure, histograms_dict, lines, bins=409
         capture_a.open(0)
 
         capture_b = cv2.VideoCapture(1)
-        capture_a.set(cv2.CAP_PROP_FORMAT, cv2.CV_16U)
+        capture_a.set(cv2.CAP_PROP_FORMAT, cv2.CV_16UC1)
+
         capture_b.open(1)
 
         grabResult_a = cam_a.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
         grabResult_b = cam_b.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
 
-
-
         if grabResult_a.GrabSucceeded() and grabResult_b.GrabSucceeded():
+            frame_count += 1
+            print("Frame %s " % frame_count)
+
             # Access the image data
             image_a = converter.Convert(grabResult_a)
             image_buffer_a = image_a.GetBuffer()
             shape_a = (image_a.GetHeight(), image_a.GetWidth(), 3)
             img_a = np.ndarray(buffer=image_buffer_a, shape=shape_a, dtype=np.uint16)
 
-            # img_a = image_a.GetArray()
+            frame = cv2.cvtColor(img_a, cv2.COLOR_RGB2GRAY)
+            #cv2.imshow("frame", frame)
+
+            camera_a_frames.append(img_a)
+            img_a_8bit_500px = (cv2.resize(img_a, (500, 500), interpolation=cv2.INTER_AREA)/ 256).astype('uint8')
 
             image_b = converter.Convert(grabResult_b)
             image_buffer_b = image_b.GetBuffer()
             shape_b = (image_b.GetHeight(), image_b.GetWidth(), 3)
             img_b = np.ndarray(buffer=image_buffer_b, shape=shape_b, dtype=np.uint16)
 
+
+
+
+
+            img_b_8bit_500px = (cv2.resize(img_b, (500, 500), interpolation=cv2.INTER_AREA)/ 256).astype('uint8')
+            os.chdir(camera_b_frames_directory)
+            cv2.imwrite("cam_b_frame_%s.tiff" % frame_count, img_b)
+            os.chdir(initial_current_working_directory)
+            camera_b_frames.append(img_b)
+
             numPixels_a, numPixels_b = np.prod(img_a.shape[:2]), np.prod(img_b.shape[:2])
 
 
             gray_img_a, gray_img_b = cv2.cvtColor(img_a, cv2.COLOR_BGR2GRAY), cv2.cvtColor(img_b, cv2.COLOR_BGR2GRAY)
 
-
             # According to opencv's documentation 'OpenCV function is faster than (around 40X) than np.histogram().'
             # Source: https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
             histogram_a = cv2.calcHist([gray_img_a], [0], None, [bins], [0, 4095]) / numPixels_a
-            #("histogram_a \n %s" % str(histogram_a))
             histogram_b = cv2.calcHist([gray_img_b], [0], None, [bins], [0, 4095]) / numPixels_b
 
             lineGray_a = lines["intensities"]["a"]
@@ -225,10 +329,8 @@ def stream_cam_to_histograms(cams_dict, figure, histograms_dict, lines, bins=409
             lineGray_a.set_ydata(histogram_a)  # Camera A intensity
             lineGray_b.set_ydata(histogram_b)  # Camera B intensity
 
-
             maximum_a = np.amax(histogram_a)
             maximum_b = np.amax(histogram_b)
-
 
             indices_a = list(range(0, bins))
             indices_b = list(range(0, bins))
@@ -285,7 +387,6 @@ def stream_cam_to_histograms(cams_dict, figure, histograms_dict, lines, bins=409
             histograms_dict["a"].set_xlim(left=0, right=4096)
             histograms_dict["b"].set_xlim(left=0, right=4096)
 
-
             if maximum_a > 0.001:
                 histograms_dict["a"].set_ylim(bottom=0.000000, top= maximum_a*1.2)
             else:
@@ -297,29 +398,57 @@ def stream_cam_to_histograms(cams_dict, figure, histograms_dict, lines, bins=409
             else:
                 histograms_dict["b"].set_ylim(bottom=0.000000, top= 0.001)
 
-            # recompute the ax.dataLim
-            #histograms_dict["a"].relim()
-            # update ax.viewLim using the new dataLim
-            #histograms_dict["a"].autoscale_view()
+            figures["a"].canvas.draw()
+            figures["b"].canvas.draw()
 
+            hist_img_a = np.fromstring(figures["a"].canvas.tostring_rgb(), dtype=np.uint8, sep='') # convert canvas to image
+            hist_img_a = hist_img_a.reshape(figures["a"].canvas.get_width_height()[::-1] + (3,))
+            hist_img_a = cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR) # img is rgb, convert to opencv's default bgr
 
-            figure.canvas.draw()
+            hist_img_b = np.fromstring(figures["b"].canvas.tostring_rgb(), dtype=np.uint8, sep='') # convert canvas to image
+            hist_img_b = hist_img_b.reshape(figures["b"].canvas.get_width_height()[::-1] + (3,))
+            hist_img_b = cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR) # img is rgb, convert to opencv's default bgr
 
-            cv2.namedWindow('Camera A', cv2.WINDOW_NORMAL)
-            cv2.imshow('Camera A', img_a)
-
-            cv2.namedWindow('Camera B', cv2.WINDOW_NORMAL)
-            cv2.imshow('Camera B', img_b)
-
-            k = cv2.waitKey(1)
+            cameras_histograms_4x4 = np.vstack(
+                (np.hstack((hist_img_a, img_a_8bit_500px)),
+                 np.hstack((hist_img_b, img_b_8bit_500px))))
+            cv2.imshow("Camera & Histogram Streams", cameras_histograms_4x4)
+            cameras_histogram_4x4_frames.append(cameras_histograms_4x4)
             if cv2.waitKey(1) & 0xFF == ord('q'):  # Hit q button twice to close break nicely.
                 # if 0xFF == ord('q'):  # Hit q button twice to close break nicely.
                 cam_a.StopGrabbing()
                 cam_b.StopGrabbing()
                 break
-
+            if frame_count == 15:
+                "Hit Frame 25, Breaking"
+                break
         grabResult_a.Release()
         grabResult_b.Release()
+    #for frame in camera_a_frames:
+    #    camera_a_stream_video.write(frame)
+    #for frame in camera_b_frames:
+    #    camera_b_stream_video.write(frame)
+    #for frame in cameras_histogram_4x4_frames:
+    #    cams_hist_writer.write(frame)
+
+
+    cams_hist_writer.release()
+    #camera_a_stream_video.release()
+    #camera_b_stream_video.release()
+
+    video_name = 'video_b.avi'
+
+    images = [img for img in os.listdir(camera_b_frames_directory) if img.endswith(".tiff")]
+    frame = cv2.imread(os.path.join(camera_b_frames_directory, images[0]))
+    height, width, layers = frame.shape
+
+    video = cv2.VideoWriter(video_name, 0, 1, (width, height))
+
+    for image in images:
+        video.write(cv2.imread(os.path.join(camera_b_frames_directory, image)))
+
+    cv2.destroyAllWindows()
+    video.release()
 
     return
 
