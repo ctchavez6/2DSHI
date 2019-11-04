@@ -424,6 +424,7 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
                 break
         grabResult_a.Release()
         grabResult_b.Release()
+
     #for frame in camera_a_frames:
     #    camera_a_stream_video.write(frame)
     #for frame in camera_b_frames:
