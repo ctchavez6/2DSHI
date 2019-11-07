@@ -11,6 +11,7 @@ import stream_cameras_and_histograms as streams
 parser = argparse.ArgumentParser()
 
 
+
 def validate_video_file(video_file_path_string):
     """
     Validates that the input video file exists and is in one of the accepted formats.
