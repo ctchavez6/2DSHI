@@ -243,6 +243,7 @@ def clear_videos(list_of_videos, video_directory):
     Deletes any video files created during previous runs.
 
 
+
     """
     initial_directory = os.getcwd()
     if os.path.exists(video_directory):

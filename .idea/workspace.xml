@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/file_and_directory_handling.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/stream_cameras_and_histograms_is_edit.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/2DSHI.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/2DSHI.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/stream_cameras_and_histograms_is_edit.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_cameras_and_histograms_is_edit.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -266,7 +263,7 @@
       <workItem from="1572134427398" duration="282000" />
       <workItem from="1572201775819" duration="15582000" />
       <workItem from="1572806701730" duration="16498000" />
-      <workItem from="1572919027931" duration="16453000" />
+      <workItem from="1572919027931" duration="16668000" />
     </task>
     <task id="LOCAL-00001" summary="this is a test commit">
       <created>1571506272404</created>
@@ -387,7 +384,14 @@
       <option name="project" value="LOCAL" />
       <updated>1572827342897</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="adding my file">
+      <created>1573091715813</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1573091715813</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -422,7 +426,8 @@
     <MESSAGE value="use main" />
     <MESSAGE value="saving video successfully" />
     <MESSAGE value="saving video successfully b" />
-    <option name="LAST_COMMIT_MESSAGE" value="saving video successfully b" />
+    <MESSAGE value="adding my file" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding my file" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/2DSHI$callback.coverage" NAME="callback Coverage Results" MODIFIED="1571510342858" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
