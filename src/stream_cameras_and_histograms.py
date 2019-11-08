@@ -17,13 +17,12 @@ import os
 # import sys
 import cv2
 import numpy as np  # Pixel math, among other array operations
-import traceback # exception handling
-# from numpy.linalg import inv
+import traceback  # exception handling
+import xlwt
 
-def grab_frame(cap):
-    ret, frame = cap.read()
-    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-    return frame
+
+
+
 
 def find_devices():
     """
@@ -99,47 +98,10 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
         "stdevs": dict(),
         "max_vert": dict(),
     }
-    #fig, (stream_subplots["a"], stream_subplots["b"]) = plt.subplots(1, 2, figsize=(12, 9))  # Initialize plots/subplots
     fig_a = plt.figure(figsize=(5, 5))
     stream_subplots["a"] = fig_a.add_subplot()
     fig_b = plt.figure(figsize=(5, 5))
     stream_subplots["b"] = fig_b.add_subplot()
-
-    """
-    stream_subplots["cam_a"] = axs[0, 0]
-    stream_subplots["cam_a"].set_title('Camera A')
-    stream_subplots["cam_a"].tick_params(
-        axis='x',  # changes apply to the x-axis
-        which='both',  # both major and minor ticks are affected
-        bottom=False,  # ticks along the bottom edge are off
-        top=False,  # ticks along the top edge are off
-        labelbottom=False)  # labels along the bottom edge are off
-    stream_subplots["cam_a"].tick_params(
-        axis='y',  # changes apply to the x-axis
-        which='both',  # both major and minor ticks are affected
-        bottom=False,  # ticks along the bottom edge are off
-        top=False,  # ticks along the top edge are off
-        labelbottom=False)  # labels along the bottom edge are off
-
-
-
-
-    stream_subplots["cam_b"] = axs[1, 0]
-    stream_subplots["cam_b"].set_title('Camera B')
-    stream_subplots["cam_b"].tick_params(
-        axis='x',  # changes apply to the x-axis
-        which='both',  # both major and minor ticks are affected
-        bottom=False,  # ticks along the bottom edge are off
-        top=False,  # ticks along the top edge are off
-        labelbottom=False)  # labels along the bottom edge are off
-    stream_subplots["cam_b"].tick_params(
-        axis='y',  # changes apply to the x-axis
-        which='both',  # both major and minor ticks are affected
-        bottom=False,  # ticks along the bottom edge are off
-        top=False,  # ticks along the top edge are off
-        labelbottom=False)  # labels along the bottom edge are off
-    
-    """
 
 
     if num_cameras != 2:
@@ -147,310 +109,309 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
 
     for i in range(num_cameras):
         camera_identifier = chr(97 + i)
-        stream_subplots[camera_identifier].set_title('Camera ' + camera_identifier.capitalize())
-        stream_subplots[camera_identifier].set_xlabel('Bin')
+        #stream_subplots[camera_identifier].set_title('Camera ' + camera_identifier.capitalize())
+        stream_subplots[camera_identifier].set_xlabel('Camera %s: Bin' % camera_identifier.upper())
         stream_subplots[camera_identifier].set_ylabel('Frequency')
 
-        lines["intensities"][camera_identifier], = stream_subplots[camera_identifier]\
+        lines["intensities"][camera_identifier], = stream_subplots[camera_identifier] \
             .plot(np.arange(bins), np.zeros((bins, 1)), c='k', lw=line_width, label='intensity')
 
-        lines["maxima"][camera_identifier], = stream_subplots[camera_identifier]\
+        lines["maxima"][camera_identifier], = stream_subplots[camera_identifier] \
             .plot(np.arange(bins), np.zeros((bins, 1)), c='g', lw=1, label='maximum')
 
-        lines["averages"][camera_identifier], = stream_subplots[camera_identifier]\
+        lines["averages"][camera_identifier], = stream_subplots[camera_identifier] \
             .plot(np.arange(bins), np.zeros((bins, 1)), c='b', linestyle='dashed', lw=1, label='average')
 
         lines["stdevs"][camera_identifier], = stream_subplots[camera_identifier] \
             .plot(np.arange(bins), np.zeros((bins, 1)), c='r', linestyle='dotted', lw=2, label='stdev')
 
-        lines["max_vert"][camera_identifier] = stream_subplots[camera_identifier]\
+        lines["max_vert"][camera_identifier] = stream_subplots[camera_identifier] \
             .axvline(0, color='b', linestyle='solid', linewidth=2)
 
         stream_subplots[camera_identifier].set_xlim(0, bins - 1)
-        stream_subplots[camera_identifier].set_ylim(0, 1)
         stream_subplots[camera_identifier].grid(True)
         stream_subplots[camera_identifier].axvline(0, color='b', linestyle='solid', linewidth=2)
         stream_subplots[camera_identifier].set_autoscale_on(False)
+        stream_subplots[camera_identifier].set_ylim(bottom=0, top=1)
 
     plt.ion()  # Turn the interactive mode on.
     figs = dict()
     figs["a"], figs["b"] = fig_a, fig_b
+
     return figs, stream_subplots, lines
 
-def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=4096):
+
+def update_histogram(histogram_dict, lines_dict, histogram_identifier, calculated_hist, bins, threshold=1.2):
+    maximum = np.amax(calculated_hist)
+    average = np.average(calculated_hist)
+    stdev = np.nanstd(calculated_hist)
+
+    update_histogram_lines(lines_dict, histogram_identifier, calculated_hist, bins)
+
+    histogram_dict[histogram_identifier].legend(
+        labels=(
+            "intensity",
+            "maximum %.4f" % maximum,
+            "average %.4f" % average,
+            "stdev %.4f" % stdev,),
+        loc="upper left",
+        mode="expand",
+        ncol=2,
+        bbox_to_anchor=(0, 0.95, 1, 0.2)
+    )
+
+    if maximum > 0.001:
+        histogram_dict[histogram_identifier].set_ylim(bottom=0.000000, top=maximum * threshold)
+    else:
+        histogram_dict[histogram_identifier].set_ylim(bottom=0.000000, top=0.001)
+
+
+def update_histogram_lines(lines_dict, identifier, calculated_hist, bins):
+    lines_dict["intensities"][identifier].set_ydata(calculated_hist)  # Intensities/Percent of Saturation
+    maximum = np.amax(calculated_hist)
+    average = np.average(calculated_hist)
+    stdev = np.nanstd(calculated_hist)
+
+    indices = list(range(0, bins))
+    hist = [val[0] for val in calculated_hist]
+    s = [(x, y) for y, x in sorted(zip(hist, indices), reverse=True)]
+    index_of_highest_peak = s[0][0]
+
+    lines_dict["maxima"][identifier].set_ydata(maximum)  # Maximums
+    lines_dict["averages"][identifier].set_ydata(average)  # Averages
+    lines_dict["stdevs"][identifier].set_ydata(stdev)  # Standard Deviations
+    lines_dict["max_vert"][identifier].set_xdata(index_of_highest_peak)  # Maximum Indicator as vertical line
+
+def initialize_dual_video_capture(first_channel=0, second_channel=1):
+    capture_a, capture_b = cv2.VideoCapture(first_channel), cv2.VideoCapture(second_channel)
+    capture_a.set(cv2.CAP_PROP_FORMAT, cv2.CV_16U)
+    capture_b.set(cv2.CAP_PROP_FORMAT, cv2.CV_16UC1)
+    capture_a.open(first_channel)
+    capture_b.open(second_channel)
+    return capture_a, capture_b
+
+
+def save_img(filename, directory, image, needs_buffer=True):
+    initial_working_directory = os.getcwd()
+    os.chdir(directory)
+    if needs_buffer:
+        img = np.ndarray(buffer=image.GetBuffer(),
+                           shape=(image.GetHeight(), image.GetWidth(), 3),
+                           dtype=np.uint16)
+        cv2.imwrite(filename, img)
+        return img
+    else:
+        cv2.imwrite(filename, image)
+    os.chdir(initial_working_directory)
+    return image
+
+def create_camera_histogram_4x4(figure_a, figure_b, cam_img_a, cam_img_b):
+    hist_img_a = np.fromstring(figure_a.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+    hist_img_b = np.fromstring(figure_b.canvas.tostring_rgb(), dtype=np.uint8, sep='')  # convert  to image
+
+    hist_img_a = hist_img_a.reshape(figure_a.canvas.get_width_height()[::-1] + (3,))
+    hist_img_b = hist_img_b.reshape(figure_b.canvas.get_width_height()[::-1] + (3,))
+
+    hist_img_a = cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR)  # img is rgb, convert to opencv's default bgr
+    hist_img_b = cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR)  # img is rgb, convert to opencv's default bgr
+
+    img_a_8bit_500px = (cv2.resize(cam_img_a, (500, 500), interpolation=cv2.INTER_AREA) / 256).astype('uint8')
+    img_b_8bit_500px = (cv2.resize(cam_img_b, (500, 500), interpolation=cv2.INTER_AREA) / 256).astype('uint8')
+
+    return np.vstack(
+        (np.hstack((hist_img_a, img_a_8bit_500px)),
+         np.hstack((hist_img_b, img_b_8bit_500px))))
+
+def set_plot_upper_bound(minimum_upper_bound, upper_bound_factor, maximum, plot):
+    if maximum > minimum_upper_bound:
+        plot.set_ylim(bottom=0.000000, top=maximum * upper_bound_factor)
+    else:
+        plot.set_ylim(bottom=0.000000, top=minimum_upper_bound)
+
+
+def reset_images_directory(saved_imgs_directory, extension=".tiff"):
     """
-    Description.
+    Deletes any image files created during previous runs, and creates a directory for
+
+
+    """
+    if os.path.exists(saved_imgs_directory):
+        filelist = [f for f in os.listdir(saved_imgs_directory) if f.endswith(extension)]
+        for f in filelist:
+            os.remove(os.path.join(saved_imgs_directory, f))
+    else:
+        try:
+            os.mkdir(saved_imgs_directory)
+        except OSError:
+            print("Creation of the directory %s failed" % saved_imgs_directory)
+
+def clear_videos(list_of_videos, video_directory):
+    """
+    Deletes any video files created during previous runs.
+
+
+
+    """
+
+    initial_directory = os.getcwd()
+    if os.path.exists(video_directory):
+        os.chdir(video_directory)
+        for video in list_of_videos:
+            if os.path.exists(video):
+
+                os.remove(video)
+    else:
+        try:
+            os.mkdir(video_directory)
+        except OSError:
+            print("Creation of the directory %s failed" % video_directory)
+    os.chdir(initial_directory)
+
+
+def create_and_save_videos(cam_a_frames_direc, cam_b_frames_direc, videos_directory, cams_by_hists_direc):
+    """
+    By iterating through all the saved frames, constructs a video for each camera.
 
     Args:
-        example_parameter_a: Description
-
-        example_parameter_b: Description
-    Returns:
-        abc: An integer
-    Raises:
-        Exception: Any error/exception other than 'no such file or directory'.
+        cam_a_frames_direc: Directory that holds all the saved images for Camera A
+        cam_b_frames_direc: Directory that holds all the saved images for Camera B
+        videos_directory: Directory where all the video files will be saved
     """
+    initial_directory = os.getcwd()
 
-    """Starts grabbing for all cameras starting with index 0. The grabbing is started for one camera after the other.
-        That's why the images of all cameras are not taken at the same time. However, a hardware trigger setup can be used
-        to cause all cameras to grab images synchronously. According to their default configuration, the cameras are set up 
-        for free-running continuous acquisition."""
+    cam_a_saved_img_files = [file for file in os.listdir(cam_a_frames_direc)]
+    cam_b_saved_img_files = [file for file in os.listdir(cam_b_frames_direc)]
+    cam_by_his_img_files =  [file for file in os.listdir(cam_b_frames_direc)]
+    height_a, width_a, layers_a = cv2.imread(os.path.join(cam_a_frames_direc, cam_a_saved_img_files[0])).shape
+    height_b, width_b, layers_b = cv2.imread(os.path.join(cam_b_frames_direc, cam_b_saved_img_files[0])).shape
 
-    cameras = cams_dict["all"]
-    cam_a = cams_dict["a"]
-    cam_b = cams_dict["b"]
+    video_a = cv2.VideoWriter(videos_directory+'/video_a.avi', 0, 1, (height_a, width_a))
+    video_b = cv2.VideoWriter(videos_directory+'/video_b.avi', 0, 1, (height_b, width_b))
+    cams_hist_writer = cv2.VideoWriter(videos_directory+'/four_by_four.avi',  # File Name
+                                       cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'),  # Codec
+                                       1,  # Frames Per Second
+                                       (1000, 1000),  # Dimensions
+                                       True)  # Start
+    os.chdir(videos_directory)
 
-    cameras.StartGrabbing()
+    for frame_a, frame_b, hist_frame in zip(cam_a_saved_img_files, cam_b_saved_img_files, cam_by_his_img_files):
+        video_a.write(cv2.imread(os.path.join(cam_a_frames_direc, frame_a)))
+        video_b.write(cv2.imread(os.path.join(cam_b_frames_direc, frame_b)))
+        cams_hist_writer.write(cv2.imread(os.path.join(cams_by_hists_direc, hist_frame)))
+
+    cv2.destroyAllWindows()
+    video_a.release()
+    video_b.release()
+    cams_hist_writer.release()
+    os.chdir(initial_directory)
+
+def get_pylon_image_converter():
+    """
+    Creates and returns an instance of a pylon.ImageFormatConverter() after updating the Output Pixel Format as well
+    as the Output Bit Alignment.
+
+    Returns:
+        converter: pylon.ImageFormatConverter() object with RGB16packed Pixel Format and MsbAligned Output Bit Alignment
+    """
     converter = pylon.ImageFormatConverter()
     converter.OutputPixelFormat = pylon.PixelType_RGB16packed
     converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
+    return converter
 
-    histograms_dict["a"].set_autoscale_on(False)
-    histograms_dict["b"].set_autoscale_on(False)
-    histograms_dict["a"].set_ylim(bottom=0, top=1)
-    histograms_dict["b"].set_ylim(bottom=0, top=1)
-
-
-
+def clear_prev_run():
     initial_current_working_directory = os.getcwd()
+    possibly_pre_existing_videos = ['camera_a.avi', 'camera_b.avi', 'four_by_four.avi']
+    camera_a_frames_directory = initial_current_working_directory + "/cam_a_frames"
     camera_b_frames_directory = initial_current_working_directory + "/cam_b_frames"
+    cams_by_hists_directory = initial_current_working_directory + "/histogram_streams"
+    videos_directory = initial_current_working_directory + "/videos"
+    reset_images_directory(camera_a_frames_directory)
+    reset_images_directory(camera_b_frames_directory)
+    reset_images_directory(cams_by_hists_directory)
 
-    if os.path.exists(camera_b_frames_directory):
-        filelist = [f for f in os.listdir(camera_b_frames_directory) if f.endswith(".tiff")]
-        for f in filelist:
-            os.remove(os.path.join(camera_b_frames_directory, f))
-    else:
-        try:
-            os.mkdir(camera_b_frames_directory)
-        except OSError:
-            print("Creation of the directory %s failed" % camera_b_frames_directory)
-
-    if os.path.exists('camera_a.avi'):
-        os.remove('camera_a.avi')
-    if os.path.exists('camera_b.avi'):
-        os.remove('camera_b.avi')
-    if os.path.exists('four_by_four.avi'):
-        os.remove('four_by_four.avi')
+    clear_videos(possibly_pre_existing_videos, videos_directory)
+    return camera_a_frames_directory, camera_b_frames_directory, videos_directory, cams_by_hists_directory
 
 
+def output(filename, sheet, list1, list2, x, y, z):
+    book = xlwt.Workbook()
+    sh = book.add_sheet(sheet)
 
+    col_0_name = 'Stimulus Time'
+    col_1_name = 'Reaction Time'
 
-    #fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    #fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-    fourcc_iyuv = cv2.VideoWriter_fourcc('i', 'Y', 'U', 'V')
-    fourcc_hists = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-    fourcc_ffv1 = cv2.VideoWriter_fourcc('F', 'F', 'V', '1')
+    for i in range(len(list1)):
+        sh.write(i, 0, i)
+        sh.write(i, 1, list1[i])
 
-    #camera_a_stream_video = cv2.VideoWriter('camera_a.avi', fourcc_ffv1, 1,
-    #                           (1200, 1200), True)
-    #camera_b_stream_video = cv2.VideoWriter('camera_b.avi', fourcc_ffv1, 1,
-    #                                        (1200, 1200), True)
+    book.save(filename)
 
-    cams_hist_writer = cv2.VideoWriter('four_by_four.avi', fourcc_hists, 5,
-                               (1000, 1000), True)
+def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=4096, frame_break=10, fps=1):
+    """
+    Starts grabbing for all cameras starting with index 0. The grabbing is started for one camera after the other.
+    That's why the images of all cameras are not taken at the same time. However, a hardware trigger setup can be used
+    to cause all cameras to grab images synchronously. According to their default configuration, the cameras are set up
+    for free-running continuous acquisition. Also saves all the images and videos.
 
-
+    Args:
+        cams_dict: Description
+        figures: Description
+        histograms_dict: Description
+        lines: Description
+        bins: Description
+        frame_break: Limit of frames to record. Default 100.
+        fps: Frames per second saved video will play at. Default 1.
+    """
+    initial_working_directory = os.getcwd()
     frame_count = 0
-    cameras_histogram_4x4_frames = []
-    camera_a_frames = []
-    camera_b_frames = []
+    cams_dict["all"].StartGrabbing()
+    converter = get_pylon_image_converter()
 
+    camera_a_frames_directory, camera_b_frames_directory, videos_directory, cams_by_hists_direc = clear_prev_run()
+    cameras_histogram_4x4_frames, camera_a_frames, camera_b_frames = [], [], []
 
-    while cameras.IsGrabbing():
-        # Configure video capture
-        capture_a = cv2.VideoCapture(0)
-        capture_a.set(cv2.CAP_PROP_FORMAT, cv2.CV_16U)
-        capture_a.open(0)
+    while cams_dict["all"].IsGrabbing() and frame_count != frame_break and not (cv2.waitKey(1) & 0xFF == ord('q')):
+        initialize_dual_video_capture()
 
-        capture_b = cv2.VideoCapture(1)
-        capture_a.set(cv2.CAP_PROP_FORMAT, cv2.CV_16UC1)
+        grab_result_a = cams_dict["a"].RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
+        grab_result_b = cams_dict["b"].RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
 
-        capture_b.open(1)
-
-        grabResult_a = cam_a.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
-        grabResult_b = cam_b.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
-
-        if grabResult_a.GrabSucceeded() and grabResult_b.GrabSucceeded():
+        if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
             frame_count += 1
             print("Frame %s " % frame_count)
 
-            # Access the image data
-            image_a = converter.Convert(grabResult_a)
-            image_buffer_a = image_a.GetBuffer()
-            shape_a = (image_a.GetHeight(), image_a.GetWidth(), 3)
-            img_a = np.ndarray(buffer=image_buffer_a, shape=shape_a, dtype=np.uint16)
+            image_a, image_b = converter.Convert(grab_result_a), converter.Convert(grab_result_b)
 
-            frame = cv2.cvtColor(img_a, cv2.COLOR_RGB2GRAY)
-            #cv2.imshow("frame", frame)
-
-            camera_a_frames.append(img_a)
-            img_a_8bit_500px = (cv2.resize(img_a, (500, 500), interpolation=cv2.INTER_AREA)/ 256).astype('uint8')
-
-            image_b = converter.Convert(grabResult_b)
-            image_buffer_b = image_b.GetBuffer()
-            shape_b = (image_b.GetHeight(), image_b.GetWidth(), 3)
-            img_b = np.ndarray(buffer=image_buffer_b, shape=shape_b, dtype=np.uint16)
-
-
-
-
-
-            img_b_8bit_500px = (cv2.resize(img_b, (500, 500), interpolation=cv2.INTER_AREA)/ 256).astype('uint8')
-            os.chdir(camera_b_frames_directory)
-            cv2.imwrite("cam_b_frame_%s.tiff" % frame_count, img_b)
-            os.chdir(initial_current_working_directory)
-            camera_b_frames.append(img_b)
-
-            numPixels_a, numPixels_b = np.prod(img_a.shape[:2]), np.prod(img_b.shape[:2])
-
+            img_a = save_img("cam_a_frame_%s.tiff" % frame_count, camera_a_frames_directory, image_a)
+            img_b = save_img("cam_b_frame_%s.tiff" % frame_count, camera_b_frames_directory, image_b)
 
             gray_img_a, gray_img_b = cv2.cvtColor(img_a, cv2.COLOR_BGR2GRAY), cv2.cvtColor(img_b, cv2.COLOR_BGR2GRAY)
+            histogram_a = cv2.calcHist([gray_img_a], [0], None, [bins], [0, 4095]) / np.prod(img_a.shape[:2])
+            histogram_b = cv2.calcHist([gray_img_b], [0], None, [bins], [0, 4095]) / np.prod(img_b.shape[:2])
 
-            # According to opencv's documentation 'OpenCV function is faster than (around 40X) than np.histogram().'
-            # Source: https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
-            histogram_a = cv2.calcHist([gray_img_a], [0], None, [bins], [0, 4095]) / numPixels_a
-            histogram_b = cv2.calcHist([gray_img_b], [0], None, [bins], [0, 4095]) / numPixels_b
-
-            lineGray_a = lines["intensities"]["a"]
-            lineGray_b = lines["intensities"]["b"]
-
-            lineMaximum_a = lines["maxima"]["a"]
-            lineMaximum_b = lines["maxima"]["b"]
-
-            lineAverage_a = lines["averages"]["a"]
-            lineAverage_b = lines["averages"]["b"]
-
-            lineStdev_a = lines["stdevs"]["a"]
-            lineStdev_b = lines["stdevs"]["b"]
-
-            vertline_x_of_y_max_a = lines["max_vert"]["a"]
-            vertline_x_of_y_max_b = lines["max_vert"]["b"]
-
-            lineGray_a.set_ydata(histogram_a)  # Camera A intensity
-            lineGray_b.set_ydata(histogram_b)  # Camera B intensity
-
-            maximum_a = np.amax(histogram_a)
-            maximum_b = np.amax(histogram_b)
-
-            indices_a = list(range(0, bins))
-            indices_b = list(range(0, bins))
-
-            # Convert histogram to simple list
-            hist_a = [val[0] for val in histogram_a]
-            hist_b = [val[0] for val in histogram_b]
-
-            # Descending sort-by-key with histogram value as key
-            s_a = [(x, y) for y, x in sorted(zip(hist_a, indices_a), reverse=True)]
-            s_b = [(x, y) for y, x in sorted(zip(hist_b, indices_b), reverse=True)]
-
-            # Index of highest peak in histogram
-            index_of_highest_peak_a = s_a[0][0]
-            index_of_highest_peak_b = s_b[0][0]
-
-            average_a = np.average(histogram_a)
-            average_b = np.average(histogram_b)
-
-            stdev_a = np.nanstd(histogram_a)
-            stdev_b = np.nanstd(histogram_b)
-
-            lineMaximum_a.set_ydata(maximum_a)
-            lineAverage_a.set_ydata(average_a)
-            lineStdev_a.set_ydata(stdev_a)
-
-            lineMaximum_b.set_ydata(maximum_b)
-            lineAverage_b.set_ydata(average_b)
-            lineStdev_b.set_ydata(stdev_b)
-
-            vertline_x_of_y_max_a.set_xdata(index_of_highest_peak_a)
-            vertline_x_of_y_max_b.set_xdata(index_of_highest_peak_b)
-
-            # Labels must be in the following order: intensity, max, avg, stdev (same order their y values are set)
-            # Additionally, if location is not specified, legend will jump around
-            histograms_dict["a"].legend(
-                labels=(
-                    "intensity",
-                    "maximum %.4f" % maximum_a,
-                    "average %.4f" % average_a,
-                    "stdev %.4f" % stdev_a,),
-                loc="upper right"
-            )
-
-            histograms_dict["b"].legend(
-                labels=(
-                    "intensity",
-                    "maximum %.4f" % maximum_b,
-                    "average %.4f" % average_b,
-                    "stdev %.4f" % stdev_b),
-                loc="upper right"
-            )
-
-            histograms_dict["a"].set_xlim(left=0, right=4096)
-            histograms_dict["b"].set_xlim(left=0, right=4096)
-
-            if maximum_a > 0.001:
-                histograms_dict["a"].set_ylim(bottom=0.000000, top= maximum_a*1.2)
-            else:
-                histograms_dict["a"].set_ylim(bottom=0.000000, top= 0.001)
-
-
-            if maximum_b >  0.001:
-                histograms_dict["b"].set_ylim(bottom=0.000000, top=maximum_b*1.2)
-            else:
-                histograms_dict["b"].set_ylim(bottom=0.000000, top= 0.001)
-
+            update_histogram(histograms_dict, lines, "a", histogram_a, bins)
+            update_histogram(histograms_dict, lines, "b", histogram_b, bins)
             figures["a"].canvas.draw()
             figures["b"].canvas.draw()
 
-            hist_img_a = np.fromstring(figures["a"].canvas.tostring_rgb(), dtype=np.uint8, sep='') # convert canvas to image
-            hist_img_a = hist_img_a.reshape(figures["a"].canvas.get_width_height()[::-1] + (3,))
-            hist_img_a = cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR) # img is rgb, convert to opencv's default bgr
-
-            hist_img_b = np.fromstring(figures["b"].canvas.tostring_rgb(), dtype=np.uint8, sep='') # convert canvas to image
-            hist_img_b = hist_img_b.reshape(figures["b"].canvas.get_width_height()[::-1] + (3,))
-            hist_img_b = cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR) # img is rgb, convert to opencv's default bgr
-
-            cameras_histograms_4x4 = np.vstack(
-                (np.hstack((hist_img_a, img_a_8bit_500px)),
-                 np.hstack((hist_img_b, img_b_8bit_500px))))
+            cameras_histograms_4x4 = create_camera_histogram_4x4(figures["a"], figures["b"], img_a, img_b)
+            save_img("histograms_frame_%s.tiff" % frame_count, cams_by_hists_direc, cameras_histograms_4x4, needs_buffer=False)
             cv2.imshow("Camera & Histogram Streams", cameras_histograms_4x4)
+
+            camera_a_frames.append(img_a)
+            camera_b_frames.append(img_b)
             cameras_histogram_4x4_frames.append(cameras_histograms_4x4)
-            if cv2.waitKey(1) & 0xFF == ord('q'):  # Hit q button twice to close break nicely.
-                # if 0xFF == ord('q'):  # Hit q button twice to close break nicely.
-                cam_a.StopGrabbing()
-                cam_b.StopGrabbing()
+
+            if frame_count == frame_break:
+                hist = [val[0] for val in histogram_a]
+                print(gray_img_b)
+                if os.path.exists(initial_working_directory + "/trial.xls"):
+                    os.remove(initial_working_directory + "/trial.xls")
+                output(initial_working_directory + "/trial.xls", "test", hist, hist, 1, 2, 3)
                 break
-            if frame_count == 15:
-                "Hit Frame 25, Breaking"
-                break
-        grabResult_a.Release()
-        grabResult_b.Release()
+    cams_dict["a"].StopGrabbing()
+    cams_dict["b"].StopGrabbing()
+    create_and_save_videos(camera_a_frames_directory, camera_b_frames_directory, videos_directory, cams_by_hists_direc)
 
-    #for frame in camera_a_frames:
-    #    camera_a_stream_video.write(frame)
-    #for frame in camera_b_frames:
-    #    camera_b_stream_video.write(frame)
-    #for frame in cameras_histogram_4x4_frames:
-    #    cams_hist_writer.write(frame)
-
-
-    cams_hist_writer.release()
-    #camera_a_stream_video.release()
-    #camera_b_stream_video.release()
-
-    video_name = 'video_b.avi'
-
-    images = [img for img in os.listdir(camera_b_frames_directory) if img.endswith(".tiff")]
-    frame = cv2.imread(os.path.join(camera_b_frames_directory, images[0]))
-    height, width, layers = frame.shape
-
-    video = cv2.VideoWriter(video_name, 0, 1, (width, height))
-
-    for image in images:
-        video.write(cv2.imread(os.path.join(camera_b_frames_directory, image)))
-
-    cv2.destroyAllWindows()
-    video.release()
-
-    return
 
 

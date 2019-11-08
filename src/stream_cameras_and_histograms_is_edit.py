@@ -161,7 +161,7 @@ def update_histogram(histogram_dict, lines_dict, histogram_identifier, calculate
     else:
         histogram_dict[histogram_identifier].set_ylim(bottom=0.000000, top=0.001)
 
-    histogram_dict[histogram_identifier].canvas.draw()
+    #histogram_dict[histogram_identifier].canvas.draw()
 
 
 def update_histogram_lines(lines_dict, identifier, calculated_hist, bins):
@@ -189,14 +189,18 @@ def initialize_dual_video_capture(first_channel=0, second_channel=1):
     return capture_a, capture_b
 
 
-def save_img(filename, directory, image):
+def save_img(filename, directory, image, needs_buffer=True):
     os.chdir(directory)
-    img = np.ndarray(buffer=image.GetBuffer(),
-                       shape=(image.GetHeight(), image.GetWidth(), 3),
-                       dtype=np.uint16)
-    cv2.imwrite(filename, img)
+    if needs_buffer:
+        img = np.ndarray(buffer=image.GetBuffer(),
+                           shape=(image.GetHeight(), image.GetWidth(), 3),
+                           dtype=np.uint16)
+        cv2.imwrite(filename, img)
+        return img
+    else:
+        cv2.imwrite(filename, image)
     os.chdir(directory)
-    return img
+    return image
 
 def create_camera_histogram_4x4(figure_a, figure_b, cam_img_a, cam_img_b):
     hist_img_a = np.fromstring(figure_a.canvas.tostring_rgb(), dtype=np.uint8, sep='')
@@ -260,7 +264,7 @@ def clear_videos(list_of_videos, video_directory):
     os.chdir(initial_directory)
 
 
-def create_and_save_videos(cam_a_frames_direc, cam_b_frames_direc, videos_directory):
+def create_and_save_videos(cam_a_frames_direc, cam_b_frames_direc, videos_directory, cams_by_hists_direc):
     """
     By iterating through all the saved frames, constructs a video for each camera.
 
@@ -271,23 +275,32 @@ def create_and_save_videos(cam_a_frames_direc, cam_b_frames_direc, videos_direct
     """
     initial_directory = os.getcwd()
 
-    cam_a_saved_img_files = [img for img in os.listdir(cam_a_frames_direc) if img.endswith(".tiff")]
-    cam_b_saved_img_files = [img for img in os.listdir(cam_b_frames_direc) if img.endswith(".tiff")]
-
+    cam_a_saved_img_files = [file for file in os.listdir(cam_a_frames_direc)]
+    cam_b_saved_img_files = [file for file in os.listdir(cam_b_frames_direc)]
+    cam_by_his_img_files =  [file for file in os.listdir(cam_b_frames_direc)]
     height_a, width_a, layers_a = cv2.imread(os.path.join(cam_a_frames_direc, cam_a_saved_img_files[0])).shape
     height_b, width_b, layers_b = cv2.imread(os.path.join(cam_b_frames_direc, cam_b_saved_img_files[0])).shape
 
-    video_a = cv2.VideoWriter('video_a.avi', 0, 1, (height_a, width_a))
-    video_b = cv2.VideoWriter('video_b.avi', 0, 1, (height_b, width_b))
-
+    video_a = cv2.VideoWriter(videos_directory+'/video_a.avi', 0, 1, (height_a, width_a))
+    video_b = cv2.VideoWriter(videos_directory+'/video_b.avi', 0, 1, (height_b, width_b))
+    cams_hist_writer = cv2.VideoWriter(videos_directory+'/four_by_four.avi',  # File Name
+                                       cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'),  # Codec
+                                       1,  # Frames Per Second
+                                       (1000, 1000),  # Dimensions
+                                       True)  # Start
+    print("videos_directory: %s" % str(videos_directory))
     os.chdir(videos_directory)
+    print("current directory: %s" % str(os.getcwd()))
 
-    for frame_a, frame_b in zip(cam_a_saved_img_files, cam_b_saved_img_files):
+    for frame_a, frame_b, hist_frame in zip(cam_a_saved_img_files, cam_b_saved_img_files, cam_by_his_img_files):
         video_a.write(cv2.imread(os.path.join(cam_a_frames_direc, frame_a)))
         video_b.write(cv2.imread(os.path.join(cam_b_frames_direc, frame_b)))
+        cams_hist_writer.write(cv2.imread(os.path.join(cams_by_hists_direc, hist_frame)))
 
     cv2.destroyAllWindows()
+    video_a.release()
     video_b.release()
+    cams_hist_writer.release()
     os.chdir(initial_directory)
 
 def get_pylon_image_converter():
@@ -303,18 +316,22 @@ def get_pylon_image_converter():
     converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
     return converter
 
-def clear_previous_run():
+def clear_prev_run():
     initial_current_working_directory = os.getcwd()
     possibly_pre_existing_videos = ['camera_a.avi', 'camera_b.avi', 'four_by_four.avi']
     camera_a_frames_directory = initial_current_working_directory + "/cam_a_frames"
     camera_b_frames_directory = initial_current_working_directory + "/cam_b_frames"
+    cams_by_hists_directory = initial_current_working_directory + "/histogram_streams"
     videos_directory = initial_current_working_directory + "/videos"
     reset_images_directory(camera_a_frames_directory)
     reset_images_directory(camera_b_frames_directory)
-    clear_videos(possibly_pre_existing_videos, videos_directory)
-    return camera_a_frames_directory, camera_b_frames_directory, videos_directory
+    reset_images_directory(cams_by_hists_directory)
 
-def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=4096, frame_break=100, fps=1):
+    clear_videos(possibly_pre_existing_videos, videos_directory)
+    return camera_a_frames_directory, camera_b_frames_directory, videos_directory, cams_by_hists_directory
+
+
+def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=4096, frame_break=25, fps=1):
     """
     Starts grabbing for all cameras starting with index 0. The grabbing is started for one camera after the other.
     That's why the images of all cameras are not taken at the same time. However, a hardware trigger setup can be used
@@ -334,14 +351,9 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
     cams_dict["all"].StartGrabbing()
     converter = get_pylon_image_converter()
 
-    camera_a_frames_directory, camera_b_frames_directory, videos_directory = clear_previous_run()
+    camera_a_frames_directory, camera_b_frames_directory, videos_directory, cams_by_hists_direc = clear_prev_run()
     cameras_histogram_4x4_frames, camera_a_frames, camera_b_frames = [], [], []
 
-    cams_hist_writer = cv2.VideoWriter('four_by_four.avi',  # File Name
-                                       cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'),  # Codec
-                                       fps,  # Frames Per Second
-                                       (1000, 1000),  # Dimensions
-                                       True)  # Start
 
     while cams_dict["all"].IsGrabbing() and frame_count != frame_break and not (cv2.waitKey(1) & 0xFF == ord('q')):
         initialize_dual_video_capture()
@@ -365,8 +377,11 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
 
             update_histogram(histograms_dict, lines, "a", histogram_a, bins)
             update_histogram(histograms_dict, lines, "b", histogram_b, bins)
+            figures["a"].canvas.draw()
+            figures["b"].canvas.draw()
 
-            cameras_histograms_4x4 = create_camera_histogram_4x4(figures["a"], figures["a"], img_a, img_b)
+            cameras_histograms_4x4 = create_camera_histogram_4x4(figures["a"], figures["b"], img_a, img_b)
+            save_img("histograms_frame_%s.tiff" % frame_count, cams_by_hists_direc, cameras_histograms_4x4, needs_buffer=False)
             cv2.imshow("Camera & Histogram Streams", cameras_histograms_4x4)
 
             camera_a_frames.append(img_a)
@@ -375,8 +390,7 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
 
     cams_dict["a"].StopGrabbing()
     cams_dict["b"].StopGrabbing()
-    create_and_save_videos(camera_a_frames_directory, camera_b_frames_directory, videos_directory)
-    cams_hist_writer.release()
+    create_and_save_videos(camera_a_frames_directory, camera_b_frames_directory, videos_directory, cams_by_hists_direc)
 
 
 

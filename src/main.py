@@ -5,8 +5,6 @@ import argparse
 import os
 import stream_cameras_and_histograms as streams
 
-#import src.stream_cameras_and_histograms as stream
-
 # Create an instance of an ArgumentParser Object
 parser = argparse.ArgumentParser()
 
