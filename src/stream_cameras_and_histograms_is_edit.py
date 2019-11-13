@@ -331,7 +331,7 @@ def clear_prev_run():
     return camera_a_frames_directory, camera_b_frames_directory, videos_directory, cams_by_hists_directory
 
 
-def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=4096, frame_break=25, fps=1):
+def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=4096, frame_break=10, fps=1):
     """
     Starts grabbing for all cameras starting with index 0. The grabbing is started for one camera after the other.
     That's why the images of all cameras are not taken at the same time. However, a hardware trigger setup can be used

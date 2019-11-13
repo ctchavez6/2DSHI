@@ -1,6 +1,4 @@
 """
-
-
 """
 """How to grab and process images from multiple cameras using the CInstantCameraArray class. The CInstantCameraArray
 class represents an array of instant camera objects. It provides almost the same interface as the instant camera for
@@ -18,7 +16,6 @@ import os
 import cv2
 import numpy as np  # Pixel math, among other array operations
 import traceback  # exception handling
-import xlwt
 
 
 
@@ -29,7 +26,6 @@ def find_devices():
     If devices are connected to computer and number of cameras are connected , and number of devices connected is equal
     to or below user specified limit, this function should return list of Basler device instances. Otherwise, raises a
     a general Exception or a RuntimeError.
-
     Raises:
         Exception: Any error/exception other than 'no such file or directory'.
     """
@@ -45,16 +41,12 @@ def find_devices():
 def get_cameras(devices, tlFactory, config_files, num_cameras=2):
     """
     Should be called AFTER and with the return value of find_devices() (as implied by the first parameter: devices)
-
     Args:
         devices: An instance of tlFactory.EnumerateDevices()
         num_cameras: An integer
         config_files: An integer
-
     Raises:
         Exception: Any error/exception other than 'no such file or directory'.
-
-
     Returns:
         cameras: A dictionary of cameras with ascending lowercase alphabetical letters as keys
     """
@@ -74,19 +66,24 @@ def get_cameras(devices, tlFactory, config_files, num_cameras=2):
 
     return cameras
 
-
+def set_xvalues(polygon, x0, x1):
+    if len(polygon.get_xy()) == 4:
+        _ndarray = polygon.get_xy()
+        _ndarray[:, 0] = [x0, x0, x1, x1]
+        polygon.set_xy(_ndarray)
+    if len(polygon.get_xy()) == 5:
+        _ndarray = polygon.get_xy()
+        _ndarray[:, 0] = [x0, x0, x1, x1, x0]
+        polygon.set_xy(_ndarray)
 def initialize_histograms(bins, num_cameras=2, line_width=3):
     """
     Initializes histogram matplotlib.pyplot figures/subplots
-
     Args:
         devices: An instance of tlFactory.EnumerateDevices()
         num_cameras: An integer
         config_files: An integer
-
     Raises:
         Exception: Any error/exception other than 'no such file or directory'.
-
     Returns:
         histograms: A dictionary of histograms with ascending lowercase alphabetical letters (that match cameras) as keys
     """
@@ -97,6 +94,12 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
         "averages": dict(),
         "stdevs": dict(),
         "max_vert": dict(),
+        "avg+sigma": dict(),
+        "avg-sigma": dict(),
+        "grayscale_avg": dict(),
+        "grayscale_avg+0.5sigma": dict(),
+        "grayscale_avg-0.5sigma": dict()
+
     }
     fig_a = plt.figure(figsize=(5, 5))
     stream_subplots["a"] = fig_a.add_subplot()
@@ -109,8 +112,8 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
 
     for i in range(num_cameras):
         camera_identifier = chr(97 + i)
-        #stream_subplots[camera_identifier].set_title('Camera ' + camera_identifier.capitalize())
-        stream_subplots[camera_identifier].set_xlabel('Camera %s: Bin' % camera_identifier.upper())
+        stream_subplots[camera_identifier].set_title('Camera ' + camera_identifier.capitalize())
+        stream_subplots[camera_identifier].set_xlabel('Bin')
         stream_subplots[camera_identifier].set_ylabel('Frequency')
 
         lines["intensities"][camera_identifier], = stream_subplots[camera_identifier] \
@@ -125,12 +128,28 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
         lines["stdevs"][camera_identifier], = stream_subplots[camera_identifier] \
             .plot(np.arange(bins), np.zeros((bins, 1)), c='r', linestyle='dotted', lw=2, label='stdev')
 
-        lines["max_vert"][camera_identifier] = stream_subplots[camera_identifier] \
-            .axvline(0, color='b', linestyle='solid', linewidth=2)
+        lines["grayscale_avg"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='b', linestyle='dashed', linewidth=1)
 
-        stream_subplots[camera_identifier].set_xlim(0, bins - 1)
+        lines["grayscale_avg+0.5sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='b', linestyle='dotted', linewidth=1)
+
+        lines["grayscale_avg-0.5sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='b', linestyle='dotted', linewidth=1)
+
+
+        lines["max_vert"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='b', linestyle='solid', linewidth=1)
+
+        lines["avg+sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvspan(-100, -100, alpha=0.5, color='y')
+
+        lines["avg-sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvspan(-100, -100, alpha=0.5, color='y')
+
+        stream_subplots[camera_identifier].set_xlim(-100, bins - 1 + 100)
         stream_subplots[camera_identifier].grid(True)
-        stream_subplots[camera_identifier].axvline(0, color='b', linestyle='solid', linewidth=2)
+        #stream_subplots[camera_identifier].axvline(0, color='b', linestyle='solid', linewidth=2)
         stream_subplots[camera_identifier].set_autoscale_on(False)
         stream_subplots[camera_identifier].set_ylim(bottom=0, top=1)
 
@@ -141,46 +160,56 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
     return figs, stream_subplots, lines
 
 
-def update_histogram(histogram_dict, lines_dict, histogram_identifier, calculated_hist, bins, threshold=1.2):
-    maximum = np.amax(calculated_hist)
+def update_histogram(histogram_dict, lines_dict, histogram_identifier, calculated_hist,bins,raw_2d_array,threshold=1.2):
+    histogram_maximum = np.amax(calculated_hist)
+    greyscale_max = np.amax(raw_2d_array.flatten())
+    greyscale_avg = np.mean(raw_2d_array)
     average = np.average(calculated_hist)
+    greyscale_stdev = np.std(raw_2d_array)
+
     stdev = np.nanstd(calculated_hist)
 
-    update_histogram_lines(lines_dict, histogram_identifier, calculated_hist, bins)
+    update_histogram_lines(lines_dict, histogram_identifier, calculated_hist, bins, raw_2d_array)
 
     histogram_dict[histogram_identifier].legend(
         labels=(
             "intensity",
-            "maximum %.4f" % maximum,
-            "average %.4f" % average,
-            "stdev %.4f" % stdev,),
-        loc="upper left",
-        mode="expand",
-        ncol=2,
-        bbox_to_anchor=(0, 0.95, 1, 0.2)
+            "maximum %.0f" % greyscale_max,
+            "average %.2f" % greyscale_avg,
+            "stdev %.4f" % greyscale_stdev,),
+        loc="upper right"
     )
 
-    if maximum > 0.001:
-        histogram_dict[histogram_identifier].set_ylim(bottom=0.000000, top=maximum * threshold)
+    if histogram_maximum > 0.001:
+        histogram_dict[histogram_identifier].set_ylim(bottom=0.000000, top=histogram_maximum * threshold)
     else:
         histogram_dict[histogram_identifier].set_ylim(bottom=0.000000, top=0.001)
 
+    #histogram_dict[histogram_identifier].canvas.draw()
 
-def update_histogram_lines(lines_dict, identifier, calculated_hist, bins):
+
+def update_histogram_lines(lines_dict, identifier, calculated_hist, bins, raw_2d_array):
     lines_dict["intensities"][identifier].set_ydata(calculated_hist)  # Intensities/Percent of Saturation
     maximum = np.amax(calculated_hist)
-    average = np.average(calculated_hist)
-    stdev = np.nanstd(calculated_hist)
+    grayscale_max = np.amax(raw_2d_array)
+    average = np.mean(raw_2d_array)
+    stdev = np.std(raw_2d_array)
 
     indices = list(range(0, bins))
     hist = [val[0] for val in calculated_hist]
     s = [(x, y) for y, x in sorted(zip(hist, indices), reverse=True)]
-    index_of_highest_peak = s[0][0]
 
     lines_dict["maxima"][identifier].set_ydata(maximum)  # Maximums
     lines_dict["averages"][identifier].set_ydata(average)  # Averages
     lines_dict["stdevs"][identifier].set_ydata(stdev)  # Standard Deviations
-    lines_dict["max_vert"][identifier].set_xdata(index_of_highest_peak)  # Maximum Indicator as vertical line
+    lines_dict["max_vert"][identifier].set_xdata(grayscale_max)  # Maximum Indicator as vertical line
+    lines_dict["grayscale_avg"][identifier].set_xdata(average)  # Maximum Indicator as vertical line
+    lines_dict["grayscale_avg+0.5sigma"][identifier].set_xdata(min([4095, average+(stdev*0.5)]))  # Maximum Indicator as vertical line
+    lines_dict["grayscale_avg-0.5sigma"][identifier].set_xdata(max([average-(stdev*0.5), 0]))  # Maximum Indicator as vertical line
+
+    set_xvalues(lines_dict["avg+sigma"][identifier], average, min([4095, average+(stdev*0.5)]))
+    set_xvalues(lines_dict["avg-sigma"][identifier], max([average-(stdev*0.5), 0]), average)
+
 
 def initialize_dual_video_capture(first_channel=0, second_channel=1):
     capture_a, capture_b = cv2.VideoCapture(first_channel), cv2.VideoCapture(second_channel)
@@ -192,7 +221,6 @@ def initialize_dual_video_capture(first_channel=0, second_channel=1):
 
 
 def save_img(filename, directory, image, needs_buffer=True):
-    initial_working_directory = os.getcwd()
     os.chdir(directory)
     if needs_buffer:
         img = np.ndarray(buffer=image.GetBuffer(),
@@ -202,7 +230,7 @@ def save_img(filename, directory, image, needs_buffer=True):
         return img
     else:
         cv2.imwrite(filename, image)
-    os.chdir(initial_working_directory)
+    os.chdir(directory)
     return image
 
 def create_camera_histogram_4x4(figure_a, figure_b, cam_img_a, cam_img_b):
@@ -232,8 +260,6 @@ def set_plot_upper_bound(minimum_upper_bound, upper_bound_factor, maximum, plot)
 def reset_images_directory(saved_imgs_directory, extension=".tiff"):
     """
     Deletes any image files created during previous runs, and creates a directory for
-
-
     """
     if os.path.exists(saved_imgs_directory):
         filelist = [f for f in os.listdir(saved_imgs_directory) if f.endswith(extension)]
@@ -248,11 +274,7 @@ def reset_images_directory(saved_imgs_directory, extension=".tiff"):
 def clear_videos(list_of_videos, video_directory):
     """
     Deletes any video files created during previous runs.
-
-
-
     """
-
     initial_directory = os.getcwd()
     if os.path.exists(video_directory):
         os.chdir(video_directory)
@@ -271,7 +293,6 @@ def clear_videos(list_of_videos, video_directory):
 def create_and_save_videos(cam_a_frames_direc, cam_b_frames_direc, videos_directory, cams_by_hists_direc):
     """
     By iterating through all the saved frames, constructs a video for each camera.
-
     Args:
         cam_a_frames_direc: Directory that holds all the saved images for Camera A
         cam_b_frames_direc: Directory that holds all the saved images for Camera B
@@ -292,7 +313,9 @@ def create_and_save_videos(cam_a_frames_direc, cam_b_frames_direc, videos_direct
                                        1,  # Frames Per Second
                                        (1000, 1000),  # Dimensions
                                        True)  # Start
+    print("videos_directory: %s" % str(videos_directory))
     os.chdir(videos_directory)
+    print("current directory: %s" % str(os.getcwd()))
 
     for frame_a, frame_b, hist_frame in zip(cam_a_saved_img_files, cam_b_saved_img_files, cam_by_his_img_files):
         video_a.write(cv2.imread(os.path.join(cam_a_frames_direc, frame_a)))
@@ -309,7 +332,6 @@ def get_pylon_image_converter():
     """
     Creates and returns an instance of a pylon.ImageFormatConverter() after updating the Output Pixel Format as well
     as the Output Bit Alignment.
-
     Returns:
         converter: pylon.ImageFormatConverter() object with RGB16packed Pixel Format and MsbAligned Output Bit Alignment
     """
@@ -333,36 +355,21 @@ def clear_prev_run():
     return camera_a_frames_directory, camera_b_frames_directory, videos_directory, cams_by_hists_directory
 
 
-def output(filename, sheet, list1, list2, x, y, z):
-    book = xlwt.Workbook()
-    sh = book.add_sheet(sheet)
-
-    col_0_name = 'Stimulus Time'
-    col_1_name = 'Reaction Time'
-
-    for i in range(len(list1)):
-        sh.write(i, 0, i)
-        sh.write(i, 1, list1[i])
-
-    book.save(filename)
-
-def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=4096, frame_break=10, fps=1):
+def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=4096, frame_break=25, fps=1):
     """
     Starts grabbing for all cameras starting with index 0. The grabbing is started for one camera after the other.
     That's why the images of all cameras are not taken at the same time. However, a hardware trigger setup can be used
     to cause all cameras to grab images synchronously. According to their default configuration, the cameras are set up
     for free-running continuous acquisition. Also saves all the images and videos.
-
     Args:
         cams_dict: Description
         figures: Description
         histograms_dict: Description
         lines: Description
         bins: Description
-        frame_break: Limit of frames to record. Default 100.
+        frame_break: Limit of frames to record. Default 10.
         fps: Frames per second saved video will play at. Default 1.
     """
-    initial_working_directory = os.getcwd()
     frame_count = 0
     cams_dict["all"].StartGrabbing()
     converter = get_pylon_image_converter()
@@ -378,19 +385,46 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
 
         if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
             frame_count += 1
-            print("Frame %s " % frame_count)
+            """
+            print("------------------------------------------------------------------------------------------------")
+            print("\nFrame %s \n" % frame_count)
+            print("------------------------------------------------------------------------------------------------")
+            print("Grab Result A")
+            print("Type: %s" % str(type(grab_result_a_as_1d_list)))
+            print("Shape: %s" % str(grab_result_a.GetArray().shape))
+            print("Minimum: %s" % str(min(grab_result_a_as_1d_list)))
+            print("Maximum: %s" % str(max(grab_result_a_as_1d_list)))
+            print("Average: %s" % str(np.mean(grab_result_a.GetArray())))
+            print("Standard Deviation: %s" % str())
+            print("Set of All Values:\n%s" % set(grab_result_a_as_1d_list))
+
+            print("\n")
+            print("Grab Result B")
+            print("Type: %s" % str(type(grab_result_b_as_1d_list)))
+            print("Shape: %s" % str(grab_result_b.GetArray().shape))
+            print("Minimum: %s" % str(min(grab_result_b_as_1d_list)))
+            print("Maximum: %s" % str(max(grab_result_b_as_1d_list)))
+            print("Average: %s" % str(np.mean(grab_result_b.GetArray())))
+            print("Standard Deviation: %s" % str())
+            print("Set of All Values:\n%s" % set(grab_result_b_as_1d_list))
+            """
 
             image_a, image_b = converter.Convert(grab_result_a), converter.Convert(grab_result_b)
-
+            cv2.imshow('Cam A Noise', np.array(grab_result_a.GetArray(), dtype=np.uint8))
+            cv2.imshow('Cam B Noise', np.array(grab_result_b.GetArray(), dtype=np.uint8))
+            cv2.imwrite('Cam A Noise.tiff', np.array(grab_result_a.GetArray(), dtype=np.uint8))
+            cv2.imwrite('Cam B Noise.tiff', np.array(grab_result_b.GetArray(), dtype=np.uint8))
+            break
             img_a = save_img("cam_a_frame_%s.tiff" % frame_count, camera_a_frames_directory, image_a)
             img_b = save_img("cam_b_frame_%s.tiff" % frame_count, camera_b_frames_directory, image_b)
 
             gray_img_a, gray_img_b = cv2.cvtColor(img_a, cv2.COLOR_BGR2GRAY), cv2.cvtColor(img_b, cv2.COLOR_BGR2GRAY)
+
             histogram_a = cv2.calcHist([gray_img_a], [0], None, [bins], [0, 4095]) / np.prod(img_a.shape[:2])
             histogram_b = cv2.calcHist([gray_img_b], [0], None, [bins], [0, 4095]) / np.prod(img_b.shape[:2])
 
-            update_histogram(histograms_dict, lines, "a", histogram_a, bins)
-            update_histogram(histograms_dict, lines, "b", histogram_b, bins)
+            update_histogram(histograms_dict, lines, "a", histogram_a, bins, grab_result_a.GetArray())
+            update_histogram(histograms_dict, lines, "b", histogram_b, bins, grab_result_b.GetArray())
             figures["a"].canvas.draw()
             figures["b"].canvas.draw()
 
@@ -402,16 +436,7 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
             camera_b_frames.append(img_b)
             cameras_histogram_4x4_frames.append(cameras_histograms_4x4)
 
-            if frame_count == frame_break:
-                hist = [val[0] for val in histogram_a]
-                print(gray_img_b)
-                if os.path.exists(initial_working_directory + "/trial.xls"):
-                    os.remove(initial_working_directory + "/trial.xls")
-                output(initial_working_directory + "/trial.xls", "test", hist, hist, 1, 2, 3)
-                break
     cams_dict["a"].StopGrabbing()
     cams_dict["b"].StopGrabbing()
     create_and_save_videos(camera_a_frames_directory, camera_b_frames_directory, videos_directory, cams_by_hists_direc)
-
-
 

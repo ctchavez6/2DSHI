@@ -125,8 +125,8 @@ if __name__ == "__main__":
     # Now that all the user inputs have be validated, we can begin running the script(s)
     parent_directory = os.path.dirname(os.getcwd())  # String representing parent directory of current working directory
     camera_configurations_folder = os.getcwd() + "\camera_configuration_files"
-    camera_a_configuration = camera_configurations_folder + "\/23097552_setup_Oct23_padded_12.pfs"
-    camera_b_configuration = camera_configurations_folder + "\/23097552_setup_Oct23_padded_12.pfs"
+    camera_a_configuration = camera_configurations_folder + "/23097552_setup_Oct23_padded_12.pfs"
+    camera_b_configuration = camera_configurations_folder + "/23097552_setup_Oct23_padded_12.pfs"
 
     config_files_by_cam = dict()
     config_files_by_cam["a"] = camera_a_configuration
