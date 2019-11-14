@@ -189,7 +189,7 @@ def initialize_dual_video_capture(first_channel=0, second_channel=1):
     return capture_a, capture_b
 
 
-def save_img(filename, directory, image, needs_buffer=True):
+def save_img(filename, directory, image, needs_buffer=True, twelve_as_16=False):
     os.chdir(directory)
     if needs_buffer:
         img = np.ndarray(buffer=image.GetBuffer(),
@@ -197,6 +197,8 @@ def save_img(filename, directory, image, needs_buffer=True):
                            dtype=np.uint16)
         cv2.imwrite(filename, img)
         return img
+    if twelve_as_16:
+        cv2.imwrite(filename, image*4)
     else:
         cv2.imwrite(filename, image)
     os.chdir(directory)
@@ -367,8 +369,8 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
 
             image_a, image_b = converter.Convert(grab_result_a), converter.Convert(grab_result_b)
 
-            img_a = save_img("cam_a_frame_%s.tiff" % frame_count, camera_a_frames_directory, image_a)
-            img_b = save_img("cam_b_frame_%s.tiff" % frame_count, camera_b_frames_directory, image_b)
+            img_a = save_img("cam_a_frame_%s.tiff" % frame_count, camera_a_frames_directory, image_a, needs_buffer=False, twelve_as_16=True)
+            img_b = save_img("cam_b_frame_%s.tiff" % frame_count, camera_b_frames_directory, image_b, needs_buffer=False, twelve_as_16=True)
 
             gray_img_a, gray_img_b = cv2.cvtColor(img_a, cv2.COLOR_BGR2GRAY), cv2.cvtColor(img_b, cv2.COLOR_BGR2GRAY)
 

@@ -16,10 +16,9 @@ import os
 import cv2
 import numpy as np  # Pixel math, among other array operations
 import traceback  # exception handling
-
-
-
-
+import png
+from PIL import Image
+from io import BytesIO
 
 def find_devices():
     """
@@ -132,20 +131,20 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
             .axvline(-100, color='b', linestyle='dashed', linewidth=1)
 
         lines["grayscale_avg+0.5sigma"][camera_identifier] = stream_subplots[camera_identifier] \
-            .axvline(-100, color='b', linestyle='dotted', linewidth=1)
+            .axvline(-100, color='r', linestyle='dotted', linewidth=1)
 
         lines["grayscale_avg-0.5sigma"][camera_identifier] = stream_subplots[camera_identifier] \
-            .axvline(-100, color='b', linestyle='dotted', linewidth=1)
+            .axvline(-100, color='r', linestyle='dotted', linewidth=1)
 
 
         lines["max_vert"][camera_identifier] = stream_subplots[camera_identifier] \
             .axvline(-100, color='b', linestyle='solid', linewidth=1)
 
         lines["avg+sigma"][camera_identifier] = stream_subplots[camera_identifier] \
-            .axvspan(-100, -100, alpha=0.5, color='y')
+            .axvspan(-100, -100, alpha=0.5, color='#f5beba')
 
         lines["avg-sigma"][camera_identifier] = stream_subplots[camera_identifier] \
-            .axvspan(-100, -100, alpha=0.5, color='y')
+            .axvspan(-100, -100, alpha=0.5, color='#f5beba')
 
         stream_subplots[camera_identifier].set_xlim(-100, bins - 1 + 100)
         stream_subplots[camera_identifier].grid(True)
@@ -220,20 +219,32 @@ def initialize_dual_video_capture(first_channel=0, second_channel=1):
     return capture_a, capture_b
 
 
-def save_img(filename, directory, image, needs_buffer=True):
+def save_img(filename, directory, image, needs_buffer=True, twelve_as_16=False):
     os.chdir(directory)
     if needs_buffer:
-        img = np.ndarray(buffer=image.GetBuffer(),
-                           shape=(image.GetHeight(), image.GetWidth(), 3),
-                           dtype=np.uint16)
+        img = np.ndarray(
+            buffer=image.GetBuffer(),
+            shape=(image.GetHeight(), image.GetWidth(), 3),
+            dtype=np.uint16)
         cv2.imwrite(filename, img)
         return img
+
+    if (not needs_buffer) and (twelve_as_16):
+        #print(max(np.array(image * 16, dtype=np.uint16).flatten()))
+        img_2 = np.array(image * 16, dtype=np.uint16).astype(np.uint16)
+        im = Image.fromarray(img_2)
+        im.save("PIL_uncompressed_"+filename,compress_level=0)
+        with open("____"+filename, 'wb') as f:
+            writer = png.Writer(width=img_2.shape[1], height=img_2.shape[0], bitdepth=16, greyscale=True)
+            zgray2list = img_2.tolist()
+            writer.write(f, zgray2list)
+        cv2.imwrite(filename, np.array(image * 16, dtype=np.uint16).astype(np.uint16))
     else:
-        cv2.imwrite(filename, image)
+        cv2.imwrite(filename, image.astype(np.uint16))
     os.chdir(directory)
     return image
 
-def create_camera_histogram_4x4(figure_a, figure_b, cam_img_a, cam_img_b):
+def create_camera_histogram_4x4(figure_a, figure_b, cam_img_a, cam_img_b, raw_array_a=None, raw_array_b=None):
     hist_img_a = np.fromstring(figure_a.canvas.tostring_rgb(), dtype=np.uint8, sep='')
     hist_img_b = np.fromstring(figure_b.canvas.tostring_rgb(), dtype=np.uint8, sep='')  # convert  to image
 
@@ -243,12 +254,31 @@ def create_camera_histogram_4x4(figure_a, figure_b, cam_img_a, cam_img_b):
     hist_img_a = cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR)  # img is rgb, convert to opencv's default bgr
     hist_img_b = cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR)  # img is rgb, convert to opencv's default bgr
 
-    img_a_8bit_500px = (cv2.resize(cam_img_a, (500, 500), interpolation=cv2.INTER_AREA) / 256).astype('uint8')
-    img_b_8bit_500px = (cv2.resize(cam_img_b, (500, 500), interpolation=cv2.INTER_AREA) / 256).astype('uint8')
+    #cv2.imshow('cam_b', cam_img_b)
+
+    #img_a_8bit_500px = (cv2.resize(cam_img_a, (500, 500), interpolation=cv2.INTER_AREA) / 256).astype('uint8')
+    #img_b_8bit_500px = (cv2.resize(cam_img_b, (500, 500), interpolation=cv2.INTER_AREA) / 256).astype('uint8')
+
+    img_a_8bit_500px_2 = cv2.cvtColor((cv2.resize(np.array(raw_array_a/16, dtype=np.uint8), (500, 500), interpolation=cv2.INTER_AREA)).astype('uint8')
+                                      ,cv2.COLOR_GRAY2BGR)
+    img_b_8bit_500px_2 = cv2.cvtColor((cv2.resize(np.array(raw_array_b/16, dtype=np.uint8), (500, 500), interpolation=cv2.INTER_AREA)).astype('uint8')
+                                      ,cv2.COLOR_GRAY2BGR)
+    #print(img_a_8bit_500px_2.shape)
+    #print(img_b_8bit_500px_2.shape)
+    #cv2.imshow('trial_for_cam_b',img_b_8bit_500px_2)
+    #img_b_scaled = cv2.imread(raw_array_b, cv2.IMREAD_GRAYSCALE)
+    #cv2.imshow("trial_for_b", np.array(raw_array_b/16, dtype=np.uint8 ))
+    #print(np.amax((raw_array_b*16).flatten()))
+    #img_a_8bit_500px = cv2.cvtColor(
+    #    (cv2.resize(cam_img_a, (500, 500), interpolation=cv2.INTER_AREA) / 256).astype('uint8')
+    #    , cv2.COLOR_GRAY2BGR)
+    #img_b_8bit_500px = cv2.cvtColor(
+    #    (cv2.resize(cam_img_b, (500, 500), interpolation=cv2.INTER_AREA) / 256).astype('uint8')
+    #    , cv2.COLOR_GRAY2BGR)
 
     return np.vstack(
-        (np.hstack((hist_img_a, img_a_8bit_500px)),
-         np.hstack((hist_img_b, img_b_8bit_500px))))
+        (np.hstack((hist_img_a, img_a_8bit_500px_2)),
+         np.hstack((hist_img_b, img_b_8bit_500px_2))))
 
 def set_plot_upper_bound(minimum_upper_bound, upper_bound_factor, maximum, plot):
     if maximum > minimum_upper_bound:
@@ -385,6 +415,7 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
 
         if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
             frame_count += 1
+            print("Frame: %s" % frame_count)
             """
             print("------------------------------------------------------------------------------------------------")
             print("\nFrame %s \n" % frame_count)
@@ -409,26 +440,23 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
             print("Set of All Values:\n%s" % set(grab_result_b_as_1d_list))
             """
 
-            image_a, image_b = converter.Convert(grab_result_a), converter.Convert(grab_result_b)
-            cv2.imshow('Cam A Noise', np.array(grab_result_a.GetArray(), dtype=np.uint8))
-            cv2.imshow('Cam B Noise', np.array(grab_result_b.GetArray(), dtype=np.uint8))
-            cv2.imwrite('Cam A Noise.tiff', np.array(grab_result_a.GetArray(), dtype=np.uint8))
-            cv2.imwrite('Cam B Noise.tiff', np.array(grab_result_b.GetArray(), dtype=np.uint8))
-            break
-            img_a = save_img("cam_a_frame_%s.tiff" % frame_count, camera_a_frames_directory, image_a)
-            img_b = save_img("cam_b_frame_%s.tiff" % frame_count, camera_b_frames_directory, image_b)
+            #image_a, image_b = converter.Convert(grab_result_a), converter.Convert(grab_result_b)
+            image_a = grab_result_a.GetArray()
+            image_b = grab_result_b.GetArray()
+            img_a = save_img("cam_a_frame_%s.png" % frame_count, camera_a_frames_directory, image_a, needs_buffer=False, twelve_as_16=True)
+            img_b = save_img("cam_b_frame_%s.png" % frame_count, camera_b_frames_directory, image_b, needs_buffer=False, twelve_as_16=True)
 
-            gray_img_a, gray_img_b = cv2.cvtColor(img_a, cv2.COLOR_BGR2GRAY), cv2.cvtColor(img_b, cv2.COLOR_BGR2GRAY)
-
-            histogram_a = cv2.calcHist([gray_img_a], [0], None, [bins], [0, 4095]) / np.prod(img_a.shape[:2])
-            histogram_b = cv2.calcHist([gray_img_b], [0], None, [bins], [0, 4095]) / np.prod(img_b.shape[:2])
+            #cv2.imshow("cam_b_raw", np.array(grab_result_b.GetArray(), dtype = np.uint8 ))
+            histogram_a = cv2.calcHist([grab_result_a.GetArray()], [0], None, [bins], [0, 4095]) / np.prod(grab_result_a.GetArray().shape[:2])
+            histogram_b = cv2.calcHist([grab_result_b.GetArray()], [0], None, [bins], [0, 4095]) / np.prod(grab_result_b.GetArray().shape[:2])
 
             update_histogram(histograms_dict, lines, "a", histogram_a, bins, grab_result_a.GetArray())
             update_histogram(histograms_dict, lines, "b", histogram_b, bins, grab_result_b.GetArray())
             figures["a"].canvas.draw()
             figures["b"].canvas.draw()
 
-            cameras_histograms_4x4 = create_camera_histogram_4x4(figures["a"], figures["b"], img_a, img_b)
+            cameras_histograms_4x4 = create_camera_histogram_4x4(figures["a"], figures["b"], None, None,
+                                                                 grab_result_a.GetArray(), grab_result_b.GetArray())
             save_img("histograms_frame_%s.tiff" % frame_count, cams_by_hists_direc, cameras_histograms_4x4, needs_buffer=False)
             cv2.imshow("Camera & Histogram Streams", cameras_histograms_4x4)
 
