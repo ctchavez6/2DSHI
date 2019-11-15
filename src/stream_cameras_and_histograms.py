@@ -229,16 +229,10 @@ def save_img(filename, directory, image, needs_buffer=True, twelve_as_16=False):
         cv2.imwrite(filename, img)
         return img
 
-    if (not needs_buffer) and (twelve_as_16):
-        #print(max(np.array(image * 16, dtype=np.uint16).flatten()))
-        img_2 = np.array(image * 16, dtype=np.uint16).astype(np.uint16)
-        im = Image.fromarray(img_2)
-        im.save("PIL_uncompressed_"+filename,compress_level=0)
-        with open("____"+filename, 'wb') as f:
-            writer = png.Writer(width=img_2.shape[1], height=img_2.shape[0], bitdepth=16, greyscale=True)
-            zgray2list = img_2.tolist()
-            writer.write(f, zgray2list)
-        cv2.imwrite(filename, np.array(image * 16, dtype=np.uint16).astype(np.uint16))
+    if (not needs_buffer) and twelve_as_16:
+        image = Image.fromarray(np.array(image * 16, dtype=np.uint16).astype(np.uint16))
+        image.save("PIL_uncompressed_"+filename, compress_level=0)
+
     else:
         cv2.imwrite(filename, image.astype(np.uint16))
     os.chdir(directory)
@@ -254,27 +248,12 @@ def create_camera_histogram_4x4(figure_a, figure_b, cam_img_a, cam_img_b, raw_ar
     hist_img_a = cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR)  # img is rgb, convert to opencv's default bgr
     hist_img_b = cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR)  # img is rgb, convert to opencv's default bgr
 
-    #cv2.imshow('cam_b', cam_img_b)
-
-    #img_a_8bit_500px = (cv2.resize(cam_img_a, (500, 500), interpolation=cv2.INTER_AREA) / 256).astype('uint8')
-    #img_b_8bit_500px = (cv2.resize(cam_img_b, (500, 500), interpolation=cv2.INTER_AREA) / 256).astype('uint8')
 
     img_a_8bit_500px_2 = cv2.cvtColor((cv2.resize(np.array(raw_array_a/16, dtype=np.uint8), (500, 500), interpolation=cv2.INTER_AREA)).astype('uint8')
                                       ,cv2.COLOR_GRAY2BGR)
     img_b_8bit_500px_2 = cv2.cvtColor((cv2.resize(np.array(raw_array_b/16, dtype=np.uint8), (500, 500), interpolation=cv2.INTER_AREA)).astype('uint8')
                                       ,cv2.COLOR_GRAY2BGR)
-    #print(img_a_8bit_500px_2.shape)
-    #print(img_b_8bit_500px_2.shape)
-    #cv2.imshow('trial_for_cam_b',img_b_8bit_500px_2)
-    #img_b_scaled = cv2.imread(raw_array_b, cv2.IMREAD_GRAYSCALE)
-    #cv2.imshow("trial_for_b", np.array(raw_array_b/16, dtype=np.uint8 ))
-    #print(np.amax((raw_array_b*16).flatten()))
-    #img_a_8bit_500px = cv2.cvtColor(
-    #    (cv2.resize(cam_img_a, (500, 500), interpolation=cv2.INTER_AREA) / 256).astype('uint8')
-    #    , cv2.COLOR_GRAY2BGR)
-    #img_b_8bit_500px = cv2.cvtColor(
-    #    (cv2.resize(cam_img_b, (500, 500), interpolation=cv2.INTER_AREA) / 256).astype('uint8')
-    #    , cv2.COLOR_GRAY2BGR)
+
 
     return np.vstack(
         (np.hstack((hist_img_a, img_a_8bit_500px_2)),
@@ -416,36 +395,17 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
         if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
             frame_count += 1
             print("Frame: %s" % frame_count)
-            """
-            print("------------------------------------------------------------------------------------------------")
-            print("\nFrame %s \n" % frame_count)
-            print("------------------------------------------------------------------------------------------------")
-            print("Grab Result A")
-            print("Type: %s" % str(type(grab_result_a_as_1d_list)))
-            print("Shape: %s" % str(grab_result_a.GetArray().shape))
-            print("Minimum: %s" % str(min(grab_result_a_as_1d_list)))
-            print("Maximum: %s" % str(max(grab_result_a_as_1d_list)))
-            print("Average: %s" % str(np.mean(grab_result_a.GetArray())))
-            print("Standard Deviation: %s" % str())
-            print("Set of All Values:\n%s" % set(grab_result_a_as_1d_list))
-
-            print("\n")
-            print("Grab Result B")
-            print("Type: %s" % str(type(grab_result_b_as_1d_list)))
-            print("Shape: %s" % str(grab_result_b.GetArray().shape))
-            print("Minimum: %s" % str(min(grab_result_b_as_1d_list)))
-            print("Maximum: %s" % str(max(grab_result_b_as_1d_list)))
-            print("Average: %s" % str(np.mean(grab_result_b.GetArray())))
-            print("Standard Deviation: %s" % str())
-            print("Set of All Values:\n%s" % set(grab_result_b_as_1d_list))
-            """
-
-            #image_a, image_b = converter.Convert(grab_result_a), converter.Convert(grab_result_b)
             image_a = grab_result_a.GetArray()
             image_b = grab_result_b.GetArray()
+            cv2.imshow('Cam A Noise', np.array(grab_result_a.GetArray()*16))
+            cv2.imshow('Cam B Noise', np.array(grab_result_b.GetArray()*16))
+
+            cv2.imshow('Cam A Noise (8 bit img)', np.array(grab_result_a.GetArray(), dtype=np.uint8))
+            cv2.imshow('Cam B Noise (8 bit img)', np.array(grab_result_b.GetArray(), dtype=np.uint8))
+
             img_a = save_img("cam_a_frame_%s.png" % frame_count, camera_a_frames_directory, image_a, needs_buffer=False, twelve_as_16=True)
             img_b = save_img("cam_b_frame_%s.png" % frame_count, camera_b_frames_directory, image_b, needs_buffer=False, twelve_as_16=True)
-
+            print("max(b) occurs at: %s" % str(np.where(image_b == 4095)))
             #cv2.imshow("cam_b_raw", np.array(grab_result_b.GetArray(), dtype = np.uint8 ))
             histogram_a = cv2.calcHist([grab_result_a.GetArray()], [0], None, [bins], [0, 4095]) / np.prod(grab_result_a.GetArray().shape[:2])
             histogram_b = cv2.calcHist([grab_result_b.GetArray()], [0], None, [bins], [0, 4095]) / np.prod(grab_result_b.GetArray().shape[:2])
