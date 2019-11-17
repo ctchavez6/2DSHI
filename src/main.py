@@ -116,7 +116,6 @@ if __name__ == "__main__":
         validate_video_file(args['file'])  # Raises error if not a valid video
 
     validate_color_input(args['color'])
-
     validate_bins_input(args['bins'])
 
     if args['width'] is not 0:

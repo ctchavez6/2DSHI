@@ -109,8 +109,8 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
     if num_cameras != 2:
         raise Exception("Unfortunately, this version currently only supports exactly two histograms.")
 
-    for i in range(num_cameras):
-        camera_identifier = chr(97 + i)
+    for camera_identifier in ["a", "b"]:
+        #camera_identifier = chr(97 + i)
         stream_subplots[camera_identifier].set_title('Camera ' + camera_identifier.capitalize())
         stream_subplots[camera_identifier].set_xlabel('Bin')
         stream_subplots[camera_identifier].set_ylabel('Frequency')
@@ -148,7 +148,6 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
 
         stream_subplots[camera_identifier].set_xlim(-100, bins - 1 + 100)
         stream_subplots[camera_identifier].grid(True)
-        #stream_subplots[camera_identifier].axvline(0, color='b', linestyle='solid', linewidth=2)
         stream_subplots[camera_identifier].set_autoscale_on(False)
         stream_subplots[camera_identifier].set_ylim(bottom=0, top=1)
 
@@ -193,10 +192,6 @@ def update_histogram_lines(lines_dict, identifier, calculated_hist, bins, raw_2d
     grayscale_max = np.amax(raw_2d_array)
     average = np.mean(raw_2d_array)
     stdev = np.std(raw_2d_array)
-
-    indices = list(range(0, bins))
-    hist = [val[0] for val in calculated_hist]
-    s = [(x, y) for y, x in sorted(zip(hist, indices), reverse=True)]
 
     lines_dict["maxima"][identifier].set_ydata(maximum)  # Maximums
     lines_dict["averages"][identifier].set_ydata(average)  # Averages
@@ -314,7 +309,7 @@ def create_and_save_videos(cam_a_frames_direc, cam_b_frames_direc, videos_direct
     cam_by_his_img_files =  [file for file in os.listdir(cam_b_frames_direc)]
     height_a, width_a, layers_a = cv2.imread(os.path.join(cam_a_frames_direc, cam_a_saved_img_files[0])).shape
     height_b, width_b, layers_b = cv2.imread(os.path.join(cam_b_frames_direc, cam_b_saved_img_files[0])).shape
-
+    # what do 0 and 1 do
     video_a = cv2.VideoWriter(videos_directory+'/video_a.avi', 0, 1, (height_a, width_a))
     video_b = cv2.VideoWriter(videos_directory+'/video_b.avi', 0, 1, (height_b, width_b))
     cams_hist_writer = cv2.VideoWriter(videos_directory+'/four_by_four.avi',  # File Name
@@ -322,22 +317,20 @@ def create_and_save_videos(cam_a_frames_direc, cam_b_frames_direc, videos_direct
                                        1,  # Frames Per Second
                                        (1000, 1000),  # Dimensions
                                        True)  # Start
-    print("videos_directory: %s" % str(videos_directory))
     os.chdir(videos_directory)
-    print("current directory: %s" % str(os.getcwd()))
 
     for frame_a, frame_b, hist_frame in zip(cam_a_saved_img_files, cam_b_saved_img_files, cam_by_his_img_files):
         video_a.write(cv2.imread(os.path.join(cam_a_frames_direc, frame_a)))
         video_b.write(cv2.imread(os.path.join(cam_b_frames_direc, frame_b)))
         cams_hist_writer.write(cv2.imread(os.path.join(cams_by_hists_direc, hist_frame)))
 
-    cv2.destroyAllWindows()
+    cv2.destroyAllWindows()  # do  i need this?
     video_a.release()
     video_b.release()
     cams_hist_writer.release()
     os.chdir(initial_directory)
 
-def get_pylon_image_converter():
+def get_pylon_image_converter(): # I should be able
     """
     Creates and returns an instance of a pylon.ImageFormatConverter() after updating the Output Pixel Format as well
     as the Output Bit Alignment.
@@ -381,7 +374,6 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
     """
     frame_count = 0
     cams_dict["all"].StartGrabbing()
-    converter = get_pylon_image_converter()
 
     camera_a_frames_directory, camera_b_frames_directory, videos_directory, cams_by_hists_direc = clear_prev_run()
     cameras_histogram_4x4_frames, camera_a_frames, camera_b_frames = [], [], []
@@ -391,29 +383,29 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
 
         grab_result_a = cams_dict["a"].RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
         grab_result_b = cams_dict["b"].RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
-
+        # TODO look into Retrieve Result for ALL all cameras simultaneously (cams_dict[all].RetrieveResult)
         if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
             frame_count += 1
             print("Frame: %s" % frame_count)
             image_a = grab_result_a.GetArray()
             image_b = grab_result_b.GetArray()
-            cv2.imshow('Cam A Noise', np.array(grab_result_a.GetArray()*16))
-            cv2.imshow('Cam B Noise', np.array(grab_result_b.GetArray()*16))
+            #cv2.imshow('Cam A Noise', np.array(grab_result_a.GetArray()*16))
+            #cv2.imshow('Cam B Noise', np.array(grab_result_b.GetArray()*16))
 
-            cv2.imshow('Cam A Noise (8 bit img)', np.array(grab_result_a.GetArray(), dtype=np.uint8))
-            cv2.imshow('Cam B Noise (8 bit img)', np.array(grab_result_b.GetArray(), dtype=np.uint8))
+            #cv2.imshow('Cam A Noise (8 bit img)', np.array(grab_result_a.GetArray(), dtype=np.uint8))
+            #cv2.imshow('Cam B Noise (8 bit img)', np.array(grab_result_b.GetArray(), dtype=np.uint8))
 
             img_a = save_img("cam_a_frame_%s.png" % frame_count, camera_a_frames_directory, image_a, needs_buffer=False, twelve_as_16=True)
             img_b = save_img("cam_b_frame_%s.png" % frame_count, camera_b_frames_directory, image_b, needs_buffer=False, twelve_as_16=True)
-            print("max(b) occurs at: %s" % str(np.where(image_b == 4095)))
+            #print("max(b) occurs at: %s" % str(np.where(image_b == 4095)))
             #cv2.imshow("cam_b_raw", np.array(grab_result_b.GetArray(), dtype = np.uint8 ))
             histogram_a = cv2.calcHist([grab_result_a.GetArray()], [0], None, [bins], [0, 4095]) / np.prod(grab_result_a.GetArray().shape[:2])
             histogram_b = cv2.calcHist([grab_result_b.GetArray()], [0], None, [bins], [0, 4095]) / np.prod(grab_result_b.GetArray().shape[:2])
 
             update_histogram(histograms_dict, lines, "a", histogram_a, bins, grab_result_a.GetArray())
             update_histogram(histograms_dict, lines, "b", histogram_b, bins, grab_result_b.GetArray())
-            figures["a"].canvas.draw()
-            figures["b"].canvas.draw()
+            figures["a"].canvas.draw()  # Draw updates subplots in interactive mode
+            figures["b"].canvas.draw()  # Draw updates subplots in interactive mode
 
             cameras_histograms_4x4 = create_camera_histogram_4x4(figures["a"], figures["b"], None, None,
                                                                  grab_result_a.GetArray(), grab_result_b.GetArray())
@@ -426,5 +418,6 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
 
     cams_dict["a"].StopGrabbing()
     cams_dict["b"].StopGrabbing()
+    # cams all stop grabbing , check later
     create_and_save_videos(camera_a_frames_directory, camera_b_frames_directory, videos_directory, cams_by_hists_direc)
 
