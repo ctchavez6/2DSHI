@@ -17,7 +17,15 @@ def reduce_dictionary(input_dictionary, keys_kept):
 
 
 def update_camera_configuration(parameter_dictionary):
-    print("starting update_camera_configuration")
+    """
+    Takes a dictionary and removes any keys not specified.
+
+    Args:
+        input_dictionary: Requested number of bins.
+        keys_kept: Requested number of bins.
+    Returns:
+        reduced_dictionary: The input dictionary but reduced to the keys specified.
+    """
     current_working_directory = os.getcwd()
     camera_config_files_directory = os.path.join(current_working_directory, "camera_configuration_files")
     default_config_file_path = os.path.join(camera_config_files_directory, "default_camera_configuration.pfs")

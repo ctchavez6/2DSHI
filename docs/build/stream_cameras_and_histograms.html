@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>stream_cameras_and_histograms &#8212; 2DSHI 1.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="update_camera_configuration" href="update_camera_configuration.html" />
+    <link rel="prev" title="main" href="main.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="update_camera_configuration.html" title="update_camera_configuration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="main.html" title="main"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">2DSHI 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-stream_cameras_and_histograms">
+<span id="stream-cameras-and-histograms"></span><h1>stream_cameras_and_histograms<a class="headerlink" href="#module-stream_cameras_and_histograms" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="stream_cameras_and_histograms.clear_videos">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">clear_videos</code><span class="sig-paren">(</span><em class="sig-param">video_directory</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.clear_videos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes any .tiff or .png image files created during previous runs that were saved in the specified directory.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stream_cameras_and_histograms.create_and_save_videos">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">create_and_save_videos</code><span class="sig-paren">(</span><em class="sig-param">cam_a_frames_direc</em>, <em class="sig-param">cam_b_frames_direc</em>, <em class="sig-param">videos_directory</em>, <em class="sig-param">cams_by_hists_direc</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.create_and_save_videos" title="Permalink to this definition">¶</a></dt>
+<dd><p>By iterating through all the saved frames, constructs a video for each camera.
+:param cam_a_frames_direc: Directory that holds all the saved images for Camera A
+:param cam_b_frames_direc: Directory that holds all the saved images for Camera B
+:param videos_directory: Directory where all the video files will be saved</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stream_cameras_and_histograms.find_devices">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">find_devices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.find_devices" title="Permalink to this definition">¶</a></dt>
+<dd><p>If devices are connected to computer and number of cameras are connected , and number of devices connected is equal
+to or below user specified limit, this function should return list of Basler device instances. Otherwise, raises a
+a general Exception or a RuntimeError.
+:raises Exception: Any error/exception other than ‘no such file or directory’.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stream_cameras_and_histograms.get_cameras">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">get_cameras</code><span class="sig-paren">(</span><em class="sig-param">devices</em>, <em class="sig-param">tlFactory</em>, <em class="sig-param">config_files</em>, <em class="sig-param">num_cameras=2</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.get_cameras" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should be called AFTER and with the return value of find_devices() (as implied by the first parameter: devices)
+:param devices: An instance of tlFactory.EnumerateDevices()
+:param num_cameras: An integer
+:param config_files: An integer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>Exception</strong> – Any error/exception other than ‘no such file or directory’.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary of cameras with ascending lowercase alphabetical letters as keys</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>cameras</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="stream_cameras_and_histograms.initialize_histograms">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">initialize_histograms</code><span class="sig-paren">(</span><em class="sig-param">bins</em>, <em class="sig-param">num_cameras=2</em>, <em class="sig-param">line_width=3</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.initialize_histograms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes histogram matplotlib.pyplot figures/subplots
+:param devices: An instance of tlFactory.EnumerateDevices()
+:param num_cameras: An integer
+:param config_files: An integer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>Exception</strong> – Any error/exception other than ‘no such file or directory’.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary of histograms with ascending lowercase alphabetical letters (that match cameras) as keys</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>histograms</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="stream_cameras_and_histograms.reset_images_directory">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">reset_images_directory</code><span class="sig-paren">(</span><em class="sig-param">saved_imgs_directory</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.reset_images_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes any .tiff or .png image files created during previous runs that were saved in the specified directory.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stream_cameras_and_histograms.stream_cam_to_histograms">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">stream_cam_to_histograms</code><span class="sig-paren">(</span><em class="sig-param">cams_dict</em>, <em class="sig-param">figures</em>, <em class="sig-param">histograms_dict</em>, <em class="sig-param">lines</em>, <em class="sig-param">bins=4096</em>, <em class="sig-param">frame_break=1000</em>, <em class="sig-param">save_imgs=False</em>, <em class="sig-param">save_vids=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.stream_cam_to_histograms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts grabbing for all cameras starting with index 0. The grabbing is started for one camera after the other.
+That’s why the images of all cameras are not taken at the same time. However, a hardware trigger setup can be used
+to cause all cameras to grab images synchronously. According to their default configuration, the cameras are set up
+for free-running continuous acquisition. Also saves all the images and videos.
+:param cams_dict: Description
+:param figures: Description
+:param histograms_dict: Description
+:param lines: Description
+:param bins: Description
+:param frame_break: Limit of frames to record. Default 10.
+:param fps: Frames per second saved video will play at. Default 1.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="find_gaussian_profile.html">find_gaussian_profile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main.html">main</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">stream_cameras_and_histograms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="update_camera_configuration.html">update_camera_configuration</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/stream_cameras_and_histograms.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="update_camera_configuration.html" title="update_camera_configuration"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="main.html" title="main"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">2DSHI 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Iván Sepulveda.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

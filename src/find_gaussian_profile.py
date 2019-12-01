@@ -17,10 +17,9 @@ def read_image_from_file(image_path, file_bit_depth=16, original_bit_depth=12):
     Raises:
         Exception: Nothing so far.
     Returns:
-        The image array in it's intended bit depth. D
-
+        The image array in it's intended bit depth.
     """
-    return cv2.imread(image_path, -1)/(2**(file_bit_depth-original_bit_depth))
+    return np.asarray(cv2.imread(image_path, -1)) / (2**(file_bit_depth-original_bit_depth))
 
 
 def get_maximum_pixel_intensity(image_array):
@@ -127,6 +126,6 @@ def plot_horizonal_lineout_intensity(image, coordinates, upper_limit_noise=10):
 
 
 
-img = read_image_from_file("./coregistration/cam_b_frame_186.png")
+#img = read_image_from_file("./coregistration/cam_b_frame_186.png")
 
-get_horizontal_roi(img, get_coordinates_of_maximum(img))
+#get_horizontal_roi(img, get_coordinates_of_maximum(img))
