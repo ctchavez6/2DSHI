@@ -4,6 +4,7 @@
 import argparse
 import os
 import stream_cameras_and_histograms as streams
+import update_camera_configuration as ucc
 
 # Create an instance of an ArgumentParser Object
 parser = argparse.ArgumentParser()
@@ -92,52 +93,66 @@ def validate_width_input(width_input_int):
                      )
 
 
-parser.add_argument('-f', '--file', default=None,
-                    help='Path to video file (if not using camera)')
-parser.add_argument('-c', '--color', type=str, default='gray',
-                    help='Color space: "grayscale" (default) or "rgb"')
-parser.add_argument('-b', '--bins', type=int, default=4096,
-                    help='Number of bins per channel (default 4096)')
-parser.add_argument('-w', '--width', type=int, default=0,
-                    help='Resize video to specified width in pixels (maintains aspect ratio)')
-parser.add_argument('-n', '--num_cameras', type=int, default=2,
-                    help='Number of cameras (default 2)')
+parser.add_argument('-va', '--video_a', default=None,
+                    help='Path to video file for Camera A (if not using camera)')
+parser.add_argument('-vb', '--video_b', default=None,
+                    help='Path to video file for Camera B (if not using camera)')
+parser.add_argument('-ccf', '--camera_configuration_file', default=None,
+                    help='Desired camera configuration file (if other than default_camera_configuration.pfs)')
+parser.add_argument('-e', '--ExposureTime', type=str, default=None,
+                    help='Exposure time in us (microseconds) [overwrites value in default_camera_configuration.pfs]')
+parser.add_argument('-r', '--AcquisitionFrameRate', type=str, default=None,
+                    help='Acquisition frame rate (Hz) [overwrites value in default_camera_configuration.pfs]')
+parser.add_argument('-si', '--SaveImages', type=int, default=0,
+                    help="1 if you'd like to save the images from this run, else 0.")
+parser.add_argument('-sv', '--SaveVideos', type=int, default=0,
+                    help="1 if you'd like to save the videos from this run, else 0.")
 
 
 if __name__ == "__main__":
-
     print("Starting:")
-
-    args = vars(parser.parse_args())  # Parse user arguments into a dictionary
-
-    if isinstance(args['file'], type(None)):
+    args = vars(parser.parse_args())  # Parse user arguments into a dictionaryq
+    if args["video_a"] is None and args["video_b"] is None:
         print("No file specified: Attempting video stream")
+    elif args["video_a"] is None or args["video_b"] is None:
+        print("To run a playback of data, you must specify two valid video files.")
     else:
-        validate_video_file(args['file'])  # Raises error if not a valid video
+        validate_video_file(args["video_a"])  # Raises error if not a valid video
+        validate_video_file(args["video_b"])  # Raises error if not a valid video
 
-    validate_color_input(args['color'])
-    validate_bins_input(args['bins'])
+    relevant_parameters = ["ExposureTime", "AcquisitionFrameRate"]
+    parameter_dictionary = ucc.reduce_dictionary(args, relevant_parameters)
+    camera_configurations_folder = os.path.join(os.getcwd(), "camera_configuration_files")
 
-    if args['width'] is not 0:
-        validate_width_input(args['width'])
+    if len(parameter_dictionary) > 0 and args["camera_configuration_file"] is None:
+        ucc.update_camera_configuration(parameter_dictionary)
+        camera_a_configuration = os.path.join(camera_configurations_folder, "updated_configuration_file.pfs")
+        camera_b_configuration = camera_a_configuration
 
-    # Now that all the user inputs have be validated, we can begin running the script(s)
-    parent_directory = os.path.dirname(os.getcwd())  # String representing parent directory of current working directory
-    camera_configurations_folder = os.getcwd() + "\camera_configuration_files"
-    camera_a_configuration = camera_configurations_folder + "/23097552_setup_Oct23_padded_12.pfs"
-    camera_b_configuration = camera_configurations_folder + "/23097552_setup_Oct23_padded_12.pfs"
+    elif args["camera_configuration_file"] is not None:
+        camera_a_configuration = args["camera_configuration_file"]
+        camera_b_configuration = args["camera_configuration_file"]
+    else:
+        camera_a_configuration = os.path.join(camera_configurations_folder, "default_camera_configuration.pfs")
+        camera_b_configuration = camera_a_configuration
 
-    config_files_by_cam = dict()
-    config_files_by_cam["a"] = camera_a_configuration
-    config_files_by_cam["b"] = camera_b_configuration
+
+    config_files_by_cam = {"a": camera_a_configuration, "b": camera_b_configuration}
 
     devices_found, tlFactory_found = streams.find_devices()
 
     cameras = streams.get_cameras(
         devices=devices_found,
-        tlFactory = tlFactory_found,
+        tlFactory=tlFactory_found,
         config_files=config_files_by_cam,
-        num_cameras=args["num_cameras"])
+        num_cameras=2)
 
-    figs, histograms, lines = streams.initialize_histograms(args['bins'])
-    streams.stream_cam_to_histograms(cams_dict=cameras, figures=figs, histograms_dict=histograms, lines=lines, bins=4096)
+    figs, histograms, lines = streams.initialize_histograms(4096)
+    streams.stream_cam_to_histograms(
+            cams_dict=cameras,
+            figures=figs,
+            histograms_dict=histograms,
+            lines=lines,
+            bins=4096,
+            save_imgs=args["SaveImages"],
+            save_vids=args["SaveVideos"])
