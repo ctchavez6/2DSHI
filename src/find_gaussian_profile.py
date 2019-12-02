@@ -4,12 +4,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def gaus(x, mu, sigma, coefficient):
-    return coefficient*np.exp(-(x-mu)**2/(2*sigma**2))
+def gaussian_distribution(x, mu, sigma, coefficient):
+    """
+    Returns values for a gaussian distribution based on the input array.
+    Args:
+        x: Array of x values.
+        mu: Mean/Median/Mode/
+        sigma: Standard Deviation
+        coefficient: Amplitude of gaussian distribution
+    Raises:
+        Exception: If any of the input parameters are not of the specified type.
+    Returns:
+        distribution: An array of y-values that correspond to the input parameters.
+    """
+    distribution = coefficient*np.exp(-(x-mu)**2/(2*sigma**2))
+    return distribution
+
 
 def read_image_from_file(image_path, file_bit_depth=16, original_bit_depth=12):
     """
-    Initializes histogram matplotlib.pyplot figures/subplots
+    Given a file path, returns the corresponding image array. You may also specified the original/intended bit depth
+    of said image.
+
     Args:
         image_path: Path to the image you want to read in.
         original_bit_depth: An integer

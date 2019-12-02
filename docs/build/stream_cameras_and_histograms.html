@@ -46,9 +46,33 @@
   <div class="section" id="module-stream_cameras_and_histograms">
 <span id="stream-cameras-and-histograms"></span><h1>stream_cameras_and_histograms<a class="headerlink" href="#module-stream_cameras_and_histograms" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
+<dt id="stream_cameras_and_histograms.add_histogram_representations">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">add_histogram_representations</code><span class="sig-paren">(</span><em class="sig-param">figure_a</em>, <em class="sig-param">figure_b</em>, <em class="sig-param">raw_array_a</em>, <em class="sig-param">raw_array_b</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.add_histogram_representations" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO Add documentation.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stream_cameras_and_histograms.clear_prev_run">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">clear_prev_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.clear_prev_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO Add documentation.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="stream_cameras_and_histograms.clear_videos">
 <code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">clear_videos</code><span class="sig-paren">(</span><em class="sig-param">video_directory</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.clear_videos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes any .tiff or .png image files created during previous runs that were saved in the specified directory.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stream_cameras_and_histograms.convert_to_16_bit">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">convert_to_16_bit</code><span class="sig-paren">(</span><em class="sig-param">image_array</em>, <em class="sig-param">original_bit_depth=12</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.convert_to_16_bit" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO Add documentation.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stream_cameras_and_histograms.convert_to_8_bit">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">convert_to_8_bit</code><span class="sig-paren">(</span><em class="sig-param">image_array</em>, <em class="sig-param">original_bit_depth=12</em>, <em class="sig-param">grayscale_to_rgb=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.convert_to_8_bit" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO Add documentation.</p>
 </dd></dl>
 
 <dl class="function">
@@ -72,39 +96,53 @@ a general Exception or a RuntimeError.
 <dl class="function">
 <dt id="stream_cameras_and_histograms.get_cameras">
 <code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">get_cameras</code><span class="sig-paren">(</span><em class="sig-param">devices</em>, <em class="sig-param">tlFactory</em>, <em class="sig-param">config_files</em>, <em class="sig-param">num_cameras=2</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.get_cameras" title="Permalink to this definition">¶</a></dt>
-<dd><p>Should be called AFTER and with the return value of find_devices() (as implied by the first parameter: devices)
-:param devices: An instance of tlFactory.EnumerateDevices()
-:param num_cameras: An integer
-:param config_files: An integer</p>
+<dd><p>Should be called AFTER and with the return value of find_devices() (as implied by the first parameter: devices)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>Exception</strong> – Any error/exception other than ‘no such file or directory’.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>devices</strong> – An instance of tlFactory.EnumerateDevices()</p></li>
+<li><p><strong>num_cameras</strong> (<em>int</em>) – An integer</p></li>
+<li><p><strong>config_files</strong> – An integer</p></li>
+</ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A dictionary of cameras with ascending lowercase alphabetical letters as keys</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>Exception</strong> – Any error/exception other than ‘no such file or directory’.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>cameras</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dictionary of cameras with ascending lowercase alphabetical letters as keys.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="function">
+<dt id="stream_cameras_and_histograms.initialize_dual_video_capture">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">initialize_dual_video_capture</code><span class="sig-paren">(</span><em class="sig-param">first_channel=0</em>, <em class="sig-param">second_channel=1</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.initialize_dual_video_capture" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO Add documentation.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="stream_cameras_and_histograms.initialize_histograms">
 <code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">initialize_histograms</code><span class="sig-paren">(</span><em class="sig-param">bins</em>, <em class="sig-param">num_cameras=2</em>, <em class="sig-param">line_width=3</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.initialize_histograms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes histogram matplotlib.pyplot figures/subplots
-:param devices: An instance of tlFactory.EnumerateDevices()
-:param num_cameras: An integer
-:param config_files: An integer</p>
+<dd><p>Initializes histogram matplotlib.pyplot figures/subplots.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>Exception</strong> – Any error/exception other than ‘no such file or directory’.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bins</strong> – An instance of tlFactory.EnumerateDevices()</p></li>
+<li><p><strong>num_cameras</strong> – An integer</p></li>
+<li><p><strong>line_width</strong> – An integer</p></li>
+</ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A dictionary of histograms with ascending lowercase alphabetical letters (that match cameras) as keys</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>Exception</strong> – Any error/exception other than ‘no such file or directory’.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>histograms</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dictionary of histograms with ascending lowercase alphabetical letters (that match cameras) as keys</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>histograms</p>
 </dd>
 </dl>
 </dd></dl>
@@ -113,6 +151,42 @@ a general Exception or a RuntimeError.
 <dt id="stream_cameras_and_histograms.reset_images_directory">
 <code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">reset_images_directory</code><span class="sig-paren">(</span><em class="sig-param">saved_imgs_directory</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.reset_images_directory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes any .tiff or .png image files created during previous runs that were saved in the specified directory.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stream_cameras_and_histograms.resize_img">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">resize_img</code><span class="sig-paren">(</span><em class="sig-param">image_array</em>, <em class="sig-param">new_width</em>, <em class="sig-param">new_height</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.resize_img" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO Add documentation.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stream_cameras_and_histograms.save_img">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">save_img</code><span class="sig-paren">(</span><em class="sig-param">filename</em>, <em class="sig-param">directory</em>, <em class="sig-param">image</em>, <em class="sig-param">sixteen_bit=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.save_img" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO Add documentation.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stream_cameras_and_histograms.set_plot_upper_bound">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">set_plot_upper_bound</code><span class="sig-paren">(</span><em class="sig-param">minimum_upper_bound</em>, <em class="sig-param">upper_bound_factor</em>, <em class="sig-param">maximum</em>, <em class="sig-param">plot</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.set_plot_upper_bound" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO Add documentation.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stream_cameras_and_histograms.set_xvalues">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">set_xvalues</code><span class="sig-paren">(</span><em class="sig-param">polygon</em>, <em class="sig-param">x0</em>, <em class="sig-param">x1</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.set_xvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a rectangular matplotlib.patches.Polygon object sets the horizontal values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>polygon</strong> – An instance of tlFactory.EnumerateDevices()</p></li>
+<li><p><strong>x0</strong> – An integer</p></li>
+<li><p><strong>x1</strong> – An integer</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>Exception</strong> – TODO Add some error handling.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -129,6 +203,30 @@ for free-running continuous acquisition. Also saves all the images and videos.
 :param bins: Description
 :param frame_break: Limit of frames to record. Default 10.
 :param fps: Frames per second saved video will play at. Default 1.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stream_cameras_and_histograms.update_histogram">
+<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">update_histogram</code><span class="sig-paren">(</span><em class="sig-param">histogram_dict</em>, <em class="sig-param">lines_dict</em>, <em class="sig-param">identifier</em>, <em class="sig-param">bins</em>, <em class="sig-param">raw_2d_array</em>, <em class="sig-param">threshold=1.2</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.update_histogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates histograms for a given camera given the histogram of intensity values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>histogram_dict</strong> – TODO Add Description</p></li>
+<li><p><strong>lines_dict</strong> – TODO Add Description</p></li>
+<li><p><strong>identifier</strong> – TODO Add Description</p></li>
+<li><p><strong>bins</strong> – TODO Add Description</p></li>
+<li><p><strong>raw_2d_array</strong> – TODO Add Description</p></li>
+<li><p><strong>threshold</strong> – TODO Add Description</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>Exception</strong> – TODO Add Description</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>TODO Add Description</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

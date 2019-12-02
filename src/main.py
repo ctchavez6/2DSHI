@@ -40,57 +40,9 @@ def validate_video_file(video_file_path_string):
                      )
 
 
-def validate_color_input(color_input_string):
-    """
-    Validates user input for requested format for color (or lack ther eof).
-
-    Args:
-        color_input_string: Requested color format.
-    Raises:
-        Exception: If invalid or unaccepted color format.
-    """
-
-    acceptable_color_options = ["gray", "grayscale", "rgb"]
-    if color_input_string not in acceptable_color_options:
-        parser.error("\n\tPlease use one of the following color options:" +
-                     ''.join("\n\t%s" % x for x in acceptable_color_options) +
-                     "\n\tYour input: %s\n" % color_input_string
-                     )
 
 
-def validate_bins_input(bins_input_int):
-    """
-    Validates the user input for number of bins
 
-    Args:
-        bins_input_int: Requested number of bins.
-    Raises:
-        Exception: If requested number of bins outside a specified set of values.
-    """
-    acceptable_bins_options = [4096]
-    if bins_input_int not in acceptable_bins_options:
-        parser.error("\n\tPlease use one of the following options for number of bins:" +
-                     ''.join("\n\t%s" % x for x in acceptable_bins_options) +
-                     "\n\tYour input: %s\n" % bins_input_int
-                     )
-
-
-def validate_width_input(width_input_int):
-    """
-    Validates the user input for width.
-
-    Args:
-        width_input_int: Description
-    Raises:
-        Exception: If requested width outside a specified range.
-    """
-
-    min_width, max_width = 100, 1000
-
-    if width_input_int not in range(min_width, max_width + 1):
-        parser.error("\n\tPlease enter a width between %s and %s" % (min_width, max_width) +
-                     "\n\tYour input: %s\n" % width_input_int
-                     )
 
 
 parser.add_argument('-va', '--video_a', default=None,
@@ -135,7 +87,6 @@ if __name__ == "__main__":
     else:
         camera_a_configuration = os.path.join(camera_configurations_folder, "default_camera_configuration.pfs")
         camera_b_configuration = camera_a_configuration
-
 
     config_files_by_cam = {"a": camera_a_configuration, "b": camera_b_configuration}
 

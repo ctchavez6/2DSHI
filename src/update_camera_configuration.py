@@ -16,13 +16,12 @@ def reduce_dictionary(input_dictionary, keys_kept):
     return reduced_dictionary
 
 
-def update_camera_configuration(parameter_dictionary):
+def create_updated_configuration_file(parameter_dictionary):
     """
     Takes a dictionary and removes any keys not specified.
 
     Args:
-        input_dictionary: Requested number of bins.
-        keys_kept: Requested number of bins.
+        parameter_dictionary: Requested number of bins.
     Returns:
         reduced_dictionary: The input dictionary but reduced to the keys specified.
     """

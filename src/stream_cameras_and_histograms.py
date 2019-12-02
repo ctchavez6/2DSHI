@@ -41,14 +41,16 @@ def find_devices():
 def get_cameras(devices, tlFactory, config_files, num_cameras=2):
     """
     Should be called AFTER and with the return value of find_devices() (as implied by the first parameter: devices)
+
+
     Args:
         devices: An instance of tlFactory.EnumerateDevices()
-        num_cameras: An integer
+        num_cameras (int): An integer
         config_files: An integer
     Raises:
         Exception: Any error/exception other than 'no such file or directory'.
     Returns:
-        cameras: A dictionary of cameras with ascending lowercase alphabetical letters as keys
+        dict: A dictionary of cameras with ascending lowercase alphabetical letters as keys.
     """
     cameras = dict()
 
@@ -67,6 +69,17 @@ def get_cameras(devices, tlFactory, config_files, num_cameras=2):
     return cameras
 
 def set_xvalues(polygon, x0, x1):
+    """
+    Given a rectangular matplotlib.patches.Polygon object sets the horizontal values.
+
+    Args:
+        polygon: An instance of tlFactory.EnumerateDevices()
+        x0: An integer
+        x1: An integer
+    Raises:
+        Exception: TODO Add some error handling.
+
+    """
     if len(polygon.get_xy()) == 4:
         _ndarray = polygon.get_xy()
         _ndarray[:, 0] = [x0, x0, x1, x1]
@@ -79,15 +92,16 @@ def set_xvalues(polygon, x0, x1):
 
 def initialize_histograms(bins, num_cameras=2, line_width=3):
     """
-    Initializes histogram matplotlib.pyplot figures/subplots
+    Initializes histogram matplotlib.pyplot figures/subplots.
+
     Args:
-        devices: An instance of tlFactory.EnumerateDevices()
+        bins: An instance of tlFactory.EnumerateDevices()
         num_cameras: An integer
-        config_files: An integer
+        line_width: An integer
     Raises:
         Exception: Any error/exception other than 'no such file or directory'.
     Returns:
-        histograms: A dictionary of histograms with ascending lowercase alphabetical letters (that match cameras) as keys
+        dict: A dictionary of histograms with ascending lowercase alphabetical letters (that match cameras) as keys
     """
     stream_subplots = dict()
     lines = {
@@ -101,7 +115,6 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
         "grayscale_avg": dict(),
         "grayscale_avg+0.5sigma": dict(),
         "grayscale_avg-0.5sigma": dict()
-
     }
     fig_a = plt.figure(figsize=(5, 5))
     stream_subplots["a"] = fig_a.add_subplot()
@@ -162,7 +175,21 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
 
 
 def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,threshold=1.2):
+    """
+    Updates histograms for a given camera given the histogram of intensity values.
 
+    Args:
+        histogram_dict: TODO Add Description
+        lines_dict: TODO Add Description
+        identifier: TODO Add Description
+        bins: TODO Add Description
+        raw_2d_array: TODO Add Description
+        threshold: TODO Add Description
+    Raises:
+        Exception: TODO Add Description
+    Returns:
+        TODO Add Description
+    """
     calculated_hist = cv2.calcHist([raw_2d_array], [0], None, [bins], [0, 4095]) / np.prod(raw_2d_array.shape[:2])
 
     histogram_maximum = np.amax(calculated_hist)
@@ -198,34 +225,41 @@ def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,
         histogram_dict[identifier].set_ylim(bottom=0.000000, top=0.001)
 
 
-
-
-
-def initialize_dual_video_capture(first_channel=0, second_channel=1):
-    capture_a, capture_b = cv2.VideoCapture(first_channel), cv2.VideoCapture(second_channel)
-    capture_a.set(cv2.CAP_PROP_FORMAT, cv2.CV_16U)
-    capture_b.set(cv2.CAP_PROP_FORMAT, cv2.CV_16UC1)
-    capture_a.open(first_channel)
-    capture_b.open(second_channel)
-    return capture_a, capture_b
-
-
 def convert_to_16_bit(image_array, original_bit_depth=12):
+    """
+    Takes an image array and represents it as 16 bit by multiplying all the values by the corresponding integer and
+    specifying the bit depth in the creation of a new 2D Numpy Array.
+
+    Args:
+        image_array (numpy.ndarray): The original image array.
+    Returns:
+        numpy.ndarray: The same image represented
+    """
     if original_bit_depth < 16:
         return np.array(image_array * 2**(16-original_bit_depth), dtype=np.uint16).astype(np.uint16)
-    return None
+    else:
+        raise Exception('Original Bit Depth was greater than or equal to 16')
 
 def convert_to_8_bit(image_array, original_bit_depth=12, grayscale_to_rgb=False):
+    """
+    TODO Add documentation.
+    """
     if original_bit_depth == 12:
         return np.array(image_array/16, dtype=np.uint8)
     return None
 
 
 def resize_img(image_array, new_width, new_height):
+    """
+    TODO Add documentation.
+    """
     return cv2.resize(image_array, (new_width, new_height), interpolation=cv2.INTER_AREA)
 
 
 def save_img(filename, directory, image, sixteen_bit=True):
+    """
+    TODO Add documentation.
+    """
     os.chdir(directory)
     if sixteen_bit:
         image = Image.fromarray(image)
@@ -236,6 +270,18 @@ def save_img(filename, directory, image, sixteen_bit=True):
 
 
 def add_histogram_representations(figure_a, figure_b, raw_array_a, raw_array_b):
+    """
+    Adds a matplotlib.pyplot.subplot to two matplotlib.pyplot.figure objects. The subplots are histograms of intensity
+    data from raw_array_a and raw_array_b.
+
+    Args:
+        figure_a:
+        figure_b:
+        raw_array_a:
+        raw_array_b:
+    Returns:
+        np.ndarray: An image array (3D [height, width, layers]) of the camera images and the corresponding histograms.
+    """
     hist_img_a = np.fromstring(figure_a.canvas.tostring_rgb(), dtype=np.uint8, sep='')
     hist_img_b = np.fromstring(figure_b.canvas.tostring_rgb(), dtype=np.uint8, sep='')  # convert  to image
 
@@ -256,6 +302,15 @@ def add_histogram_representations(figure_a, figure_b, raw_array_a, raw_array_b):
     return np.vstack((np.hstack((hist_img_a, img_a_8bit_resized)), np.hstack((hist_img_b, img_b_8bit_resized))))
 
 def set_plot_upper_bound(minimum_upper_bound, upper_bound_factor, maximum, plot):
+    """
+    Adjusts the y-limit/upper-bound of a matplotlib.pyplot.subplot object.
+
+    Args:
+        minimum_upper_bound: In the absence of data, default upper bound.
+        upper_bound_factor: Factor to multiply the data maximum by.
+        maximum: Image intensity histogram maximum.
+        plot (matplotlib.pyplot.subplot): Subplot that represents camera histogram.
+    """
     if maximum > minimum_upper_bound:
         plot.set_ylim(bottom=0.000000, top=maximum * upper_bound_factor)
     else:
@@ -265,6 +320,9 @@ def set_plot_upper_bound(minimum_upper_bound, upper_bound_factor, maximum, plot)
 def reset_images_directory(saved_imgs_directory):
     """
     Deletes any .tiff or .png image files created during previous runs that were saved in the specified directory.
+
+    Args:
+        saved_imgs_directory: Path to the directory where you'd like to clear out .tiff/.png files.
     """
     if os.path.exists(saved_imgs_directory):
         filelist = [f for f in os.listdir(saved_imgs_directory) if (f.endswith(".tiff") or f.endswith(".png"))]
@@ -307,15 +365,17 @@ def create_and_save_videos(cam_a_frames_direc, cam_b_frames_direc, videos_direct
 
     height_a, width_a, layers_a = cv2.imread(os.path.join(cam_a_frames_direc, cam_a_saved_img_files[0])).shape
     height_b, width_b, layers_b = cv2.imread(os.path.join(cam_b_frames_direc, cam_b_saved_img_files[0])).shape
-    print(os.path.exists(os.path.join(cams_by_hists_direc, cam_by_his_img_files[0])))
-
     height_h, width_h, layers_h = cv2.imread(os.path.join(cams_by_hists_direc, cam_by_his_img_files[0])).shape
-    print("height_h, width_h, layers_h")
-    print(height_h, width_h, layers_h)
-    # what do 0 and 1 do
-    video_a = cv2.VideoWriter(videos_directory+'/video_a.avi', 0, 10, (height_a, width_a))
-    video_b = cv2.VideoWriter(videos_directory+'/video_b.avi', 0, 10, (height_b, width_b))
-    cams_hist_writer = cv2.VideoWriter(videos_directory+'/cams_with_histogram_representations.avi',cv2.VideoWriter_fourcc(*'DIVX'), 10, (1000, 1000))
+    # The second parameter, where I use 0, seems to be the default codec. Works well.
+    video_a = cv2.VideoWriter(os.path.join(videos_directory, 'video_a.avi'), 0, 10, (height_a, width_a))
+    video_b = cv2.VideoWriter(os.path.join(videos_directory, 'video_b.avi'), 0, 10, (height_b, width_b))
+    cams_hist_writer = cv2.VideoWriter(
+        filename=os.path.join(videos_directory,'cams_with_histogram_representations.avi'),
+        fourcc=cv2.VideoWriter_fourcc(*'DIVX'),
+        fps=10,
+        frameSize=(1000, 1000),
+        isColor=1)
+
     os.chdir(videos_directory)
 
     for frame_a, frame_b, hist_frame in zip(cam_a_saved_img_files, cam_b_saved_img_files, cam_by_his_img_files):
@@ -323,7 +383,7 @@ def create_and_save_videos(cam_a_frames_direc, cam_b_frames_direc, videos_direct
         video_b.write(cv2.imread(os.path.join(cam_b_frames_direc, frame_b)))
         cams_hist_writer.write(cv2.imread(os.path.join(cams_by_hists_direc, hist_frame)))
 
-    cv2.destroyAllWindows()  # do  i need this?
+    cv2.destroyAllWindows()  # Do I need this?
     video_a.release()
     video_b.release()
     cams_hist_writer.release()
@@ -331,6 +391,13 @@ def create_and_save_videos(cam_a_frames_direc, cam_b_frames_direc, videos_direct
 
 
 def clear_prev_run():
+    """
+    Creates a new directory that corresponds to today's date and time to save the videos/images in. Unlikely, but if
+    for some reason two runs happen within the same minute, overwrites first run to keep latest.
+
+    Returns:
+        TODO Convert to dictionary? Separate Functionality?
+    """
     now = datetime.now()
     current_datetime = now.strftime("%Y_%m_%d__%H_%M")
 
@@ -371,10 +438,8 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
     raw_cam_a_frames, raw_cam_b_frames = [], []
 
     while cams_dict["all"].IsGrabbing() and frame_count != frame_break and not (cv2.waitKey(1) & 0xFF == ord('q')):
-
         grab_result_a = cams_dict["a"].RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
         grab_result_b = cams_dict["b"].RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
-        # TODO look into Retrieve Result for ALL all cameras simultaneously (cams_dict[all].RetrieveResult)
         if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
             frame_count += 1
             raw_image_a = grab_result_a.GetArray()
@@ -395,13 +460,15 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
 
     cams_dict["a"].StopGrabbing()
     cams_dict["b"].StopGrabbing()
-    if save_imgs or save_vids:
+
+    if save_imgs or save_vids #
         camera_a_frames_directory, camera_b_frames_directory, cams_by_hists_direc, videos_directory = clear_prev_run()
 
         if save_imgs:
             for a, b in zip(raw_cam_a_frames, raw_cam_b_frames):
                 camera_a_frames_as_16bit.append(convert_to_16_bit(a, original_bit_depth=12))
                 camera_b_frames_as_16bit.append(convert_to_16_bit(b, original_bit_depth=12))
+
             frame_count = 0
 
             for frame_a, frame_b, cam_hist in zip(camera_a_frames_as_16bit, camera_b_frames_as_16bit,cam_w_histogram_frames):
