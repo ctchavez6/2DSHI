@@ -59,6 +59,14 @@ parser.add_argument('-si', '--SaveImages', type=int, default=0,
                     help="1 if you'd like to save the images from this run, else 0.")
 parser.add_argument('-sv', '--SaveVideos', type=int, default=0,
                     help="1 if you'd like to save the videos from this run, else 0.")
+parser.add_argument('-fb', '--FrameBreak', type=int, default=-1,
+                    help="How many frames you'd like to grab/save.")
+parser.add_argument('-dhc', '--DisplayHistocam', type=int, default=0,
+                    help="How many frames you'd like to grab/save.")
+parser.add_argument('-shc', '--SaveHistocam', type=int, default=0,
+                    help="How many frames you'd like to grab/save.")
+parser.add_argument('-raw', '--Raw', type=int, default=1,
+                    help="Show raw image data.")
 
 
 if __name__ == "__main__":
@@ -98,12 +106,15 @@ if __name__ == "__main__":
         config_files=config_files_by_cam,
         num_cameras=2)
 
-    figs, histograms, lines = streams.initialize_histograms(4096)
+    figs, histograms, lines = streams.initialize_histograms()
     streams.stream_cam_to_histograms(
             cams_dict=cameras,
             figures=figs,
             histograms_dict=histograms,
             lines=lines,
-            bins=4096,
+            frame_break=args["FrameBreak"],
             save_imgs=args["SaveImages"],
-            save_vids=args["SaveVideos"])
+            save_vids=args["SaveVideos"],
+            display_live_histocam=args["DisplayHistocam"],
+            save_histocam_reps=args["SaveHistocam"],
+            show_raw_data=args["Raw"])

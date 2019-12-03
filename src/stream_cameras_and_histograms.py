@@ -7,18 +7,14 @@ cameras in one thread. This is done by providing a single RetrieveResult method 
 Alternatively, the grabbing can be started using the internal grab loop threads of all cameras in the
 CInstantCameraArray. The grabbed images can then be processed by one or more  image event handlers. """
 
-# #from pypylon import pylon
-# # import genicam
+
 from pypylon import genicam, pylon  # Import relevant pypylon packages/modules
 import matplotlib.pyplot as plt  # For plotting live histogram
 import os
-# import sys
 import cv2
 import numpy as np  # Pixel math, among other array operations
 import traceback  # exception handling
-import png
 from PIL import Image
-from io import BytesIO
 from datetime import datetime
 
 def find_devices():
@@ -90,12 +86,11 @@ def set_xvalues(polygon, x0, x1):
         polygon.set_xy(_ndarray)
 
 
-def initialize_histograms(bins, num_cameras=2, line_width=3):
+def initialize_histograms(num_cameras=2, line_width=3):
     """
     Initializes histogram matplotlib.pyplot figures/subplots.
 
     Args:
-        bins: An instance of tlFactory.EnumerateDevices()
         num_cameras: An integer
         line_width: An integer
     Raises:
@@ -103,6 +98,7 @@ def initialize_histograms(bins, num_cameras=2, line_width=3):
     Returns:
         dict: A dictionary of histograms with ascending lowercase alphabetical letters (that match cameras) as keys
     """
+    bins = 4096
     stream_subplots = dict()
     lines = {
         "intensities": dict(),
@@ -373,7 +369,7 @@ def create_and_save_videos(cam_a_frames_direc, cam_b_frames_direc, videos_direct
         filename=os.path.join(videos_directory,'cams_with_histogram_representations.avi'),
         fourcc=cv2.VideoWriter_fourcc(*'DIVX'),
         fps=10,
-        frameSize=(1000, 1000),
+        frameSize=(height_h, width_h),
         isColor=1)
 
     os.chdir(videos_directory)
@@ -416,19 +412,23 @@ def clear_prev_run():
     return camera_a_frames_directory, camera_b_frames_directory, cams_by_hists_directory, videos_directory
 
 
-def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=4096, frame_break=1000, save_imgs=False, save_vids=False):
+def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, frame_break=-1, save_imgs=False, save_vids=False, display_live_histocam=False, save_histocam_reps=False, show_raw_data=True):
     """
     Starts grabbing for all cameras starting with index 0. The grabbing is started for one camera after the other.
     That's why the images of all cameras are not taken at the same time. However, a hardware trigger setup can be used
     to cause all cameras to grab images synchronously. According to their default configuration, the cameras are set up
     for free-running continuous acquisition. Also saves all the images and videos.
+
     Args:
-        cams_dict: Description
+        cams_dict (dict): Dictionary of key-value pairs where they keys are 'pypylon.pylon.InstantCamera' or
+            'pypylon.pylon.InstantCameraArray' identifiers ('a', 'b', 'all') and the values are the InstantCamera and
+            InstantCameraArray objects.
         figures: Description
         histograms_dict: Description
         lines: Description
         bins: Description
-        frame_break: Limit of frames to record. Default 10.
+        frame_break: Limit of frames to record. Default -1 (Frame count starts at 0, so if left at default of -1,
+            cameras will stream indefinitely or until manually interrupted)
         fps: Frames per second saved video will play at. Default 1.
     """
     frame_count = 0
@@ -440,28 +440,31 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, bins=40
     while cams_dict["all"].IsGrabbing() and frame_count != frame_break and not (cv2.waitKey(1) & 0xFF == ord('q')):
         grab_result_a = cams_dict["a"].RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
         grab_result_b = cams_dict["b"].RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
+        raw_image_a, raw_image_b = None, None
         if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
             frame_count += 1
-            raw_image_a = grab_result_a.GetArray()
-            raw_image_b = grab_result_b.GetArray()
-            raw_cam_a_frames.append(grab_result_a.GetArray())
-            raw_cam_b_frames.append(grab_result_b.GetArray())
-            #cv2.imshow("cam_a", convert_to_16_bit(raw_image_a, original_bit_depth=12))
-            #cv2.imshow("cam_b", convert_to_16_bit(raw_image_b, original_bit_depth=12))
-            #cv2.imshow("cam_a", grab_result_a.GetArray()*16)
-            #cv2.imshow("cam_b", grab_result_b.GetArray()*16)
+            if show_raw_data:
+                raw_image_a = grab_result_a.GetArray()
+                raw_image_b = grab_result_b.GetArray()
+                cv2.imshow("cam_a", convert_to_16_bit(raw_image_a, original_bit_depth=12))
+                cv2.imshow("cam_b", convert_to_16_bit(raw_image_b, original_bit_depth=12))
+                if save_imgs or save_vids:
+                    raw_cam_a_frames.append(raw_image_a)
+                    raw_cam_b_frames.append(raw_image_b)
 
-            update_histogram(histograms_dict, lines, "a", bins, raw_image_a)
-            update_histogram(histograms_dict, lines, "b", bins, raw_image_b)
-            figures["a"].canvas.draw()  # Draw updates subplots in interactive mode
-            figures["b"].canvas.draw()  # Draw updates subplots in interactive mode
-            cam_w_histogram_frames.append(add_histogram_representations(figures["a"], figures["b"], raw_image_a, raw_image_b))
-            cv2.imshow("Camera & Histogram Streams", cam_w_histogram_frames[len(cam_w_histogram_frames)-1])
+            if display_live_histocam or save_histocam_reps:
+                update_histogram(histograms_dict, lines, "a", 4096, raw_image_a)
+                update_histogram(histograms_dict, lines, "b", 4096, raw_image_b)
+                figures["a"].canvas.draw()  # Draw updates subplots in interactive mode
+                figures["b"].canvas.draw()  # Draw updates subplots in interactive mode
+                cam_w_histogram_frames.append(add_histogram_representations(figures["a"], figures["b"], raw_image_a, raw_image_b))
+                if display_live_histocam:
+                    cv2.imshow("Camera & Histogram Streams", cam_w_histogram_frames[len(cam_w_histogram_frames)-1])
 
     cams_dict["a"].StopGrabbing()
     cams_dict["b"].StopGrabbing()
 
-    if save_imgs or save_vids #
+    if save_imgs or save_vids:
         camera_a_frames_directory, camera_b_frames_directory, cams_by_hists_direc, videos_directory = clear_prev_run()
 
         if save_imgs:
