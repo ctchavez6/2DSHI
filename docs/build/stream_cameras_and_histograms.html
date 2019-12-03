@@ -48,13 +48,36 @@
 <dl class="function">
 <dt id="stream_cameras_and_histograms.add_histogram_representations">
 <code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">add_histogram_representations</code><span class="sig-paren">(</span><em class="sig-param">figure_a</em>, <em class="sig-param">figure_b</em>, <em class="sig-param">raw_array_a</em>, <em class="sig-param">raw_array_b</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.add_histogram_representations" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO Add documentation.</p>
+<dd><p>Adds a matplotlib.pyplot.subplot to two matplotlib.pyplot.figure objects. The subplots are histograms of intensity
+data from raw_array_a and raw_array_b.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>figure_a</strong> – </p></li>
+<li><p><strong>figure_b</strong> – </p></li>
+<li><p><strong>raw_array_a</strong> – </p></li>
+<li><p><strong>raw_array_b</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An image array (3D [height, width, layers]) of the camera images and the corresponding histograms.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="stream_cameras_and_histograms.clear_prev_run">
 <code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">clear_prev_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.clear_prev_run" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO Add documentation.</p>
+<dd><p>Creates a new directory that corresponds to today’s date and time to save the videos/images in. Unlikely, but if
+for some reason two runs happen within the same minute, overwrites first run to keep latest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>TODO Convert to dictionary? Separate Functionality?</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -66,7 +89,19 @@
 <dl class="function">
 <dt id="stream_cameras_and_histograms.convert_to_16_bit">
 <code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">convert_to_16_bit</code><span class="sig-paren">(</span><em class="sig-param">image_array</em>, <em class="sig-param">original_bit_depth=12</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.convert_to_16_bit" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO Add documentation.</p>
+<dd><p>Takes an image array and represents it as 16 bit by multiplying all the values by the corresponding integer and
+specifying the bit depth in the creation of a new 2D Numpy Array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>image_array</strong> (<em>numpy.ndarray</em>) – The original image array.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The same image represented</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -118,12 +153,6 @@ a general Exception or a RuntimeError.
 </dd></dl>
 
 <dl class="function">
-<dt id="stream_cameras_and_histograms.initialize_dual_video_capture">
-<code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">initialize_dual_video_capture</code><span class="sig-paren">(</span><em class="sig-param">first_channel=0</em>, <em class="sig-param">second_channel=1</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.initialize_dual_video_capture" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO Add documentation.</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="stream_cameras_and_histograms.initialize_histograms">
 <code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">initialize_histograms</code><span class="sig-paren">(</span><em class="sig-param">bins</em>, <em class="sig-param">num_cameras=2</em>, <em class="sig-param">line_width=3</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.initialize_histograms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes histogram matplotlib.pyplot figures/subplots.</p>
@@ -142,7 +171,7 @@ a general Exception or a RuntimeError.
 <dd class="field-odd"><p>A dictionary of histograms with ascending lowercase alphabetical letters (that match cameras) as keys</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>histograms</p>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -151,6 +180,11 @@ a general Exception or a RuntimeError.
 <dt id="stream_cameras_and_histograms.reset_images_directory">
 <code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">reset_images_directory</code><span class="sig-paren">(</span><em class="sig-param">saved_imgs_directory</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.reset_images_directory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes any .tiff or .png image files created during previous runs that were saved in the specified directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>saved_imgs_directory</strong> – Path to the directory where you’d like to clear out .tiff/.png files.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -168,7 +202,17 @@ a general Exception or a RuntimeError.
 <dl class="function">
 <dt id="stream_cameras_and_histograms.set_plot_upper_bound">
 <code class="sig-prename descclassname">stream_cameras_and_histograms.</code><code class="sig-name descname">set_plot_upper_bound</code><span class="sig-paren">(</span><em class="sig-param">minimum_upper_bound</em>, <em class="sig-param">upper_bound_factor</em>, <em class="sig-param">maximum</em>, <em class="sig-param">plot</em><span class="sig-paren">)</span><a class="headerlink" href="#stream_cameras_and_histograms.set_plot_upper_bound" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO Add documentation.</p>
+<dd><p>Adjusts the y-limit/upper-bound of a matplotlib.pyplot.subplot object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>minimum_upper_bound</strong> – In the absence of data, default upper bound.</p></li>
+<li><p><strong>upper_bound_factor</strong> – Factor to multiply the data maximum by.</p></li>
+<li><p><strong>maximum</strong> – Image intensity histogram maximum.</p></li>
+<li><p><strong>plot</strong> (<em>matplotlib.pyplot.subplot</em>) – Subplot that represents camera histogram.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -195,14 +239,23 @@ a general Exception or a RuntimeError.
 <dd><p>Starts grabbing for all cameras starting with index 0. The grabbing is started for one camera after the other.
 That’s why the images of all cameras are not taken at the same time. However, a hardware trigger setup can be used
 to cause all cameras to grab images synchronously. According to their default configuration, the cameras are set up
-for free-running continuous acquisition. Also saves all the images and videos.
-:param cams_dict: Description
-:param figures: Description
-:param histograms_dict: Description
-:param lines: Description
-:param bins: Description
-:param frame_break: Limit of frames to record. Default 10.
-:param fps: Frames per second saved video will play at. Default 1.</p>
+for free-running continuous acquisition. Also saves all the images and videos.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cams_dict</strong> (<em>dict</em>) – Dictionary of key-value pairs where they keys are ‘pypylon.pylon.InstantCamera’ or
+‘pypylon.pylon.InstantCameraArray’ identifiers (‘a’, ‘b’, ‘all’) and the values are the InstantCamera and
+InstantCameraArray objects.</p></li>
+<li><p><strong>figures</strong> – Description</p></li>
+<li><p><strong>histograms_dict</strong> – Description</p></li>
+<li><p><strong>lines</strong> – Description</p></li>
+<li><p><strong>bins</strong> – Description</p></li>
+<li><p><strong>frame_break</strong> – Limit of frames to record. Default -1 (Frame count starts at 0, so if left at default of -1,
+cameras will stream indefinitely or until manually interrupted)</p></li>
+<li><p><strong>fps</strong> – Frames per second saved video will play at. Default 1.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
