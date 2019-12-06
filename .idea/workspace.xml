@@ -2,26 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Full_Line_out.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Left_Right_Trimmed_Line_out.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Left_Trimmed_Line_out.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Original_Image.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Region_of_Interest_Horizontal.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Region_of_Interest_Horizontal_Vertical.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/camera_configuration_files/old/23097552_12bit_pad_50ms_ext_pulsed.pfs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/coregistration/altered_multiple_centers_cam_a_frame_18.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/coregistration/altered_multiple_centers_cam_b_frame_18.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/coregistration/cam_a_frame_186.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/coregistration/cam_b_frame_186.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/coregistration/cameras_and_histograms_frame_186.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/coregistration/multiple_centers_cam_a_frame_18.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/coregistration/multiple_centers_cam_b_frame_18.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/coregistration/white_square.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/2DSHI.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/2DSHI.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/camera_configuration_files/23097552_12bit_pad_50ms_ext_pulsed.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Original_Image.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/Original_Image.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Region_of_Interest_Horizontal.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/Region_of_Interest_Horizontal.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Region_of_Interest_Horizontal_Vertical.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/Region_of_Interest_Horizontal_Vertical.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/find_gaussian_profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/find_gaussian_profile.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/stream_cameras_and_histograms.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_cameras_and_histograms.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -72,13 +58,13 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\fwess\Documents\GitHub" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\reference" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\previous_versions_and_reference" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\fwess\Documents\GitHub" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -295,7 +281,11 @@
       <workItem from="1575237077126" duration="1266000" />
       <workItem from="1575238980757" duration="1635000" />
       <workItem from="1575245589387" duration="6198000" />
-      <workItem from="1575338895942" duration="9917000" />
+      <workItem from="1575338895942" duration="9963000" />
+      <workItem from="1575424217007" duration="9440000" />
+      <workItem from="1575478932500" duration="1892000" />
+      <workItem from="1575599516485" duration="5554000" />
+      <workItem from="1575605358571" duration="3448000" />
     </task>
     <task id="LOCAL-00001" summary="this is a test commit">
       <created>1571506272404</created>
@@ -451,7 +441,14 @@
       <option name="project" value="LOCAL" />
       <updated>1573788119142</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="functionality updates">
+      <created>1575350224990</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1575350224990</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -489,7 +486,8 @@
     <MESSAGE value="adding my file" />
     <MESSAGE value="now we know about noise" />
     <MESSAGE value="saving images at 16 bit" />
-    <option name="LAST_COMMIT_MESSAGE" value="saving images at 16 bit" />
+    <MESSAGE value="functionality updates" />
+    <option name="LAST_COMMIT_MESSAGE" value="functionality updates" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/2DSHI$simplified_realTimeVideoHistogram.coverage" NAME="simplified_realTimeVideoHistogram Coverage Results" MODIFIED="1571591111756" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
@@ -505,8 +503,8 @@
     <SUITE FILE_PATH="coverage/2DSHI$output_pixel.coverage" NAME="output_pixel Coverage Results" MODIFIED="1571935378885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/current_scripts" />
     <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_a1.coverage" NAME="10_19_2019_a1 Coverage Results" MODIFIED="1571519715697" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1571705669835" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon" />
-    <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_a2.coverage" NAME="10_19_2019_a2 Coverage Results" MODIFIED="1571513108879" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$interactive_legend.coverage" NAME="interactive_legend Coverage Results" MODIFIED="1571711885885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/AppData/Local/Temp" />
+    <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_a2.coverage" NAME="10_19_2019_a2 Coverage Results" MODIFIED="1571513108879" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$displayPhoto.coverage" NAME="displayPhoto Coverage Results" MODIFIED="1571505715036" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/2DSHI$grabmultiplecameras.coverage" NAME="grabmultiplecameras Coverage Results" MODIFIED="1571594597344" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
     <SUITE FILE_PATH="coverage/2DSHI$10_20_2019_Dual_Stream_a1.coverage" NAME="10_20_2019_Dual_Stream_a1 Coverage Results" MODIFIED="1571593699104" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
