@@ -6,6 +6,7 @@ from astropy import modeling
 from scipy.optimize import curve_fit
 from lmfit import Model
 from PIL import Image
+from scipy.ndimage import rotate
 
 def gaussian_distribution(x, mu, sigma, coefficient):
     """
@@ -145,7 +146,7 @@ def plot_horizonal_lineout_intensity(image, coordinates):
     #print("Lineout Shape: ", lineout.shape)
     plt.plot(indices, lineout)
     plt.title("Left-Right Trimmed Line-out")
-    plt.show()
+    #plt.show()
     plt.close('all')
     return indices, lineout
 
@@ -183,7 +184,7 @@ def fit_function(x_coords, y_coords):
     plt.plot(x_coords, y_model_output, label='Model')
     plt.title("Scipy Optimize Fit - ./coregistration/cam_b_frame_186.png")
     plt.legend()
-    plt.show()
+    #plt.show()
     fig.savefig("ScipyOptimizeCurveFit_For-coregistration-cam_b_frame_186.png")
 
 
@@ -253,16 +254,16 @@ def get_noise_boundaries(image, coordinates_of_maxima, upper_limit_noise=10):
     return first_i_above_uln, last_i_above_uln, first_j_above_uln, last_j_above_uln
 
 
-def get_gaus_boundaries(image, coords_of_max):
+def get_gaus_boundaries_x(image, coords_of_max):
     fig = plt.figure()
     xs = np.arange(0, image.shape[1])
-    print(xs)
-    print("coords of max")
-    print(coords_of_max)
+
     ym, xm = coords_of_max
     # Horizontal Line Out
-    ys = img[:, ym]
-    print("Scipy Optimize Curve Fit Parameters")
+    #test = test[x_max:x_max + 1, :]  # Horizontal Line Out
+
+    ys = image[xm:xm + 1, :].flatten()
+    print("Scipy Optimize Curve Fit Parameters: x")
     popt, pcov = curve_fit(gaussian_distribution, xs, ys)
     mu, sigma, amp = popt[0], popt[1], popt[2]
     print('Mean: {} +\- {}'.format(mu, np.sqrt(pcov[0, 0])))
@@ -282,41 +283,34 @@ def get_gaus_boundaries(image, coords_of_max):
     y_model_output = gaussian_distribution(xs, *popt)
     plt.plot(xs, ys, label='Data')
     plt.plot(xs, y_model_output, label='Model')
-    plt.title("Scipy Optimize Fit - ./coregistration/cam_b_frame_186.png")
+    plt.title("Scipy Optimize Fit X - ./coregistration/cam_b_frame_186.png")
     plt.legend()
-    plt.show()
-    fig.savefig("ScipyOptimizeCurveFit_For-coregistration-cam_b_frame_186.png")
-
+    #plt.show()
+    fig.savefig("ScipyOptimizeCurveFit_X-coregistration-cam_b_frame_186.png")
 
     plt.close('all')
+    return mu, sigma, amp
 
 
 
-    #fig_a, ax = plt.subplots()
-    #xdisplay, ydisplay = ax.transData.transform_point((horizontal_center, vertical_center))
-    #print("xdisplay, ydisplay: ", xdisplay, ydisplay)
-    #ax.title.set_text('Image With NoiseSubtracted ROI Boxed')
-    #ax.axvline(first_i_above_uln, color='y', linestyle='dashed', linewidth=1)
-    #ax.axvline(last_i_above_uln, color='y', linestyle='dashed', linewidth=1)
-    #ax.axhline(first_j_above_uln, color='y', linestyle='dashed', linewidth=1)
-    #ax.axhline(last_j_above_uln, color='y', linestyle='dashed', linewidth=1)
-    """"
+def get_gaus_boundaries_y(image, coords_of_max):
     fig = plt.figure()
-    print("Scipy Optimize Curve Fit Parameters")
-    popt, pcov = curve_fit(gaussian_distribution, x_coords, y_coords)
+    xs = np.arange(0, image.shape[1])
+    print(xs)
+    print("coords of max")
+    print(coords_of_max)
+    ym, xm = coords_of_max
+    ys = image[:, ym:ym+1].flatten()  # Vertical Line Out
+
+    print(ys)
+    print("Scipy Optimize Curve Fit Parameters: y")
+    popt, pcov = curve_fit(gaussian_distribution, xs, ys)
     mu, sigma, amp = popt[0], popt[1], popt[2]
     print('Mean: {} +\- {}'.format(mu, np.sqrt(pcov[0, 0])))
     print('Standard Deviation: {} +\- {}'.format(sigma, np.sqrt(pcov[1, 1])))
     print('Amplitude: {} +\- {}'.format(amp, np.sqrt(pcov[2, 2])))
 
-    maximum_intensity = max(y_coords.tolist())
-    print("maximum_intensity:", maximum_intensity)
-    x_indices_of_max = np.argwhere(y_coords == np.amax(y_coords)).flatten().tolist()
-    print("x_indices_of_max: ", x_indices_of_max)
-    print("intensity at index = 0: ", y_coords[0])
-    print("intensity at index = 170: ", y_coords[170])
-    print("intensity at index = 172: ", y_coords[172])
-
+    mu, sigma, amp = popt[0], popt[1], popt[2]
     plt.axvline(mu + (1 * sigma), color='b', linestyle='dashed', linewidth=1, label="1sigma")
     plt.axvline(mu - (1 * sigma), color='b', linestyle='dashed', linewidth=1)
     plt.axvline(mu + (2 * sigma), color='r', linestyle='dashed', linewidth=1, label="2sigma")
@@ -326,33 +320,144 @@ def get_gaus_boundaries(image, coords_of_max):
     plt.axvline(mu + (4 * sigma), color='gray', linestyle='dashed', linewidth=1, label="4sigma")
     plt.axvline(mu - (4 * sigma), color='gray', linestyle='dashed', linewidth=1)
 
-    y_model_output = gaussian_distribution(x_coords, *popt)
-    plt.plot(x_coords, y_coords, label='Data')
-    plt.plot(x_coords, y_model_output, label='Model')
-    plt.title("Scipy Optimize Fit - ./coregistration/cam_b_frame_186.png")
+    y_model_output = gaussian_distribution(xs, *popt)
+    plt.plot(xs, ys, label='Data')
+    plt.plot(xs, y_model_output, label='Model')
+    plt.title("Scipy Optimize Fit Y - ./coregistration/cam_b_frame_186.png")
     plt.legend()
-    plt.show()
-    fig.savefig("ScipyOptimizeCurveFit_For-coregistration-cam_b_frame_186.png")
+    #plt.show()
+    fig.savefig("ScipyOptimizeCurveFit_Y-coregistration-cam_b_frame_186.png")
 
     plt.close('all')
+    return mu, sigma, amp
 
-    
+
+
+def save_img(filename, directory, image, sixteen_bit=True):
     """
+    TODO Add documentation.
+    """
+    os.chdir(directory)
+    if sixteen_bit:
+        img = image.astype(np.uint16)
+        img = np.asarray(img, dtype=np.uint16)
+        img = Image.fromarray(img*16)
+        img.save(filename, compress_level=0)
+    else:
+        cv2.imwrite(filename, image.astype(np.uint16))
+    os.chdir(directory)
+
+
+
 
 img = read_image_from_file("./coregistration/cam_b_frame_186.png")
 coordinates_of_maximum = get_coordinates_of_maximum(img)
-x0, x1, y0, y1 = get_noise_boundaries(img, coordinates_of_maximum)
-get_gaus_boundaries(img, coordinates_of_maximum)
+x_max, y_max = coordinates_of_maximum
+noise_x0, noise_x1, noise_y0, noise_y1 = get_noise_boundaries(img, coordinates_of_maximum)
+
+reduced_noise_img = img[:, :]
+cv2.namedWindow("ROI")
+cv2.moveWindow("ROI", 40,30)
 
 
-#test = np.asarray(img[:, :])
-#test[y0:y1+1, x0] = 4095
-#test[y0:y1+1, x1] = 4095
+cv2.imshow("ROI", reduced_noise_img/(2**12))
+cv2.waitKey(1500)
 
-#test[y0, x0:x1+1] = 4095
-#test[y1, x0:x1+1] = 4095
+test = np.asarray(img[:, :]).copy()
+test[noise_y0:noise_y1+1, noise_x0] = 4095
+test[noise_y0:noise_y1+1, noise_x1] = 4095
+test[noise_y0, noise_x0:noise_x1+1] = 4095
+test[noise_y1, noise_x0:noise_x1+1] = 4095
 
-#cv2.imwrite("test.png", test)
+
+cv2.imshow("ROI", test/(2**12))
+cv2.waitKey(1500)
+
+# Test is a copy of the image
+
+# The following code places a white box at the noise limits
+reduced_noise_img = img[noise_y0:noise_y1+1, noise_x0:noise_x1+1]
+
+#test[y_max:y_max+100, :] = 4095
+#test = test[:, y_max:y_max+1] # Vertical Line Out
+#test = test[x_max:x_max+1, :]  # Horizontal Line Out
+
+# White box to show noise limits
+#reduced_noise_img[noise_y0:noise_y1+1, noise_x1] = 4095
+#reduced_noise_img[noise_y0, noise_x0:noise_x1+1] = 4095
+#reduced_noise_img[noise_y1, noise_x0:noise_x1+1] = 4095
+
+cv2.imshow("ROI", reduced_noise_img/(2**12))
+cv2.waitKey(1500)
+
+# Zoom in on region above noise
+
+
+
+
+mean_x, stdev_x, amplitude_x = get_gaus_boundaries_x(img, coordinates_of_maximum)
+
+mean_y, stdev_y, amplitude_y = get_gaus_boundaries_y(img, coordinates_of_maximum)
+
+
+
+
+# Test is a copy of the image
+
+# The following code places a white box at the noise limits
+#test[y_max:y_max+100, :] = 4095
+#test = test[:, y_max:y_max+1] # Vertical Line Out
+#test = test[x_max:x_max+1, :]  # Horizontal Line Out
+
+# White box to show noise limits
+#test[noise_y0:noise_y1+1, noise_x0] = 4095
+#test[noise_y0:noise_y1+1, noise_x1] = 4095
+#test[noise_y0, noise_x0:noise_x1+1] = 4095
+#test[noise_y1, noise_x0:noise_x1+1] = 4095
+
+# White box to show noise limits
+#test[noise_y0:noise_y1+1, noise_x0] = 4095
+#test[noise_y0:noise_y1+1, noise_x1] = 4095
+#test[noise_y0, noise_x0:noise_x1+1] = 4095
+#test[noise_y1, noise_x0:noise_x1+1] = 4095
+
+# Guassian: 4 Sigma X Direction
+test[:, x_max+int(stdev_x*4)] = 4095
+test[:, x_max-int(stdev_x*4)] = 4095
+
+
+# Guassian: 4 Sigma y Direction
+test[y_max+int(stdev_y*4), :] = 4095
+test[y_max-int(stdev_y*4), :] = 4095
+
+
+#test[y_max+int(stdev_x*4), :] = 4095
+#test[y_max-int(stdev_x*4), :] = 4095
+reduced_noise_test = test[noise_y0:noise_y1+1, noise_x0:noise_x1+1]
+
+
+cv2.imshow("ROI", reduced_noise_test/(2**12))
+cv2.waitKey(1500)
+
+img_reduced_to_4sigma = reduced_noise_img[y_max-int(stdev_y*4):y_max+int(stdev_y*4), ]
+test_reduced_to_4sigma_y = test[y_max-int(stdev_y*4):y_max+int(stdev_y*4)+1, noise_x0:noise_x1+1]
+test_reduced_to_4sigma_yx = test[y_max-int(stdev_y*4):y_max+int(stdev_y*4)+1, x_max-int(stdev_x*4):x_max+int(stdev_x*4)+1]
+
+
+roi = img[y_max-int(stdev_y*4):y_max+int(stdev_y*4)+1, x_max-int(stdev_x*4):x_max+int(stdev_x*4)+1].copy()
+
+rotated_roi = rotate(roi, 45, reshape=False)
+
+cv2.imwrite("test.png", test)
+save_img("test_1.png", os.getcwd(), test)
+
+cv2.imshow("ROI", roi/(2**12))
+#cv2.imshow("Original Image with Boundary Boxes", rotated_img/(2**12))
+cv2.waitKey(3000)
+
+cv2.imshow("ROI", rotated_roi/(2**12))
+cv2.waitKey(3000)
+
 #cv2.imwrite("noise_reduced.png", img[y0:y1+1, x0:x1+1])
 
 #img_without_noise = crop_surrounding_noise(img, get_coordinates_of_maximum(img))
