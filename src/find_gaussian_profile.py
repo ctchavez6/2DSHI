@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from astropy import modeling
 from scipy.optimize import curve_fit
 from lmfit import Model
+from PIL import Image
 
 def gaussian_distribution(x, mu, sigma, coefficient):
     """
@@ -38,7 +39,8 @@ def read_image_from_file(image_path, file_bit_depth=16, original_bit_depth=12):
     Returns:
         The image array in it's intended bit depth.
     """
-    return np.asarray(cv2.imread(image_path, -1)) / (2**(file_bit_depth-original_bit_depth))
+    return cv2.imread(image_path, -1) / (2**(file_bit_depth-original_bit_depth))
+    #return np.asarray(cv2.imread(image_path, -1)) / (2**(file_bit_depth-original_bit_depth))
 
 
 def get_maximum_pixel_intensity(image_array):
@@ -50,7 +52,7 @@ def get_maximum_pixel_intensity(image_array):
     Returns:
         The image intensity maximum (assuming grayscale) as an int.
     """
-    return max(image_array.flatten())
+    return max(image_array.flatten().tolist())
 
 
 def get_coordinates_of_maximum(image):
@@ -64,11 +66,15 @@ def get_coordinates_of_maximum(image):
         The image intensity maximum (assuming grayscale) as an int.
     """
     maximum_intensity_value = get_maximum_pixel_intensity(image)
+    print("maximum_intensity_value acording to  get_maximum_pixel_intensity(): ", maximum_intensity_value)
     x_coordinates = np.where(image == maximum_intensity_value)[1]
     y_coordinates = np.where(image == maximum_intensity_value)[0]
     if len(x_coordinates) > 1 or len(y_coordinates) > 1:
-        return [(int(np.mean(x_coordinates)), int(np.mean(y_coordinates)))][0]
-    return [(i, j) for i, j in zip(x_coordinates, y_coordinates)][0]
+        x, y = [(int(np.mean(x_coordinates)), int(np.mean(y_coordinates)))][0]
+    else:
+        x, y = [(i, j) for i, j in zip(x_coordinates, y_coordinates)][0]
+    print("coordinates (x, y) [y=0 @ top of image]: ", (x, y))
+    return x, y
 
 
 def crop_surrounding_noise(image, maximum_coords, upper_limit_noise=10):
@@ -84,6 +90,7 @@ def crop_surrounding_noise(image, maximum_coords, upper_limit_noise=10):
         np.ndarray: Newly cropped image
     """
 
+    # Steps of cropping surrounding noise
     horizontal_center, vertical_center = maximum_coords[0], maximum_coords[1]
     horizontal_lineout = np.asarray(image[vertical_center:vertical_center+1, :])[0]
     vertical_lineout = image[:, horizontal_center:horizontal_center+1].flatten()
@@ -122,130 +129,234 @@ def plot_horizonal_lineout_intensity(image, coordinates):
     Returns:
         (np.ndarray, np.ndarray): A tuple equal to (indices, intensity values). Both components as a np.ndarray
     """
-    print("Image Shape: ", image.shape)
+    print("Inside Function plot_horizonal_lineout_intensity(image, coordinates)")
+    #print("Image Shape: ", image.shape)
     fig_c, cx = plt.subplots()
     cx.title.set_text('Horizontal & Vertical Region of Interest (Above Noise)')
     cx.imshow(image)
-    fig_c.savefig("abc.png")
+    fig_c.savefig("Horizontal_&_Vertical_Region_of_Interest_(Above_Noise).png")
     plt.close('all')
-    cv2.imshow("what we are plotting", image)
     x_max, y_max = coordinates
     print("Maxima at: ", (x_max, y_max))
+    print("image[%s, %s] = %s" % (str(x_max), str(y_max), str(image[y_max, x_max])))
     lineout = np.asarray(image[x_max:x_max+1, :])[0]
     #lineout = np.asarray(image[:, y_max:y_max+1])[0]
     indices = np.arange(0, len(lineout))
-    print("Lineout Shape: ", lineout.shape)
+    #print("Lineout Shape: ", lineout.shape)
     plt.plot(indices, lineout)
     plt.title("Left-Right Trimmed Line-out")
-    #plt.show()
+    plt.show()
     plt.close('all')
     return indices, lineout
-def calc_reduced_chi_square(fit, x, y, yerr, N, n_free):
-    '''
-    fit (array) values for the fit
-    x,y,yerr (arrays) data
-    N total number of points
-    n_free number of parameters we are fitting
-    '''
-    return 1.0/(N-n_free)*sum(((fit - y)/yerr)**2)
 
-
-def gaussian(x, amp, cen, wid):
-    """1-d gaussian: gaussian(x, amp, cen, wid)"""
-    return (amp / (np.sqrt(2*np.pi) * wid)) * np.exp(-(x-cen)**2 / (2*wid**2))
-def chi2(y_measure,y_predict,errors):
-    """Calculate the chi squared value given a measurement with errors and prediction"""
-    return np.sum( (y_measure - y_predict)**2 / errors**2 )
-
-def chi2reduced(y_measure, y_predict, errors, number_of_parameters):
-    """Calculate the reduced chi squared value given a measurement with errors and prediction,
-    and knowing the number of parameters in the model."""
-    return chi2(y_measure, y_predict, errors)/(y_measure.size - number_of_parameters)
 
 
 def fit_function(x_coords, y_coords):
-    """
-
-
-    fitter = modeling.fitting.LevMarLSQFitter()
-    model = modeling.models.Gaussian1D()   # depending on the data you need to give some initial values
-    fitted_model = fitter(model, x_coords, y_coords)
     fig = plt.figure()
-    plt.plot(x_coords, y_coords)
-    plt.plot(x_coords, fitted_model(x_coords))
-    plt.title("Astropy Fit - ./coregistration/cam_b_frame_186.png")
-    plt.show()
-    fig.savefig('Fit.png')
-
-    plt.close('all')
-    print("Astropy Parameters")
-    cov_diag = np.diag(fitter.fit_info['param_cov'])
-    print('Amplitude: {} +\- {}'.format(fitted_model.amplitude.value, np.sqrt(cov_diag[0])))
-    print('Mean: {} +\- {}'.format(fitted_model.mean.value, np.sqrt(cov_diag[1])))
-    print('Standard Deviation: {} +\- {}'.format(fitted_model.stddev.value, np.sqrt(cov_diag[2])))
-    #scipy stuff
-
-    reduced_chi_squared = calc_reduced_chi_square(fitted_model(x_coords), x_coords, y_coords, np.ones(len(x_coords)), len(x_coords), 3)
-    print('Reduced Chi Squared using astropy.modeling: {}'.format(reduced_chi_squared))
-
-        #model_gauss = models.Gaussian1D()
-    #fitter_gauss = fitting.LevMarLSQFitter()
-    sigma = 1
-    y2_err = np.ones(len(x_coords)) * sigma
-    popt, pcov = curve_fit(gaussian_distribution, x_coords, y_coords)
-    a, b, c = pcov
-    best_fit_gauss_2 = np.asarray([gaussian_distribution(x, a, b, c) for x in x_coords])
-
     print("Scipy Optimize Curve Fit Parameters")
-    print('Mean: {} +\- {}'.format(popt[0], np.sqrt(pcov[0, 0])))
-    print('Standard Deviation: {} +\- {}'.format(popt[1], np.sqrt(pcov[1, 1])))
-    print('Amplitude: {} +\- {}'.format(popt[2], np.sqrt(pcov[2, 2])))
-    yEXP = gaussian_distribution(x_coords, *popt)
+    popt, pcov = curve_fit(gaussian_distribution, x_coords, y_coords)
+    mu, sigma, amp = popt[0], popt[1], popt[2]
+    print('Mean: {} +\- {}'.format(mu, np.sqrt(pcov[0, 0])))
+    print('Standard Deviation: {} +\- {}'.format(sigma, np.sqrt(pcov[1, 1])))
+    print('Amplitude: {} +\- {}'.format(amp, np.sqrt(pcov[2, 2])))
 
-    reduced_chi_squared = calc_reduced_chi_square(best_fit_gauss_2, x_coords, y_coords, y2_err, len(x_coords), 3)
-    print('Reduced Chi Squared using scipy: {}'.format(reduced_chi_squared))
 
-    fig2 = plt.figure()
-    plt.plot(x_coords, y_coords, label='Data', marker='o')
-    plt.plot(x_coords, yEXP, 'r-', ls='--', label="Exp Fit")
+    maximum_intensity = max(y_coords.tolist())
+    print("maximum_intensity:", maximum_intensity)
+    x_indices_of_max = np.argwhere(y_coords == np.amax(y_coords)).flatten().tolist()
+    print("x_indices_of_max: ", x_indices_of_max)
+    print("intensity at index = 0: ", y_coords[0])
+    print("intensity at index = 170: ", y_coords[170])
+    print("intensity at index = 172: ", y_coords[172])
+
+    plt.axvline(mu + (1 * sigma), color='b', linestyle='dashed', linewidth=1, label="1sigma")
+    plt.axvline(mu - (1 * sigma), color='b', linestyle='dashed', linewidth=1)
+    plt.axvline(mu + (2 * sigma), color='r', linestyle='dashed', linewidth=1, label="2sigma")
+    plt.axvline(mu - (2 * sigma), color='r', linestyle='dashed', linewidth=1)
+    plt.axvline(mu + (3 * sigma), color='g', linestyle='dashed', linewidth=1, label="3sigma")
+    plt.axvline(mu - (3 * sigma), color='g', linestyle='dashed', linewidth=1)
+    plt.axvline(mu + (4 * sigma), color='gray', linestyle='dashed', linewidth=1, label="4sigma")
+    plt.axvline(mu - (4 * sigma), color='gray', linestyle='dashed', linewidth=1)
+
+    y_model_output = gaussian_distribution(x_coords, *popt)
+    plt.plot(x_coords, y_coords, label='Data')
+    plt.plot(x_coords, y_model_output, label='Model')
     plt.title("Scipy Optimize Fit - ./coregistration/cam_b_frame_186.png")
     plt.legend()
     plt.show()
-    """
+    fig.savefig("ScipyOptimizeCurveFit_For-coregistration-cam_b_frame_186.png")
 
-    # Create the artificial dataset
-    nobs = int(T/dt + 1.5)
-    t = dt*np.arange(nobs)
-    N = f(t,N0,tau)
-    Nfluct = stdev*np.random.normal(size=nobs)
-    N = N + Nfluct
-    sig = np.zeros(nobs) + stdev
 
-    # Fit the curve
-    start = (1100, 90)
-    popt, pcov = curve_fit(f,t,N,sigma = sig,p0 = start,absolute_sigma=True)
-    print(popt)
-    print(pcov)
+    plt.close('all')
 
-    # Compute chi square
-    Nexp = f(t, *popt)
-    r = N - Nexp
-    chisq = np.sum((r/stdev)**2)
-    df = nobs - 2
-    print(“chisq =”,chisq,”df =”,df)
+def get_noise_boundaries(image, coordinates_of_maxima, upper_limit_noise=10):
+    # Steps of cropping surrounding noise
+    print("Starting: get_noise_boundaries()")
+    horizontal_center, vertical_center = coordinates_of_maxima[0], coordinates_of_maxima[1]
+    horizontal_lineout = image[vertical_center, :]
+    vertical_lineout = image[:, horizontal_center].flatten()
+    first_i_above_uln = 0
+    for i in range(len(horizontal_lineout)):
+        x_index = i
+        intensity = horizontal_lineout[i]
+        if intensity > upper_limit_noise:
+            print("At x = {}, y = {} ------ Intensity = {}".format(x_index, vertical_center, intensity))
+            first_i_above_uln = x_index
+            break
 
-    # Plot the data with error bars along with the fit result
-    import matplotlib.pyplot as plt
-    plt.errorbar(t, N, yerr=sig, fmt = 'o', label='"data"')
-    plt.plot(t, Nexp, label='fit')
+    first_j_above_uln = 0
+    for j in range(len(vertical_lineout)):
+        y_index = j
+        intensity = vertical_lineout[j]
+        if intensity > upper_limit_noise:
+            print("At x = {}, y = {} ------ Intensity = {}".format(horizontal_center, y_index, intensity))
+            first_j_above_uln = y_index
+            break
+
+
+    last_i_above_uln = 0
+    for i in range(len(horizontal_lineout))[::-1]: #, -1):
+        x_index = i
+        intensity = horizontal_lineout[i]
+        #print(x_index, intensity)
+        if intensity > upper_limit_noise:
+            print("At x = {}, y = {} ------ Intensity = {}".format(x_index, vertical_center, intensity))
+            last_i_above_uln = x_index
+            break
+
+    last_j_above_uln = 0
+    for j in range(len(horizontal_lineout))[::-1]: #, -1):
+        y_index = j
+        intensity = horizontal_lineout[j]
+        #print(x_index, intensity)
+        if intensity > upper_limit_noise:
+            print("At x = {}, y = {} ------ Intensity = {}".format(horizontal_center, y_index, intensity))
+            last_j_above_uln = y_index
+            break
+
+
+
+    index_of_last_pixel_above_noise_limit_flo_h = len(horizontal_lineout) - next(x[0] for x in enumerate(reversed(horizontal_lineout)) if x[1] > upper_limit_noise) - 1
+
+    fig_a, ax = plt.subplots()
+    #xdisplay, ydisplay = ax.transData.transform_point((horizontal_center, vertical_center))
+    #print("xdisplay, ydisplay: ", xdisplay, ydisplay)
+    ax.title.set_text('Image With NoiseSubtracted ROI Boxed')
+    ax.axvline(first_i_above_uln, color='y', linestyle='dashed', linewidth=1)
+    ax.axvline(last_i_above_uln, color='y', linestyle='dashed', linewidth=1)
+    ax.axhline(first_j_above_uln, color='y', linestyle='dashed', linewidth=1)
+    ax.axhline(last_j_above_uln, color='y', linestyle='dashed', linewidth=1)
+
+    ax.imshow(image)
+    fig_a.savefig("Image With NoiseSubtracted ROI Boxed.png")
+    plt.close('all')
+    return first_i_above_uln, last_i_above_uln, first_j_above_uln, last_j_above_uln
+
+
+def get_gaus_boundaries(image, coords_of_max):
+    fig = plt.figure()
+    xs = np.arange(0, image.shape[1])
+    print(xs)
+    print("coords of max")
+    print(coords_of_max)
+    ym, xm = coords_of_max
+    # Horizontal Line Out
+    ys = img[:, ym]
+    print("Scipy Optimize Curve Fit Parameters")
+    popt, pcov = curve_fit(gaussian_distribution, xs, ys)
+    mu, sigma, amp = popt[0], popt[1], popt[2]
+    print('Mean: {} +\- {}'.format(mu, np.sqrt(pcov[0, 0])))
+    print('Standard Deviation: {} +\- {}'.format(sigma, np.sqrt(pcov[1, 1])))
+    print('Amplitude: {} +\- {}'.format(amp, np.sqrt(pcov[2, 2])))
+
+    mu, sigma, amp = popt[0], popt[1], popt[2]
+    plt.axvline(mu + (1 * sigma), color='b', linestyle='dashed', linewidth=1, label="1sigma")
+    plt.axvline(mu - (1 * sigma), color='b', linestyle='dashed', linewidth=1)
+    plt.axvline(mu + (2 * sigma), color='r', linestyle='dashed', linewidth=1, label="2sigma")
+    plt.axvline(mu - (2 * sigma), color='r', linestyle='dashed', linewidth=1)
+    plt.axvline(mu + (3 * sigma), color='g', linestyle='dashed', linewidth=1, label="3sigma")
+    plt.axvline(mu - (3 * sigma), color='g', linestyle='dashed', linewidth=1)
+    plt.axvline(mu + (4 * sigma), color='gray', linestyle='dashed', linewidth=1, label="4sigma")
+    plt.axvline(mu - (4 * sigma), color='gray', linestyle='dashed', linewidth=1)
+
+    y_model_output = gaussian_distribution(xs, *popt)
+    plt.plot(xs, ys, label='Data')
+    plt.plot(xs, y_model_output, label='Model')
+    plt.title("Scipy Optimize Fit - ./coregistration/cam_b_frame_186.png")
     plt.legend()
     plt.show()
+    fig.savefig("ScipyOptimizeCurveFit_For-coregistration-cam_b_frame_186.png")
 
 
+    plt.close('all')
+
+
+
+    #fig_a, ax = plt.subplots()
+    #xdisplay, ydisplay = ax.transData.transform_point((horizontal_center, vertical_center))
+    #print("xdisplay, ydisplay: ", xdisplay, ydisplay)
+    #ax.title.set_text('Image With NoiseSubtracted ROI Boxed')
+    #ax.axvline(first_i_above_uln, color='y', linestyle='dashed', linewidth=1)
+    #ax.axvline(last_i_above_uln, color='y', linestyle='dashed', linewidth=1)
+    #ax.axhline(first_j_above_uln, color='y', linestyle='dashed', linewidth=1)
+    #ax.axhline(last_j_above_uln, color='y', linestyle='dashed', linewidth=1)
+    """"
+    fig = plt.figure()
+    print("Scipy Optimize Curve Fit Parameters")
+    popt, pcov = curve_fit(gaussian_distribution, x_coords, y_coords)
+    mu, sigma, amp = popt[0], popt[1], popt[2]
+    print('Mean: {} +\- {}'.format(mu, np.sqrt(pcov[0, 0])))
+    print('Standard Deviation: {} +\- {}'.format(sigma, np.sqrt(pcov[1, 1])))
+    print('Amplitude: {} +\- {}'.format(amp, np.sqrt(pcov[2, 2])))
+
+    maximum_intensity = max(y_coords.tolist())
+    print("maximum_intensity:", maximum_intensity)
+    x_indices_of_max = np.argwhere(y_coords == np.amax(y_coords)).flatten().tolist()
+    print("x_indices_of_max: ", x_indices_of_max)
+    print("intensity at index = 0: ", y_coords[0])
+    print("intensity at index = 170: ", y_coords[170])
+    print("intensity at index = 172: ", y_coords[172])
+
+    plt.axvline(mu + (1 * sigma), color='b', linestyle='dashed', linewidth=1, label="1sigma")
+    plt.axvline(mu - (1 * sigma), color='b', linestyle='dashed', linewidth=1)
+    plt.axvline(mu + (2 * sigma), color='r', linestyle='dashed', linewidth=1, label="2sigma")
+    plt.axvline(mu - (2 * sigma), color='r', linestyle='dashed', linewidth=1)
+    plt.axvline(mu + (3 * sigma), color='g', linestyle='dashed', linewidth=1, label="3sigma")
+    plt.axvline(mu - (3 * sigma), color='g', linestyle='dashed', linewidth=1)
+    plt.axvline(mu + (4 * sigma), color='gray', linestyle='dashed', linewidth=1, label="4sigma")
+    plt.axvline(mu - (4 * sigma), color='gray', linestyle='dashed', linewidth=1)
+
+    y_model_output = gaussian_distribution(x_coords, *popt)
+    plt.plot(x_coords, y_coords, label='Data')
+    plt.plot(x_coords, y_model_output, label='Model')
+    plt.title("Scipy Optimize Fit - ./coregistration/cam_b_frame_186.png")
+    plt.legend()
+    plt.show()
+    fig.savefig("ScipyOptimizeCurveFit_For-coregistration-cam_b_frame_186.png")
+
+    plt.close('all')
+
+    
+    """
 
 img = read_image_from_file("./coregistration/cam_b_frame_186.png")
-img_without_noise = crop_surrounding_noise(img, get_coordinates_of_maximum(img))
+coordinates_of_maximum = get_coordinates_of_maximum(img)
+x0, x1, y0, y1 = get_noise_boundaries(img, coordinates_of_maximum)
+get_gaus_boundaries(img, coordinates_of_maximum)
+
+
+#test = np.asarray(img[:, :])
+#test[y0:y1+1, x0] = 4095
+#test[y0:y1+1, x1] = 4095
+
+#test[y0, x0:x1+1] = 4095
+#test[y1, x0:x1+1] = 4095
+
+#cv2.imwrite("test.png", test)
+#cv2.imwrite("noise_reduced.png", img[y0:y1+1, x0:x1+1])
+
+#img_without_noise = crop_surrounding_noise(img, get_coordinates_of_maximum(img))
 
 #plot_horizonal_lineout_intensity(img, get_coordinates_of_maximum(img), upper_limit_noise=10)
-xs, ys = plot_horizonal_lineout_intensity(img_without_noise, get_coordinates_of_maximum(img_without_noise))
-fit_function(xs, ys)
+#xs, ys = plot_horizonal_lineout_intensity(img_without_noise, get_coordinates_of_maximum(img_without_noise))
+#fit_function(xs, ys)
