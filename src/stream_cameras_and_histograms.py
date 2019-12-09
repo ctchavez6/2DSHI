@@ -452,7 +452,7 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, frame_b
                     raw_cam_a_frames.append(raw_image_a)
                     raw_cam_b_frames.append(raw_image_b)
 
-            if display_live_histocam or save_histocam_reps:
+            if display_live_histocam or save_histocam_reps or save_imgs:
                 update_histogram(histograms_dict, lines, "a", 4096, raw_image_a)
                 update_histogram(histograms_dict, lines, "b", 4096, raw_image_b)
                 figures["a"].canvas.draw()  # Draw updates subplots in interactive mode
@@ -474,6 +474,7 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, frame_b
 
             frame_count = 0
 
+            #print(camera_a_frames_as_16bit)
             for frame_a, frame_b, cam_hist in zip(camera_a_frames_as_16bit, camera_b_frames_as_16bit,cam_w_histogram_frames):
                 frame_count += 1
                 save_img("cam_a_frame_%s.png" % frame_count, camera_a_frames_directory, frame_a)
