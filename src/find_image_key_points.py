@@ -25,15 +25,22 @@ def getComponents(normalised_homography):
   return (translation, math.degrees(theta), scale, shear)
 
 
+run = "2019_12_12__18_41"
+end_result = os.path.join("D:", "Img_Keypoint_Analysis")
+end_result = os.path.join(end_result, "Img_{}_{}".format("N", run))
 
-img_a_path = os.path.join(os.getcwd(), "2019_12_11__20_32")
+
+
+img_a_path = os.path.join("D:", "2DSHI_Runs")
+img_a_path = os.path.join(img_a_path, run)
 img_a_path = os.path.join(img_a_path, "cam_a_frames")
 img_a_path = os.path.join(img_a_path, "cam_a_frame_1.png")
 
 img_a = cv2.imread(img_a_path, 0)
 
 
-img_b_path = os.path.join(os.getcwd(), "2019_12_11__20_32")
+img_b_path = os.path.join("D:", "2DSHI_Runs")
+img_b_path = os.path.join(img_b_path, run)
 img_b_path = os.path.join(img_b_path, "cam_b_frames")
 img_b_path = os.path.join(img_b_path, "cam_b_frame_1.png")
 
@@ -50,7 +57,7 @@ height, width = img_a.shape
 
 # Create ORB detector with 5000 features.
 #orb_detector = cv2.ORB_create(5000)
-orb_detector = cv2.ORB_create(nfeatures=100000, scoreType=cv2.ORB_FAST_SCORE)
+orb_detector = cv2.ORB_create(nfeatures=100000, scoreType=cv2.ORB_FAST_SCORE, nlevels=20)
 # Find keypoints and descriptors.
 # The first arg is the image, second arg is the mask
 #  (which is not reqiured in this case).
@@ -62,6 +69,15 @@ kp2, d2 = orb_detector.detectAndCompute(img_b, None)
 img_a_w_keypoints = cv2.drawKeypoints(img_a, kp1, color=(0, 255, 0), flags=0, outImage=np.array([]))
 img_b_w_keypoints = cv2.drawKeypoints(img_b, kp2, color=(0, 255, 0), flags=0, outImage=np.array([]))
 
+f = plt.figure()
+original = f.add_subplot(1,2, 1)
+original.title.set_text('Img A')
+plt.imshow(img_a_w_keypoints, cmap='gray')
+rotated = f.add_subplot(1,2, 2)
+rotated.title.set_text('Img B')
+plt.imshow(img_b_w_keypoints, cmap='gray')
+plt.show(block=True)
+plt.close('all')
 
 
 # Match features between the two images.
@@ -118,16 +134,6 @@ homography, mask = cv2.findHomography(p1, p2, cv2.RANSAC)
 
 
 print(getComponents(homography))
-
-f = plt.figure()
-original = f.add_subplot(1,2, 1)
-original.title.set_text('Img A')
-plt.imshow(img_a_w_keypoints, cmap='gray')
-rotated = f.add_subplot(1,2, 2)
-rotated.title.set_text('Img B')
-plt.imshow(img_b_w_keypoints, cmap='gray')
-
-plt.show(block=True)
 
 
 

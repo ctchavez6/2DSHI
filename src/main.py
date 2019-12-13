@@ -40,17 +40,16 @@ def validate_video_file(video_file_path_string):
                      )
 
 
-
-
-
-
-
 parser.add_argument('-va', '--video_a', default=None,
                     help='Path to video file for Camera A (if not using camera)')
 parser.add_argument('-vb', '--video_b', default=None,
                     help='Path to video file for Camera B (if not using camera)')
 parser.add_argument('-ccf', '--camera_configuration_file', default=None,
                     help='Desired camera configuration file (if other than default_camera_configuration.pfs)')
+parser.add_argument('-ccfa', '--camera_configuration_file_a', default=None,
+                    help='Desired camera configuration file for A (if other than default_camera_configuration.pfs)')
+parser.add_argument('-ccfb', '--camera_configuration_file_b', default=None,
+                    help='Desired camera configuration file for B (if other than default_camera_configuration.pfs)')
 parser.add_argument('-e', '--ExposureTime', type=str, default=None,
                     help='Exposure time in us (microseconds) [overwrites value in default_camera_configuration.pfs]')
 parser.add_argument('-r', '--AcquisitionFrameRate', type=str, default=None,
@@ -67,7 +66,8 @@ parser.add_argument('-shc', '--SaveHistocam', type=int, default=0,
                     help="How many frames you'd like to grab/save.")
 parser.add_argument('-raw', '--Raw', type=int, default=1,
                     help="Show raw image data.")
-
+parser.add_argument('-rf', '--ResizeFactor', type=float, default=None,
+                    help="Show raw image data.")
 
 if __name__ == "__main__":
     print("Starting:")
@@ -84,14 +84,38 @@ if __name__ == "__main__":
     parameter_dictionary = ucc.reduce_dictionary(args, relevant_parameters)
     camera_configurations_folder = os.path.join(os.getcwd(), "camera_configuration_files")
 
-    if len(parameter_dictionary) > 0 and args["camera_configuration_file"] is None:
+    # Case when both Cameras read the same updated default camera configuration file: CCF'
+    if len(parameter_dictionary) > 0 and \
+            (args["camera_configuration_file"] is None
+                and args["camera_configuration_file_a"] is None
+                and args["camera_configuration_file_b"] is None):
         ucc.update_camera_configuration(parameter_dictionary)
         camera_a_configuration = os.path.join(camera_configurations_folder, "updated_configuration_file.pfs")
         camera_b_configuration = camera_a_configuration
 
-    elif args["camera_configuration_file"] is not None:
+    # Case when both Cameras read the same alternate camera configuration file: CCF*
+    elif args["camera_configuration_file"] is not None \
+            and args["camera_configuration_file_a"] is None \
+            and args["camera_configuration_file_b"] is None:
         camera_a_configuration = args["camera_configuration_file"]
         camera_b_configuration = args["camera_configuration_file"]
+
+    # Case when Camera A reads an alternate camera configuration file while B Reads Default: CCF_A*
+    elif args["camera_configuration_file"] is None \
+             and args["camera_configuration_file_a"] is not None \
+             and args["camera_configuration_file_b"] is None:
+        camera_a_configuration = args["camera_configuration_file_a"]
+        camera_b_configuration = os.path.join(camera_configurations_folder, "default_camera_configuration.pfs")
+
+    # Case when Camera A reads an default camera configuration file while B Reads Alternate CCF: CCF_B*
+    elif args["camera_configuration_file"] is None \
+             and args["camera_configuration_file_a"] is None \
+             and args["camera_configuration_file_b"] is not None:
+        print("Case when Camera A reads an default camera configuration file while B Reads Alternate CCF")
+        camera_a_configuration = os.path.join(camera_configurations_folder, "default_camera_configuration.pfs")
+        camera_b_configuration = args["camera_configuration_file_b"]
+
+
     else:
         camera_a_configuration = os.path.join(camera_configurations_folder, "default_camera_configuration.pfs")
         camera_b_configuration = camera_a_configuration
@@ -117,4 +141,5 @@ if __name__ == "__main__":
             save_vids=args["SaveVideos"],
             display_live_histocam=args["DisplayHistocam"],
             save_histocam_reps=args["SaveHistocam"],
-            show_raw_data=args["Raw"])
+            show_raw_data=args["Raw"],
+            resize_factor=args["ResizeFactor"])

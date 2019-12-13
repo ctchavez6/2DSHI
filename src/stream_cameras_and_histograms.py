@@ -412,7 +412,7 @@ def clear_prev_run():
     return camera_a_frames_directory, camera_b_frames_directory, cams_by_hists_directory, videos_directory
 
 
-def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, frame_break=-1, save_imgs=False, save_vids=False, display_live_histocam=False, save_histocam_reps=False, show_raw_data=True):
+def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, frame_break=-1, save_imgs=False, save_vids=False, display_live_histocam=False, save_histocam_reps=False, show_raw_data=True, resize_factor=1.0):
     """
     Starts grabbing for all cameras starting with index 0. The grabbing is started for one camera after the other.
     That's why the images of all cameras are not taken at the same time. However, a hardware trigger setup can be used
@@ -446,8 +446,21 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, frame_b
             if show_raw_data:
                 raw_image_a = grab_result_a.GetArray()
                 raw_image_b = grab_result_b.GetArray()
-                cv2.imshow("cam_a", convert_to_16_bit(raw_image_a, original_bit_depth=12))
-                cv2.imshow("cam_b", convert_to_16_bit(raw_image_b, original_bit_depth=12))
+
+                scale_percent = resize_factor*100  # percent of original size
+                width = int(raw_image_a.shape[1] * scale_percent / 100)
+                height = int(raw_image_a.shape[0] * scale_percent / 100)
+                dim = (width, height)
+
+                if resize_factor != 1.0:
+                    img_a_resized = cv2.resize(raw_image_a, dim, interpolation=cv2.INTER_AREA)
+                    img_b_resized = cv2.resize(raw_image_b, dim, interpolation=cv2.INTER_AREA)
+                    cv2.imshow("cam_a", convert_to_16_bit(img_a_resized, original_bit_depth=12))
+                    cv2.imshow("cam_b", convert_to_16_bit(img_b_resized, original_bit_depth=12))
+                else:
+                    cv2.imshow("cam_a", convert_to_16_bit(raw_image_a, original_bit_depth=12))
+                    cv2.imshow("cam_b", convert_to_16_bit(raw_image_b, original_bit_depth=12))
+
                 if save_imgs or save_vids:
                     raw_cam_a_frames.append(raw_image_a)
                     raw_cam_b_frames.append(raw_image_b)
