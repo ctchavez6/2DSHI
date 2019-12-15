@@ -14,37 +14,44 @@ from PIL import Image
 
 run = "2019_12_14__13_08"
 
-algebra_directory = os.path.join("D:", "2DSHI_Runs")
-algebra_directory = os.path.join(algebra_directory, run)
-algebra_directory = os.path.join(algebra_directory, "Image_Algebra")
 
-subtracted_img_path = os.path.join(algebra_directory, "A_Minus_B_Prime.png")
-added_img_path = os.path.join(algebra_directory, "A_Plus_B_Prime.png")
+img_a_path = os.path.join("D:", "2DSHI_Runs")
+img_a_path = os.path.join(img_a_path, run)
+algebra_directory = os.path.join(img_a_path, "Image_Algebra")
+img_a_path = os.path.join(img_a_path, "cam_a_frames")
+img_a_path = os.path.join(img_a_path, "cam_a_frame_1.png")
+img_a = np.asarray(cv2.imread(img_a_path, cv2.IMREAD_ANYDEPTH))
+img_a_12_bit = img_a/16
 
-a_minus_b_prime = cv2.imread(subtracted_img_path, cv2.IMREAD_ANYDEPTH)
-a_plus_b_prime = cv2.imread(added_img_path, cv2.IMREAD_ANYDEPTH)
+img_b_prime_path = os.path.join(algebra_directory, "B_Prime.png")
+img_b_prime = np.asarray(cv2.imread(img_b_prime_path, cv2.IMREAD_ANYDEPTH))
+img_b_prime_12_bit = img_b_prime/16
 
-cv2.imshow("minus", a_minus_b_prime)
-cv2.waitKey(5000)
-# im.save('test_hot.jpg')
-cv2.imshow("plus", a_plus_b_prime)
-cv2.waitKey(5000)
-# im.save('test_hot.jpg')
 
+subtracted = np.subtract(img_a_12_bit, img_b_prime_12_bit)
+added = np.add(img_a_12_bit, img_b_prime_12_bit)
 
 # https://stackoverflow.com/questions/43457308/is-there-any-good-color-map-to-convert-gray-scale-image-to-colorful-ones-using-p
 
 
 
 #t = timeit.timeit(pil_test, number=1)
-def create_colormap(file_name, save_directory, img, original_bit_depth=12, input_bit_depth=16):
+def create_colormap(file_name, save_directory, array, algebra_type):
+    print(file_name)
     save_path = os.path.join(save_directory, file_name)
     fig = plt.figure()
-    intended_img = img/(2**(input_bit_depth-original_bit_depth))
-    print(np.max(intended_img.flatten()))
-    imgplot = plt.imshow(intended_img)
-    imgplot.set_cmap('nipy_spectral')
+    print("Min:", np.min(array.flatten()))
+    print("Max:", np.max(array.flatten()))
+    imgplot = plt.imshow(array)
+    imgplot.set_cmap('bwr')
+    for im in plt.gca().get_images():
+        if "subtraction" in algebra_type:
+            im.set_clim(-4095*2, 4095*2)
+        if "addition" in algebra_type:
+            im.set_clim(-4095*2, 4095*2)
     plt.colorbar()
+
+
     plt.show()
     fig.savefig(save_path)
 #print('PIL: %s' % t)
@@ -52,5 +59,5 @@ def create_colormap(file_name, save_directory, img, original_bit_depth=12, input
 #print('PLT: %s' % t)
 
 
-create_colormap("A_Minus_B_Prime_Colormap.png", algebra_directory, a_minus_b_prime)
-create_colormap("A_Plus_B_Prime_Colormap.png", algebra_directory, a_plus_b_prime)
+create_colormap("A_Minus_B_Prime_Colormap.png", algebra_directory, subtracted, "subtraction")
+create_colormap("A_Plus_B_Prime_Colormap.png", algebra_directory, added, "addition")
