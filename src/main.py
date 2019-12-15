@@ -66,7 +66,7 @@ parser.add_argument('-shc', '--SaveHistocam', type=int, default=0,
                     help="How many frames you'd like to grab/save.")
 parser.add_argument('-raw', '--Raw', type=int, default=1,
                     help="Show raw image data.")
-parser.add_argument('-rf', '--ResizeFactor', type=float, default=None,
+parser.add_argument('-rf', '--ResizeFactor', type=float, default=1.0,
                     help="Show raw image data.")
 parser.add_argument('-g', '--Grid', type=int, default=0,
                     help="Show a grid on the images.")
@@ -106,19 +106,18 @@ if __name__ == "__main__":
     elif args["camera_configuration_file"] is None \
             and args["camera_configuration_file_a"] is not None \
             and args["camera_configuration_file_b"] is None:
-        camera_a_configuration = args["camera_configuration_file_a"]
-        camera_b_configuration = os.path.join(camera_configurations_folder, "default_camera_configuration.pfs")
+        camera_a_configuration = args["cam_a_default"]
+        camera_b_configuration = os.path.join(camera_configurations_folder, "cam_a_default.pfs")
 
     # Case when Camera A reads an default camera configuration file while B Reads Alternate CCF: CCF_B*
     elif args["camera_configuration_file"] is None \
             and args["camera_configuration_file_a"] is None \
             and args["camera_configuration_file_b"] is not None:
-        camera_a_configuration = os.path.join(camera_configurations_folder, "default_camera_configuration.pfs")
-        camera_b_configuration = args["camera_configuration_file_b"]
-
+        camera_a_configuration = os.path.join(camera_configurations_folder, "cam_a_default.pfs")
+        camera_b_configuration = args["cam_b_default"]
     else:
-        camera_a_configuration = os.path.join(camera_configurations_folder, "default_camera_configuration.pfs")
-        camera_b_configuration = camera_a_configuration
+        camera_a_configuration = os.path.join(camera_configurations_folder, "cam_a_default.pfs")
+        camera_b_configuration = os.path.join(camera_configurations_folder, "cam_b_default.pfs")
 
     config_files_by_cam = {"a": camera_a_configuration, "b": camera_b_configuration}
 

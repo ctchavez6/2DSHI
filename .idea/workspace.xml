@@ -3,7 +3,60 @@
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/A__2019-12-01__11-55-06_Coll2_7_4_DShift+0_flipC2lens.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Full_Line_out.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Horizontal_&amp;_Vertical_Region_of_Interest_(Above_Noise).png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Image With NoiseSubtracted ROI Boxed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Img_1_2019_12_11__19_30.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Img_2_2019_12_11__19_37.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Img_3_2019_12_11__19_38.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Img_4_2019_12_11__19_40.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Img_5_2019_12_02__19_51.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Img_6_2019_12_11__20_15.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Img_7_2019_12_11__20_32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Left_Right_Trimmed_Line_out.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Left_Trimmed_Line_out.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Original_Image.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Region_of_Interest_Horizontal.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Region_of_Interest_Horizontal_Vertical.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ScipyOptimizeCurveFit_For-coregistration-cam_b_frame_186.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ScipyOptimizeCurveFit_X-coregistration-cam_b_frame_186.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ScipyOptimizeCurveFit_Y-coregistration-cam_b_frame_186.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/b_prime.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/camera_configuration_files/23097552_12bit_pad_200us_ext_pulsed.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/camera_configuration_files/default_camera_configuration - Copy.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/camera_configuration_files/default_camera_configuration.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/camera_configuration_files/default_camera_configuration_test.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/camera_configuration_files/old/23097552_12bit_pad_50ms_ext_pulsed.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/camera_configuration_files/updated_configuration_file.pfs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/coregistration/altered_multiple_centers_cam_a_frame_18.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/coregistration/altered_multiple_centers_cam_b_frame_18.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/coregistration/cam_a_frame_186.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/coregistration/cam_b_frame_186.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/coregistration/cameras_and_histograms_frame_186.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/coregistration/multiple_centers_cam_a_frame_18.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/coregistration/multiple_centers_cam_b_frame_18.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/coregistration/white_square.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/create_algebra_colormaps.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/create_algebra_colormaps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/noise_reduced.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/noise_reduced.tiff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/output.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/registration/A_Image__2019-11-24__13-59-32.bmp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/registration/A__2019-11-26__15-52-07.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/registration/B_Image__2019-11-24__14-00-52.bmp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/registration/B__2019-11-26__15-52-30.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/registration/align.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/registration/align.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/registration/imageRegistration.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/registration/output.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/registration/ref.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/registration/ref.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/sample.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/sample_2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test_1.png" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -54,13 +107,13 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\fwess\Documents\GitHub" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\reference" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\previous_versions_and_reference" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\fwess\Documents\GitHub" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -289,7 +342,7 @@
       <workItem from="1576116826109" duration="8638000" />
       <workItem from="1576203331209" duration="7020000" />
       <workItem from="1576352876996" duration="12820000" />
-      <workItem from="1576443888979" duration="4834000" />
+      <workItem from="1576443888979" duration="6542000" />
     </task>
     <task id="LOCAL-00001" summary="this is a test commit">
       <created>1571506272404</created>
@@ -522,7 +575,14 @@
       <option name="project" value="LOCAL" />
       <updated>1576446540782</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="colormap">
+      <created>1576448767454</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1576448767454</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -568,7 +628,8 @@
     <MESSAGE value="keypoints and matches" />
     <MESSAGE value="deleting files no longer needed" />
     <MESSAGE value="progress on image algebra" />
-    <option name="LAST_COMMIT_MESSAGE" value="progress on image algebra" />
+    <MESSAGE value="colormap" />
+    <option name="LAST_COMMIT_MESSAGE" value="colormap" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/2DSHI$simplified_realTimeVideoHistogram.coverage" NAME="simplified_realTimeVideoHistogram Coverage Results" MODIFIED="1571591111756" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
