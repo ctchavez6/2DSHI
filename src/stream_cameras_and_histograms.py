@@ -411,8 +411,20 @@ def clear_prev_run():
     clear_videos(videos_directory)
     return camera_a_frames_directory, camera_b_frames_directory, cams_by_hists_directory, videos_directory
 
+def overlay_grid(image, num_sections_vert=4, num_sections_hor=4, intensity=4095):
+    shape = image.shape
+    num_vert_lines = 1
+    height, width = shape[0], shape[1]
+    vertical_line_locations = [100]
+    horizontal_line_locations = [100]
+    altered_img = image.copy()
+    for x, y in zip(horizontal_line_locations, vertical_line_locations):
+        altered_img[x:x+6, :] = intensity
+    return altered_img
 
-def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, frame_break=-1, save_imgs=False, save_vids=False, display_live_histocam=False, save_histocam_reps=False, show_raw_data=True, resize_factor=1.0):
+def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, frame_break=-1, save_imgs=False,
+                             save_vids=False, display_live_histocam=False, save_histocam_reps=False, show_raw_data=True,
+                             resize_factor=1.0, grid=False):
     """
     Starts grabbing for all cameras starting with index 0. The grabbing is started for one camera after the other.
     That's why the images of all cameras are not taken at the same time. However, a hardware trigger setup can be used
@@ -455,12 +467,19 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, frame_b
                 if resize_factor != 1.0:
                     img_a_resized = cv2.resize(raw_image_a, dim, interpolation=cv2.INTER_AREA)
                     img_b_resized = cv2.resize(raw_image_b, dim, interpolation=cv2.INTER_AREA)
-                    cv2.imshow("cam_a", convert_to_16_bit(img_a_resized, original_bit_depth=12))
-                    cv2.imshow("cam_b", convert_to_16_bit(img_b_resized, original_bit_depth=12))
+                    if not grid:
+                        cv2.imshow("cam_a", convert_to_16_bit(img_a_resized, original_bit_depth=12))
+                        cv2.imshow("cam_b", convert_to_16_bit(img_b_resized, original_bit_depth=12))
+                    else:
+                        cv2.imshow("cam_a", overlay_grid(convert_to_16_bit(img_a_resized, original_bit_depth=12)))
+                        cv2.imshow("cam_b", overlay_grid(convert_to_16_bit(img_b_resized, original_bit_depth=12)))
                 else:
-                    cv2.imshow("cam_a", convert_to_16_bit(raw_image_a, original_bit_depth=12))
-                    cv2.imshow("cam_b", convert_to_16_bit(raw_image_b, original_bit_depth=12))
-
+                    if not grid:
+                        cv2.imshow("cam_a", convert_to_16_bit(raw_image_a, original_bit_depth=12))
+                        cv2.imshow("cam_b", convert_to_16_bit(raw_image_b, original_bit_depth=12))
+                    else:
+                        cv2.imshow("cam_a", overlay_grid(convert_to_16_bit(raw_image_a, original_bit_depth=12)))
+                        cv2.imshow("cam_b", overlay_grid(convert_to_16_bit(raw_image_b, original_bit_depth=12)))
                 if save_imgs or save_vids:
                     raw_cam_a_frames.append(raw_image_a)
                     raw_cam_b_frames.append(raw_image_b)

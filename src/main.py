@@ -68,6 +68,8 @@ parser.add_argument('-raw', '--Raw', type=int, default=1,
                     help="Show raw image data.")
 parser.add_argument('-rf', '--ResizeFactor', type=float, default=None,
                     help="Show raw image data.")
+parser.add_argument('-g', '--Grid', type=int, default=0,
+                    help="Show a grid on the images.")
 
 if __name__ == "__main__":
     print("Starting:")
@@ -102,19 +104,17 @@ if __name__ == "__main__":
 
     # Case when Camera A reads an alternate camera configuration file while B Reads Default: CCF_A*
     elif args["camera_configuration_file"] is None \
-             and args["camera_configuration_file_a"] is not None \
-             and args["camera_configuration_file_b"] is None:
+            and args["camera_configuration_file_a"] is not None \
+            and args["camera_configuration_file_b"] is None:
         camera_a_configuration = args["camera_configuration_file_a"]
         camera_b_configuration = os.path.join(camera_configurations_folder, "default_camera_configuration.pfs")
 
     # Case when Camera A reads an default camera configuration file while B Reads Alternate CCF: CCF_B*
     elif args["camera_configuration_file"] is None \
-             and args["camera_configuration_file_a"] is None \
-             and args["camera_configuration_file_b"] is not None:
-        print("Case when Camera A reads an default camera configuration file while B Reads Alternate CCF")
+            and args["camera_configuration_file_a"] is None \
+            and args["camera_configuration_file_b"] is not None:
         camera_a_configuration = os.path.join(camera_configurations_folder, "default_camera_configuration.pfs")
         camera_b_configuration = args["camera_configuration_file_b"]
-
 
     else:
         camera_a_configuration = os.path.join(camera_configurations_folder, "default_camera_configuration.pfs")
@@ -142,4 +142,5 @@ if __name__ == "__main__":
             display_live_histocam=args["DisplayHistocam"],
             save_histocam_reps=args["SaveHistocam"],
             show_raw_data=args["Raw"],
-            resize_factor=args["ResizeFactor"])
+            resize_factor=args["ResizeFactor"],
+            grid=args["Grid"])
