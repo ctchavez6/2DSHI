@@ -5,7 +5,10 @@ import argparse
 import os
 import stream_cameras_and_histograms as streams
 import update_camera_configuration as ucc
+from data_doc import request_experiment_parameters
+from data_doc import write_experimental_params_to_file
 
+from datetime import datetime
 # Create an instance of an ArgumentParser Object
 parser = argparse.ArgumentParser()
 
@@ -72,7 +75,25 @@ parser.add_argument('-g', '--Grid', type=int, default=0,
                     help="Show a grid on the images.")
 
 if __name__ == "__main__":
-    print("Starting:")
+
+
+    current_datetime = datetime.now().strftime("%Y_%m_%d__%H_%M")
+    print("\nStarting Run: {}\n".format(current_datetime))
+
+    print("All Experimental Data will be saved in the following directory:\n\tD:\\{}\n".format(current_datetime))
+
+    crystal_one_temp = request_experiment_parameters.get_crystal_temperature(1)
+    crystal_two_temp = request_experiment_parameters.get_crystal_temperature(2)
+    target_descriptor = request_experiment_parameters.get_target_description()
+    compensator_angle = request_experiment_parameters.get_compensator_angle()
+
+    user_input_params = {
+        "Crystal_1_Temp": str(crystal_one_temp),
+        "Crystal_2_Temp": str(crystal_two_temp),
+        "Target": str(target_descriptor),
+        "Compensator Angle": str(compensator_angle)
+    }
+
     args = vars(parser.parse_args())  # Parse user arguments into a dictionaryq
     if args["video_a"] is None and args["video_b"] is None:
         print("No file specified: Attempting video stream")
@@ -83,7 +104,11 @@ if __name__ == "__main__":
         validate_video_file(args["video_b"])  # Raises error if not a valid video
 
     relevant_parameters = ["ExposureTime", "AcquisitionFrameRate"]
+
     parameter_dictionary = ucc.reduce_dictionary(args, relevant_parameters)
+
+    write_experimental_params_to_file.document_run(args, user_input_params, current_datetime)
+
     camera_configurations_folder = os.path.join(os.getcwd(), "camera_configuration_files")
 
     # Case when both Cameras read the same updated default camera configuration file: CCF'
