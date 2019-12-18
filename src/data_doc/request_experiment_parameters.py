@@ -26,15 +26,31 @@ def get_crystal_temperature(crystal_number):
 
 def get_target_description():
     targets = {"T1": "Wire", "T2": "Cross-Hair", "T3": "TBD 3", "T4": "TBD 4", "T5": "TBD 5"}
+    target_nums = [str(x) for x in range(1, len(targets) + 1)]
+    print(target_nums)
     target_description_string = ""
     for key in targets:
         target_description_string += "{}: {}\n".format(key, targets[key])
     user_input = input("{}Input Target Descriptor (See options above): ".format(target_description_string))
-    if does_string_end_with_number(user_input):
-        user_input = "T" + str(user_input)
-    while user_input.upper() not in targets.keys():
-        if does_string_end_with_number(user_input):
-            user_input = "T" + str(user_input)
+
+    while user_input.upper() not in targets.keys() or user_input not in target_nums or not len(user_input) >= 1:
+        if user_input in target_nums:
+            new_user_input = "T" + str(user_input)
+            if new_user_input in targets.keys():
+                return targets[new_user_input]
+
+        new_user_input = ""
+        last_character = ""
+        if not len(user_input) >= 1:
+            new_user_input = input("{}Input Target Descriptor (See options above): ".format(target_description_string))
+
+        if len(new_user_input) >= 1:
+            last_character = user_input[len(user_input) - 1]
+
+        if last_character in target_nums:
+            new_user_input = "T" + str(last_character)
+            if new_user_input in targets.keys():
+                return targets[new_user_input]
         else:
             user_input = input("{}Input Target Descriptor (See options above): ".format(target_description_string))
     return targets[user_input.upper()]

@@ -1,12 +1,15 @@
 """Driver class - you should be able to run main from the command line along with the some command line arguments of
   your choice, and this script will call all other modules/scripts and feed those args/params as needed."""
-
+import sys
 import argparse
 import os
 import stream_cameras_and_histograms as streams
 import update_camera_configuration as ucc
 from data_doc import request_experiment_parameters
 from data_doc import write_experimental_params_to_file
+from data_doc import get_command_line_parameters
+from data_doc import find_previous_run
+
 
 from datetime import datetime
 # Create an instance of an ArgumentParser Object
@@ -43,58 +46,137 @@ def validate_video_file(video_file_path_string):
                      )
 
 
-parser.add_argument('-va', '--video_a', default=None,
-                    help='Path to video file for Camera A (if not using camera)')
-parser.add_argument('-vb', '--video_b', default=None,
-                    help='Path to video file for Camera B (if not using camera)')
-parser.add_argument('-ccf', '--camera_configuration_file', default=None,
-                    help='Desired camera configuration file (if other than default_camera_configuration.pfs)')
-parser.add_argument('-ccfa', '--camera_configuration_file_a', default=None,
-                    help='Desired camera configuration file for A (if other than default_camera_configuration.pfs)')
-parser.add_argument('-ccfb', '--camera_configuration_file_b', default=None,
-                    help='Desired camera configuration file for B (if other than default_camera_configuration.pfs)')
-parser.add_argument('-e', '--ExposureTime', type=str, default=None,
-                    help='Exposure time in us (microseconds) [overwrites value in default_camera_configuration.pfs]')
-parser.add_argument('-r', '--AcquisitionFrameRate', type=str, default=None,
-                    help='Acquisition frame rate (Hz) [overwrites value in default_camera_configuration.pfs]')
-parser.add_argument('-si', '--SaveImages', type=int, default=0,
-                    help="1 if you'd like to save the images from this run, else 0.")
-parser.add_argument('-sv', '--SaveVideos', type=int, default=0,
-                    help="1 if you'd like to save the videos from this run, else 0.")
-parser.add_argument('-fb', '--FrameBreak', type=int, default=-1,
-                    help="How many frames you'd like to grab/save.")
-parser.add_argument('-dhc', '--DisplayHistocam', type=int, default=0,
-                    help="How many frames you'd like to grab/save.")
-parser.add_argument('-shc', '--SaveHistocam', type=int, default=0,
-                    help="How many frames you'd like to grab/save.")
-parser.add_argument('-raw', '--Raw', type=int, default=1,
-                    help="Show raw image data.")
-parser.add_argument('-rf', '--ResizeFactor', type=float, default=1.0,
-                    help="Show raw image data.")
-parser.add_argument('-g', '--Grid', type=int, default=0,
-                    help="Show a grid on the images.")
-
 if __name__ == "__main__":
+    adjusted_command_line_input = [arg for arg in sys.argv[:] if not arg.endswith('main.py')]
 
+    parser = get_command_line_parameters.initialize_arg_parser()
+    args = vars(parser.parse_args())  # Parse user arguments into a dictionary
+
+    prev_run = find_previous_run.get_latest_run(args)
+    run_mode = 0
+
+    user_input_params_other = {
+        "Crystal_1_Temp": None,
+        "Crystal_2_Temp": None,
+        "Target": None,
+        "Compensator Angle": None
+    }
+
+
+    if '-rpp' in adjusted_command_line_input:
+        run_mode = 1
+
+    if len(adjusted_command_line_input) < 1 and '-rpp' not in adjusted_command_line_input:
+        if len(prev_run) >= 1:
+            print("\n")
+
+            prev_run_name = "Previous Run: " + find_previous_run.get_latest_run_name()[2:]
+            print(prev_run_name)
+            underline = ""
+            for x in range(len(prev_run_name)):
+                underline += "="
+            print(underline)
+
+            for key in prev_run:
+                print("{}: {}".format(key, prev_run[key]))
+
+            prompt = "\nNo experimental parameters entered.\n\nWould you like to implement last run's parameters?\n"
+
+            prompt += "1: Yes\n"
+            prompt += "2: No\n"
+            prompt += "3: Yes, but with some changes.\n"
+
+            run_mode = int(input(prompt))
+
+        else:
+            print("No previous run detected. Please input some experimental parameters.")
+            crystal_one_temp = request_experiment_parameters.get_crystal_temperature(1)
+            crystal_two_temp = request_experiment_parameters.get_crystal_temperature(2)
+            target_descriptor = request_experiment_parameters.get_target_description()
+            compensator_angle = request_experiment_parameters.get_compensator_angle()
+
+            user_input_params = {
+                "Crystal_1_Temp": str(crystal_one_temp),
+                "Crystal_2_Temp": str(crystal_two_temp),
+                "Target": str(target_descriptor),
+                "Compensator Angle": str(compensator_angle)
+            }
+
+            run_mode = 4
+
+    if run_mode == 2 or run_mode not in range(1, 5):
+        print("Please run again with the appropriate command line parameters.\n")
+        sys.exit()
+
+    if run_mode == 1 or run_mode == 4:
+        args = {key: prev_run[key] for key in prev_run if key in args.keys()}
+        if run_mode == 1:
+            user_input_params = {key: prev_run[key] for key in prev_run if key in user_input_params_other.keys()}
+
+    if run_mode == 3:
+        string_parameters = ["video_a",
+                             "video_b",
+                             "camera_configuration_file",
+                             "camera_configuration_file_b",
+                             "Target"]
+
+        int_parameters = ["SaveImages",
+                          "SaveVideos",
+                          "FrameBreak",
+                          "DisplayHistocam",
+                          "SaveHistocam",
+                          "Raw",
+                          "Grid",
+                          "ExposureTime",
+                          "AcquisitionFrameRate"]
+
+        float_parameters = ["ResizeFactor",
+                            "Crystal_1_Temp",
+                            "Crystal_2_Temp",
+                            "Compensator Angle"]
+
+        user_parameter_input = input("Please input the parameter you'd like to update or 'q' to exit.\n")
+
+        while user_parameter_input != "q" and user_parameter_input in prev_run.keys():
+            user_value_input = input("New value: ")
+            if user_parameter_input == "None":
+                prev_run[user_parameter_input] = None
+            elif user_parameter_input in int_parameters:
+                prev_run[user_parameter_input] = int(user_value_input)
+            elif user_parameter_input in float_parameters:
+                prev_run[user_parameter_input] = float(user_value_input)
+            elif user_parameter_input in string_parameters:
+                prev_run[user_parameter_input] = user_value_input
+            elif prev_run.endswith("RunPreviousParameters"):
+                pass
+
+            print("\nUpdated Values:")
+            underline = ""
+            for x in range(len("Updated Values:")):
+                underline += "="
+            print(underline)
+            for key in prev_run:
+                print("{}: {}".format(key, prev_run[key]))
+
+            print("\n")
+            user_parameter_input = input("Please input the parameter you'd like to update or 'q' to exit.")
+            print("\n")
+
+    user_input_params = {key: prev_run[key] for key in prev_run if key in user_input_params_other.keys()}
+
+    parser = get_command_line_parameters.initialize_arg_parser()
+    args = vars(parser.parse_args())  # Parse user arguments into a dictionary
 
     current_datetime = datetime.now().strftime("%Y_%m_%d__%H_%M")
     print("\nStarting Run: {}\n".format(current_datetime))
 
     print("All Experimental Data will be saved in the following directory:\n\tD:\\{}\n".format(current_datetime))
 
-    crystal_one_temp = request_experiment_parameters.get_crystal_temperature(1)
-    crystal_two_temp = request_experiment_parameters.get_crystal_temperature(2)
-    target_descriptor = request_experiment_parameters.get_target_description()
-    compensator_angle = request_experiment_parameters.get_compensator_angle()
+    """
 
-    user_input_params = {
-        "Crystal_1_Temp": str(crystal_one_temp),
-        "Crystal_2_Temp": str(crystal_two_temp),
-        "Target": str(target_descriptor),
-        "Compensator Angle": str(compensator_angle)
-    }
+    """
 
-    args = vars(parser.parse_args())  # Parse user arguments into a dictionaryq
+
     if args["video_a"] is None and args["video_b"] is None:
         print("No file specified: Attempting video stream")
     elif args["video_a"] is None or args["video_b"] is None:
@@ -104,7 +186,6 @@ if __name__ == "__main__":
         validate_video_file(args["video_b"])  # Raises error if not a valid video
 
     relevant_parameters = ["ExposureTime", "AcquisitionFrameRate"]
-
     parameter_dictionary = ucc.reduce_dictionary(args, relevant_parameters)
 
     write_experimental_params_to_file.document_run(args, user_input_params, current_datetime)
