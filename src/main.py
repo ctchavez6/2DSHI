@@ -9,7 +9,7 @@ from data_doc import request_experiment_parameters
 from data_doc import write_experimental_params_to_file
 from data_doc import get_command_line_parameters
 from data_doc import find_previous_run
-
+import path_management.directory_management as dirs
 
 from datetime import datetime
 # Create an instance of an ArgumentParser Object
@@ -67,10 +67,10 @@ if __name__ == "__main__":
         run_mode = 1
 
     if len(adjusted_command_line_input) < 1 and '-rpp' not in adjusted_command_line_input:
-        if len(prev_run) >= 1:
+        if len(prev_run) >= 1 and dirs.get_latest_run() is not None:
             print("\n")
 
-            prev_run_name = "Previous Run: " + find_previous_run.get_latest_run_name()[2:]
+            prev_run_name = "Previous Run: " + dirs.get_latest_run()[2:]
             print(prev_run_name)
             underline = ""
             for x in range(len(prev_run_name)):
@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
             prompt += "1: Yes\n"
             prompt += "2: No\n"
-            prompt += "3: Yes, but with some changes.\n"
+            prompt += "3: Yes, but with some changes.\n\n"
 
             run_mode = int(input(prompt))
 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
             run_mode = 4
 
     if run_mode == 2 or run_mode not in range(1, 5):
-        print("Please run again with the appropriate command line parameters.\n")
+        print("\nPlease run again with the appropriate command line parameters.\n")
         sys.exit()
 
     if run_mode == 1 or run_mode == 4:
