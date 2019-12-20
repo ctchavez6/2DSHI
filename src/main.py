@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
         user_parameter_input = input("Please input the parameter you'd like to update or 'q' to exit.\n")
 
-        while user_parameter_input != "q" and user_parameter_input in prev_run.keys():
+        while user_parameter_input != "q" or user_parameter_input in prev_run.keys():
             user_value_input = input("New value: ")
             if user_parameter_input == "None":
                 prev_run[user_parameter_input] = None
