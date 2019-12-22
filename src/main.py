@@ -66,7 +66,7 @@ if __name__ == "__main__":
     if '-rpp' in adjusted_command_line_input:
         run_mode = 1
 
-    if len(adjusted_command_line_input) < 1 and '-rpp' not in adjusted_command_line_input:
+    if len(adjusted_command_line_input) < 1 or '-rpp' not in adjusted_command_line_input:
         if len(prev_run) >= 1 and dirs.get_latest_run() is not None:
             print("\n")
 
