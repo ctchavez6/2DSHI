@@ -16,6 +16,8 @@ import numpy as np  # Pixel math, among other array operations
 import traceback  # exception handling
 from PIL import Image
 from datetime import datetime
+from histocam import histocam
+from image_processing import bit_depth_conversion as bdc
 
 def find_devices():
     """
@@ -289,8 +291,8 @@ def add_histogram_representations(figure_a, figure_b, raw_array_a, raw_array_b):
     hist_img_a = cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR)  # img is rgb, convert to opencv's default bgr
     hist_img_b = cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR)  # img is rgb, convert to opencv's default bgr
 
-    img_a_8bit_gray = convert_to_8_bit(raw_array_a)
-    img_b_8bit_gray = convert_to_8_bit(raw_array_b)
+    img_a_8bit_gray = bdc.to_8_bit(raw_array_a)
+    img_b_8bit_gray = bdc.to_8_bit(raw_array_b)
 
     img_a_8bit_resized = cv2.cvtColor((resize_img(img_a_8bit_gray, hist_width, hist_height)), cv2.COLOR_GRAY2BGR)
     img_b_8bit_resized = cv2.cvtColor((resize_img(img_b_8bit_gray, hist_width, hist_height)), cv2.COLOR_GRAY2BGR)
@@ -485,16 +487,18 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, frame_b
                     raw_cam_b_frames.append(raw_image_b)
 
             if display_live_histocam or save_histocam_reps or save_imgs:
+
                 update_histogram(histograms_dict, lines, "a", 4096, raw_image_a)
                 update_histogram(histograms_dict, lines, "b", 4096, raw_image_b)
                 figures["a"].canvas.draw()  # Draw updates subplots in interactive mode
                 figures["b"].canvas.draw()  # Draw updates subplots in interactive mode
                 cam_w_histogram_frames.append(add_histogram_representations(figures["a"], figures["b"], raw_image_a, raw_image_b))
                 if display_live_histocam:
+                    print("hello")
                     cv2.imshow("Camera & Histogram Streams", cam_w_histogram_frames[len(cam_w_histogram_frames)-1])
 
-    cams_dict["a"].StopGrabbing()
-    cams_dict["b"].StopGrabbing()
+
+    cams_dict["all"].StopGrabbing()
 
     if save_imgs or save_vids:
         camera_a_frames_directory, camera_b_frames_directory, cams_by_hists_direc, videos_directory = clear_prev_run()

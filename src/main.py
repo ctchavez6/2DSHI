@@ -10,40 +10,12 @@ from data_doc import write_experimental_params_to_file
 from data_doc import get_command_line_parameters
 from data_doc import find_previous_run
 import path_management.directory_management as dirs
+from stream_tools import stream_tools
 
 from datetime import datetime
 # Create an instance of an ArgumentParser Object
 parser = argparse.ArgumentParser()
 
-
-
-def validate_video_file(video_file_path_string):
-    """
-    Validates that the input video file exists and is in one of the accepted formats.
-
-    Args:
-        video_file_path_string: Path to video file.
-    Raises:
-        Exception: If invalid file or video.
-    """
-
-    if not os.path.exists(video_file_path_string):
-        parser.error("\n\tThe file %s does not exist:" % video_file_path_string)
-
-    acceptable_video_extensions = \
-        [
-            ".mov",
-            ".avi",
-            ".mp4"
-        ]
-
-    filename, file_extension = os.path.splitext(video_file_path_string)
-
-    if file_extension not in acceptable_video_extensions:
-        parser.error("\n\n\tPlease use one of the following video formats:" +
-                     ''.join("\n\t\t%s" % x for x in acceptable_video_extensions) +
-                     "\n\n\tYour input: %s\n" % video_file_path_string
-                     )
 
 
 if __name__ == "__main__":
@@ -104,6 +76,8 @@ if __name__ == "__main__":
 
             run_mode = 4
 
+    print("Run Mode: {}".format(run_mode))
+
     if run_mode == 2 or run_mode not in range(1, 5):
         print("\nPlease run again with the appropriate command line parameters.\n")
         sys.exit()
@@ -147,8 +121,6 @@ if __name__ == "__main__":
                 prev_run[user_parameter_input] = float(user_value_input)
             elif user_parameter_input in string_parameters:
                 prev_run[user_parameter_input] = user_value_input
-            elif prev_run.endswith("RunPreviousParameters"):
-                pass
 
             print("\nUpdated Values:")
             underline = ""
@@ -159,11 +131,20 @@ if __name__ == "__main__":
                 print("{}: {}".format(key, prev_run[key]))
 
             print("\n")
-            user_parameter_input = input("Please input the parameter you'd like to update or 'q' to exit.")
+            user_parameter_input = input("Please input the parameter you'd like to update or 'q' to proceed.")
             print("\n")
 
-    user_input_params = {key: prev_run[key] for key in prev_run if key in user_input_params_other.keys()}
 
+    user_input_params = {key: prev_run[key] for key in prev_run if key in user_input_params_other.keys()}
+    print("-----------------------------------")
+    print("Below are the final user input params")
+    for key in prev_run:
+        print(key, prev_run[key])
+
+        #if key in user_input_params_other.keys():
+
+
+    print("well, thats all")
     parser = get_command_line_parameters.initialize_arg_parser()
     args = vars(parser.parse_args())  # Parse user arguments into a dictionary
 
@@ -172,18 +153,6 @@ if __name__ == "__main__":
 
     print("All Experimental Data will be saved in the following directory:\n\tD:\\{}\n".format(current_datetime))
 
-    """
-
-    """
-
-
-    if args["video_a"] is None and args["video_b"] is None:
-        print("No file specified: Attempting video stream")
-    elif args["video_a"] is None or args["video_b"] is None:
-        print("To run a playback of data, you must specify two valid video files.")
-    else:
-        validate_video_file(args["video_a"])  # Raises error if not a valid video
-        validate_video_file(args["video_b"])  # Raises error if not a valid video
 
     relevant_parameters = ["ExposureTime", "AcquisitionFrameRate"]
     parameter_dictionary = ucc.reduce_dictionary(args, relevant_parameters)
@@ -226,26 +195,33 @@ if __name__ == "__main__":
         camera_b_configuration = os.path.join(camera_configurations_folder, "cam_b_default.pfs")
 
     config_files_by_cam = {"a": camera_a_configuration, "b": camera_b_configuration}
-
     devices_found, tlFactory_found = streams.find_devices()
 
-    cameras = streams.get_cameras(
-        devices=devices_found,
-        tlFactory=tlFactory_found,
-        config_files=config_files_by_cam,
-        num_cameras=2)
+    try_module = False
 
-    figs, histograms, lines = streams.initialize_histograms()
-    streams.stream_cam_to_histograms(
-            cams_dict=cameras,
-            figures=figs,
-            histograms_dict=histograms,
-            lines=lines,
-            frame_break=args["FrameBreak"],
-            save_imgs=args["SaveImages"],
-            save_vids=args["SaveVideos"],
-            display_live_histocam=args["DisplayHistocam"],
-            save_histocam_reps=args["SaveHistocam"],
-            show_raw_data=args["Raw"],
-            resize_factor=args["ResizeFactor"],
-            grid=args["Grid"])
+    if try_module:
+        stream = stream_tools.Stream()
+        stream.get_cameras(config_files_by_cam)
+        stream.start(histogram=True)
+
+    if not try_module:
+        cameras = streams.get_cameras(
+            devices=devices_found,
+            tlFactory=tlFactory_found,
+            config_files=config_files_by_cam,
+            num_cameras=2)
+
+        figs, histograms, lines = streams.initialize_histograms()
+        streams.stream_cam_to_histograms(
+                cams_dict=cameras,
+                figures=figs,
+                histograms_dict=histograms,
+                lines=lines,
+                frame_break=args["FrameBreak"],
+                save_imgs=args["SaveImages"],
+                save_vids=args["SaveVideos"],
+                display_live_histocam=args["DisplayHistocam"],
+                save_histocam_reps=args["SaveHistocam"],
+                show_raw_data=args["Raw"],
+                resize_factor=args["ResizeFactor"],
+                grid=args["Grid"])

@@ -2,10 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/histocam/Histocam.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/stream_tools/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/image_processing/stack_images.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/histocam/Histocam.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/histocam/histocam.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/path_management/video_management.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/path_management/video_management.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/stream_cameras_and_histograms.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_cameras_and_histograms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/stream_tools/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/image_processing/bit_depth_conversion.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -305,7 +309,8 @@
       <workItem from="1576867224285" duration="159000" />
       <workItem from="1576867805929" duration="532000" />
       <workItem from="1576869312584" duration="640000" />
-      <workItem from="1576982110566" duration="3245000" />
+      <workItem from="1576982110566" duration="3480000" />
+      <workItem from="1577047063060" duration="15813000" />
     </task>
     <task id="LOCAL-00001" summary="this is a test commit">
       <created>1571506272404</created>
@@ -587,7 +592,14 @@
       <option name="project" value="LOCAL" />
       <updated>1576815355268</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="Started histocam module, need to think about structure of stream_tools module">
+      <created>1576985413828</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1576985413828</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -611,7 +623,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="able to simultaneously stream two basler cameras" />
     <MESSAGE value="file management" />
     <MESSAGE value="double histogram" />
     <MESSAGE value="updating max,stdev, avg values on histograms" />
@@ -636,13 +647,23 @@
     <MESSAGE value="Dynamic documentation of individual runs" />
     <MESSAGE value="Now allowing user to use previous runs parameters." />
     <MESSAGE value="Started 2 more modules: path_management and coregistration" />
-    <option name="LAST_COMMIT_MESSAGE" value="Started 2 more modules: path_management and coregistration" />
+    <MESSAGE value="Started histocam module, need to think about structure of stream_tools module" />
+    <option name="LAST_COMMIT_MESSAGE" value="Started histocam module, need to think about structure of stream_tools module" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="416" y="255" key="com.intellij.ide.util.TipDialog" timestamp="1576982112752">
+    <state x="330" y="25" key="CommitChangelistDialog2" timestamp="1576985413040">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
+    <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1576985413040" />
+    <state x="312" y="164" key="Vcs.Push.Dialog.v2" timestamp="1576985420367">
+      <screen x="0" y="0" width="1440" height="860" />
+    </state>
+    <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1576985420367" />
+    <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1577066885724">
+      <screen x="0" y="0" width="2560" height="1560" />
+    </state>
     <state x="416" y="255" key="com.intellij.ide.util.TipDialog/0.0.1440.860@0.0.1440.860" timestamp="1576982112752" />
+    <state x="740" y="463" key="com.intellij.ide.util.TipDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1577066885724" />
     <state x="518" y="90" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1576983755808">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
