@@ -1,7 +1,7 @@
 import os
-from data_doc import get_command_line_parameters
+from . import get_command_line_parameters as gclp
 
-def get_latest_run(command_line_args_dict):
+def get_latest_run():
     start_directory = os.getcwd()
     data_directory = os.path.join("D:", "")
 
@@ -18,7 +18,6 @@ def get_latest_run(command_line_args_dict):
     last_run_params_file_path = os.path.join(last_run, "run_parameters.txt")
 
     last_run_params_file = open(last_run_params_file_path, 'r')
-    command_line_params = command_line_args_dict.keys()
 
 
     string_parameters = ["video_a",
@@ -38,9 +37,11 @@ def get_latest_run(command_line_args_dict):
                       "AcquisitionFrameRate"]
 
     float_parameters = ["ResizeFactor",
-                        "Crystal_1_Temp",
-                        "Crystal_2_Temp",
-                        "Compensator Angle"]
+                        "CrystalTemp1",
+                        "CrystalTemp2",
+                        "CompensatorAngle"]
+
+
 
     for line in last_run_params_file:
         split_by_tabs = line.split('\t')
@@ -62,7 +63,6 @@ def get_latest_run(command_line_args_dict):
             print("Warning: Parameter {} with a value of {} has NOT been accounted for.".format(parameter, value))
 
     last_run_params_file.close()
-
     return all_params_dict
 
 def get_latest_run_name():

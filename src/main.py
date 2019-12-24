@@ -4,13 +4,16 @@ import sys
 import argparse
 import os
 import stream_cameras_and_histograms as streams
-import update_camera_configuration as ucc
-from data_doc import request_experiment_parameters
-from data_doc import write_experimental_params_to_file
-from data_doc import get_command_line_parameters
-from data_doc import find_previous_run
+from experiment_set_up import update_camera_configuration as ucc
+from experiment_set_up import request_experiment_parameters
+from experiment_set_up import write_experimental_params_to_file
+from experiment_set_up import get_command_line_parameters
+from experiment_set_up import find_previous_run
+from experiment_set_up import config_file_setup as cam_setup
+
 import path_management.directory_management as dirs
 from stream_tools import stream_tools
+from experiment_set_up import user_input_validation as uiv
 
 from datetime import datetime
 # Create an instance of an ArgumentParser Object
@@ -19,182 +22,35 @@ parser = argparse.ArgumentParser()
 
 
 if __name__ == "__main__":
-    adjusted_command_line_input = [arg for arg in sys.argv[:] if not arg.endswith('main.py')]
+    args = None
+    run_mode = uiv.determine_run_mode(sys.argv[:])
 
-    parser = get_command_line_parameters.initialize_arg_parser()
-    args = vars(parser.parse_args())  # Parse user arguments into a dictionary
+    if run_mode == 1:  # Apply the parameters for the previous run, exactly.
+        prev_run = find_previous_run.get_latest_run()
+        uiv.display_dict_values(prev_run)
+        args = prev_run
 
-    prev_run = find_previous_run.get_latest_run(args)
-    run_mode = 0
+    if run_mode == 2:  # Apply the parameters specified in the command line, exactly.
+        parser = get_command_line_parameters.initialize_arg_parser()
+        args = vars(parser.parse_args())  # Parse user arguments into a dictionary)
+        uiv.display_dict_values(args)
 
-    user_input_params_other = {
-        "Crystal_1_Temp": None,
-        "Crystal_2_Temp": None,
-        "Target": None,
-        "Compensator Angle": None
-    }
-
-
-    if '-rpp' in adjusted_command_line_input:
-        run_mode = 1
-
-    if len(adjusted_command_line_input) < 1 or '-rpp' not in adjusted_command_line_input:
-        if len(prev_run) >= 1 and dirs.get_latest_run() is not None:
-            print("\n")
-
-            prev_run_name = "Previous Run: " + dirs.get_latest_run()[2:]
-            print(prev_run_name)
-            underline = ""
-            for x in range(len(prev_run_name)):
-                underline += "="
-            print(underline)
-
-            for key in prev_run:
-                print("{}: {}".format(key, prev_run[key]))
-
-            prompt = "\nNo experimental parameters entered.\n\nWould you like to implement last run's parameters?\n"
-
-            prompt += "1: Yes\n"
-            prompt += "2: No\n"
-            prompt += "3: Yes, but with some changes.\n\n"
-
-            run_mode = int(input(prompt))
-
-        else:
-            print("No previous run detected. Please input some experimental parameters.")
-            crystal_one_temp = request_experiment_parameters.get_crystal_temperature(1)
-            crystal_two_temp = request_experiment_parameters.get_crystal_temperature(2)
-            target_descriptor = request_experiment_parameters.get_target_description()
-            compensator_angle = request_experiment_parameters.get_compensator_angle()
-
-            user_input_params = {
-                "Crystal_1_Temp": str(crystal_one_temp),
-                "Crystal_2_Temp": str(crystal_two_temp),
-                "Target": str(target_descriptor),
-                "Compensator Angle": str(compensator_angle)
-            }
-
-            run_mode = 4
-
-    print("Run Mode: {}".format(run_mode))
-
-    if run_mode == 2 or run_mode not in range(1, 5):
-        print("\nPlease run again with the appropriate command line parameters.\n")
-        sys.exit()
-
-    if run_mode == 1 or run_mode == 4:
-        args = {key: prev_run[key] for key in prev_run if key in args.keys()}
-        if run_mode == 1:
-            user_input_params = {key: prev_run[key] for key in prev_run if key in user_input_params_other.keys()}
-
-    if run_mode == 3:
-        string_parameters = ["video_a",
-                             "video_b",
-                             "camera_configuration_file",
-                             "camera_configuration_file_b",
-                             "Target"]
-
-        int_parameters = ["SaveImages",
-                          "SaveVideos",
-                          "FrameBreak",
-                          "DisplayHistocam",
-                          "SaveHistocam",
-                          "Raw",
-                          "Grid",
-                          "ExposureTime",
-                          "AcquisitionFrameRate"]
-
-        float_parameters = ["ResizeFactor",
-                            "Crystal_1_Temp",
-                            "Crystal_2_Temp",
-                            "Compensator Angle"]
-
-        user_parameter_input = input("Please input the parameter you'd like to update or 'q' to exit.\n")
-
-        while user_parameter_input != "q" or user_parameter_input in prev_run.keys():
-            user_value_input = input("New value: ")
-            if user_parameter_input == "None":
-                prev_run[user_parameter_input] = None
-            elif user_parameter_input in int_parameters:
-                prev_run[user_parameter_input] = int(user_value_input)
-            elif user_parameter_input in float_parameters:
-                prev_run[user_parameter_input] = float(user_value_input)
-            elif user_parameter_input in string_parameters:
-                prev_run[user_parameter_input] = user_value_input
-
-            print("\nUpdated Values:")
-            underline = ""
-            for x in range(len("Updated Values:")):
-                underline += "="
-            print(underline)
-            for key in prev_run:
-                print("{}: {}".format(key, prev_run[key]))
-
-            print("\n")
-            user_parameter_input = input("Please input the parameter you'd like to update or 'q' to proceed.")
-            print("\n")
-
-
-    user_input_params = {key: prev_run[key] for key in prev_run if key in user_input_params_other.keys()}
-    print("-----------------------------------")
-    print("Below are the final user input params")
-    for key in prev_run:
-        print(key, prev_run[key])
-
-        #if key in user_input_params_other.keys():
-
-
-    print("well, thats all")
-    parser = get_command_line_parameters.initialize_arg_parser()
-    args = vars(parser.parse_args())  # Parse user arguments into a dictionary
+    if run_mode == 3:  # Apply last runs parameters, but with some modifications you'll specify.
+        parser = get_command_line_parameters.initialize_arg_parser()
+        args = vars(parser.parse_args())  # Parse user arguments into a dictionary)
+        uiv.display_dict_values(args)
 
     current_datetime = datetime.now().strftime("%Y_%m_%d__%H_%M")
+
+    print("\nAll Experimental Data will be saved in the following directory:\n\tD:\\{}\n".format(current_datetime))
     print("\nStarting Run: {}\n".format(current_datetime))
 
-    print("All Experimental Data will be saved in the following directory:\n\tD:\\{}\n".format(current_datetime))
-
-
-    relevant_parameters = ["ExposureTime", "AcquisitionFrameRate"]
-    parameter_dictionary = ucc.reduce_dictionary(args, relevant_parameters)
-
-    write_experimental_params_to_file.document_run(args, user_input_params, current_datetime)
+    config_file_parameters = ["ExposureTime", "AcquisitionFrameRate"]
+    parameter_dictionary = ucc.reduce_dictionary(args, config_file_parameters)
 
     camera_configurations_folder = os.path.join(os.getcwd(), "camera_configuration_files")
+    config_files_by_cam = cam_setup.assign_config_files(parameter_dictionary, args, camera_configurations_folder)
 
-    # Case when both Cameras read the same updated default camera configuration file: CCF'
-    if len(parameter_dictionary) > 0 and \
-            (args["camera_configuration_file"] is None
-                and args["camera_configuration_file_a"] is None
-                and args["camera_configuration_file_b"] is None):
-        ucc.update_camera_configuration(parameter_dictionary)
-        camera_a_configuration = os.path.join(camera_configurations_folder, "updated_configuration_file.pfs")
-        camera_b_configuration = camera_a_configuration
-
-    # Case when both Cameras read the same alternate camera configuration file: CCF*
-    elif args["camera_configuration_file"] is not None \
-            and args["camera_configuration_file_a"] is None \
-            and args["camera_configuration_file_b"] is None:
-        camera_a_configuration = args["camera_configuration_file"]
-        camera_b_configuration = args["camera_configuration_file"]
-
-    # Case when Camera A reads an alternate camera configuration file while B Reads Default: CCF_A*
-    elif args["camera_configuration_file"] is None \
-            and args["camera_configuration_file_a"] is not None \
-            and args["camera_configuration_file_b"] is None:
-        camera_a_configuration = args["cam_a_default"]
-        camera_b_configuration = os.path.join(camera_configurations_folder, "cam_a_default.pfs")
-
-    # Case when Camera A reads an default camera configuration file while B Reads Alternate CCF: CCF_B*
-    elif args["camera_configuration_file"] is None \
-            and args["camera_configuration_file_a"] is None \
-            and args["camera_configuration_file_b"] is not None:
-        camera_a_configuration = os.path.join(camera_configurations_folder, "cam_a_default.pfs")
-        camera_b_configuration = args["cam_b_default"]
-    else:
-        camera_a_configuration = os.path.join(camera_configurations_folder, "cam_a_default.pfs")
-        camera_b_configuration = os.path.join(camera_configurations_folder, "cam_b_default.pfs")
-
-    config_files_by_cam = {"a": camera_a_configuration, "b": camera_b_configuration}
     devices_found, tlFactory_found = streams.find_devices()
 
     try_module = False

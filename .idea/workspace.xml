@@ -2,14 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/image_processing/stack_images.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/experiment_set_up/config_file_setup.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/experiment_set_up/user_input_validation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/histocam/Histocam.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/histocam/histocam.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Img_7_2019_12_11__20_32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/add_images.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/image_processing/add_images.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/create_algebra_colormaps.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/image_processing/create_algebra_colormaps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data_doc/find_previous_run.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/find_previous_run.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data_doc/get_command_line_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/get_command_line_parameters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data_doc/request_experiment_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/request_experiment_parameters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data_doc/write_experimental_params_to_file.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/write_experimental_params_to_file.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/find_gaussian_profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/find_gaussian_profile.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/find_image_key_points.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/find_image_key_points.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/path_management/video_management.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/path_management/video_management.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/stream_cameras_and_histograms.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_cameras_and_histograms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/stream_tools/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/image_processing/bit_depth_conversion.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/subtract_images.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/image_processing/subtract_images.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/update_camera_configuration.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/update_camera_configuration.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,15 +71,15 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\image_processing" />
+      <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\coregistration" />
+      <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\image_algebra" />
+      <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\experiment_set_up" />
+      <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\data_doc" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\fwess\Documents\GitHub" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\tests" />
-      <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\coregistration" />
-      <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src" />
-      <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\reference" />
-      <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\previous_versions_and_reference" />
     </key>
   </component>
   <component name="RunManager" selected="Python.main">
@@ -111,7 +118,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/data_doc/find_previous_run.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\fwess\Documents\GitHub\2DSHI\src\experiment_set_up\find_previous_run.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -311,6 +318,8 @@
       <workItem from="1576869312584" duration="640000" />
       <workItem from="1576982110566" duration="3480000" />
       <workItem from="1577047063060" duration="15813000" />
+      <workItem from="1577066884806" duration="71000" />
+      <workItem from="1577152085108" duration="5545000" />
     </task>
     <task id="LOCAL-00001" summary="this is a test commit">
       <created>1571506272404</created>
@@ -599,7 +608,14 @@
       <option name="project" value="LOCAL" />
       <updated>1576985413828</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="latest bug - run params not actually updated by user input">
+      <created>1577066924960</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1577066924960</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -623,7 +639,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="file management" />
     <MESSAGE value="double histogram" />
     <MESSAGE value="updating max,stdev, avg values on histograms" />
     <MESSAGE value="todays version" />
@@ -648,26 +663,33 @@
     <MESSAGE value="Now allowing user to use previous runs parameters." />
     <MESSAGE value="Started 2 more modules: path_management and coregistration" />
     <MESSAGE value="Started histocam module, need to think about structure of stream_tools module" />
-    <option name="LAST_COMMIT_MESSAGE" value="Started histocam module, need to think about structure of stream_tools module" />
+    <MESSAGE value="latest bug - run params not actually updated by user input" />
+    <option name="LAST_COMMIT_MESSAGE" value="latest bug - run params not actually updated by user input" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="330" y="25" key="CommitChangelistDialog2" timestamp="1576985413040">
-      <screen x="0" y="0" width="1440" height="860" />
+    <state x="587" y="45" key="CommitChangelistDialog2" timestamp="1577066924236">
+      <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1576985413040" />
-    <state x="312" y="164" key="Vcs.Push.Dialog.v2" timestamp="1576985420367">
-      <screen x="0" y="0" width="1440" height="860" />
+    <state x="587" y="45" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1577066924236" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1577066928114">
+      <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1576985420367" />
-    <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1577066885724">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1577066928114" />
+    <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1577152085727">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="416" y="255" key="com.intellij.ide.util.TipDialog/0.0.1440.860@0.0.1440.860" timestamp="1576982112752" />
-    <state x="740" y="463" key="com.intellij.ide.util.TipDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1577066885724" />
+    <state x="740" y="463" key="com.intellij.ide.util.TipDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1577152085727" />
     <state x="518" y="90" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1576983755808">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
     <state x="518" y="90" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1440.860@0.0.1440.860" timestamp="1576983755808" />
+    <state x="943" y="355" width="672" height="678" key="search.everywhere.popup" timestamp="1577153356800">
+      <screen x="0" y="0" width="2560" height="1560" />
+    </state>
+    <state x="943" y="355" width="672" height="678" key="search.everywhere.popup/0.0.2560.1560@0.0.2560.1560" timestamp="1577153356800" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/2DSHI$displayPhoto.coverage" NAME="displayPhoto Coverage Results" MODIFIED="1571505715036" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

@@ -36,5 +36,13 @@ def initialize_arg_parser():
                         help="Show raw image data.")
     parser.add_argument('-g', '--Grid', type=int, default=0,
                         help="Show a grid on the images.")
+    parser.add_argument('-c1t', '--CrystalTemp1', type=float, default=0,
+                        help="Show a grid on the images.")
+    parser.add_argument('-c2t', '--CrystalTemp2', type=float, default=0,
+                        help="Show a grid on the images.")
+    parser.add_argument('-c_ang', '--CompensatorAngle', type=float, default=0,
+                        help="Show a grid on the images.")
+    parser.add_argument('-tar', '--Target', type=int, default=0,
+                        help="Show a grid on the images.")
 
     return parser
