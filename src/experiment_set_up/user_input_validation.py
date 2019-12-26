@@ -55,10 +55,12 @@ def determine_run_mode(sys_args):
 
     return run_mode
 
-def update_previous_params():
+def update_previous_params(args_):
+
     string_parameters = ["video_a",
                          "video_b",
                          "camera_configuration_file",
+                         "camera_configuration_file_a",
                          "camera_configuration_file_b",
                          "Target"]
 
@@ -77,5 +79,41 @@ def update_previous_params():
                         "CrystalTemp2",
                         "CompensatorAngle"]
 
-    print
+    other_params = ["RunPreviousParameters"]
 
+    all_params = string_parameters + int_parameters + float_parameters + other_params
+
+    modified_args = dict(args_).copy()
+
+    for key in modified_args:
+        if key not in all_params:
+            print("Warning: {} not accounted for.")
+
+    param_prompt = "Enter the parameter you'd like to update (or 'r' to run as is)."
+    param_input = input(param_prompt)
+
+    value_prompt = "Enter your new value for {}: "
+
+    while param_input != "r":
+        if param_input in all_params:
+            new_value = input(value_prompt.format(param_input))
+
+            if param_input in string_parameters:
+                modified_args[param_input] = new_value
+            elif param_input in int_parameters:
+                modified_args[param_input] = float(new_value)
+            elif param_input in float_parameters:
+                modified_args[param_input] = float(new_value)
+
+            print("Parameters have been updated as shown below.\n")
+
+            for key in modified_args:
+                print(key, modified_args[key])
+
+            param_input = input(param_prompt)
+
+        elif param_input not in all_params:
+            print("Unfortunately, '{}' is not a valid paramter")
+            param_input = input(param_prompt)
+
+    return modified_args
