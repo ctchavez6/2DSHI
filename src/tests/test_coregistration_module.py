@@ -81,6 +81,7 @@ def test_img_characterization():
         cv2.waitKey(7500)
         cv2.destroyAllWindows()
 
+
         print("\t\tTesting transform_img(): {}".format("Pass"))
     except NameError as e:
         print(characterize_img_test_str.format("Fail"))

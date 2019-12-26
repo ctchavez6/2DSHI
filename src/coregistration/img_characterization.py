@@ -43,6 +43,7 @@ def get_homography_components(homography_matrix):
 def derive_homography(matches, kp1, kp2, threshold=90):
     matches.sort(key=lambda x: x.distance)
 
+
     matches = matches[:int(len(matches) * threshold)]  # Take the top 90 % matches forward.
     no_of_matches = len(matches)
 

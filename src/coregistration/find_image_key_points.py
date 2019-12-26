@@ -107,6 +107,7 @@ print("Img B Shape:", img_b.shape)
 #rotated_img = np.rot90(rotated_img, 1)
 
 height, width = img_a.shape
+
 img_a_color = cv2.cvtColor(img_a, cv2.COLOR_GRAY2BGR)
 img_b_color = cv2.cvtColor(img_b, cv2.COLOR_GRAY2BGR)
 #blank_image = np.zeros((height,width,3), np.uint8)
