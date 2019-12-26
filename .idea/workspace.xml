@@ -2,12 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/tests/test_histocam.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/coregistration/img_characterization.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/img_characterization.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/experiment_set_up/find_previous_run.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/find_previous_run.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tests/test_coregistration_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/test_coregistration_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/histocam/histocam.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/histocam/histocam.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/main.py" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -61,6 +64,9 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\fwess\Documents\GitHub" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\image_processing" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\coregistration" />
@@ -68,21 +74,6 @@
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\experiment_set_up" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\data_doc" />
     </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\fwess\Documents\GitHub" />
-    </key>
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
   </component>
   <component name="RunManager" selected="Python.main">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
@@ -227,6 +218,18 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -312,6 +315,8 @@
       <workItem from="1577152085108" duration="5545000" />
       <workItem from="1577310801153" duration="1124000" />
       <workItem from="1577312627034" duration="11877000" />
+      <workItem from="1577384512603" duration="1393000" />
+      <workItem from="1577385998008" duration="2423000" />
     </task>
     <task id="LOCAL-00001" summary="this is a test commit">
       <created>1571506272404</created>
@@ -683,10 +688,10 @@
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1576985420367" />
     <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1577066928114" />
-    <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1577152085727">
-      <screen x="0" y="0" width="2560" height="1560" />
+    <state x="416" y="255" key="com.intellij.ide.util.TipDialog" timestamp="1577386000262">
+      <screen x="0" y="0" width="1440" height="860" />
     </state>
-    <state x="416" y="255" key="com.intellij.ide.util.TipDialog/0.0.1440.860@0.0.1440.860" timestamp="1576982112752" />
+    <state x="416" y="255" key="com.intellij.ide.util.TipDialog/0.0.1440.860@0.0.1440.860" timestamp="1577386000262" />
     <state x="740" y="463" key="com.intellij.ide.util.TipDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1577152085727" />
     <state x="518" y="90" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1576983755808">
       <screen x="0" y="0" width="1440" height="860" />
@@ -698,33 +703,33 @@
     <state x="943" y="355" width="672" height="678" key="search.everywhere.popup/0.0.2560.1560@0.0.2560.1560" timestamp="1577153356800" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/2DSHI$callback.coverage" NAME="callback Coverage Results" MODIFIED="1571510342858" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
-    <SUITE FILE_PATH="coverage/2DSHI$grab_multiple_cameras.coverage" NAME="grab_multiple_cameras Coverage Results" MODIFIED="1571617337430" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/working_files_dont_edit" />
-    <SUITE FILE_PATH="coverage/2DSHI$stream_cameras_and_histograms_10_23_2019.coverage" NAME="stream_cameras_and_histograms_10_23_2019 Coverage Results" MODIFIED="1571937271429" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/current_scripts" />
-    <SUITE FILE_PATH="coverage/2DSHI$captureDualVideo.coverage" NAME="captureDualVideo Coverage Results" MODIFIED="1571596084807" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/RelevantFiles" />
-    <SUITE FILE_PATH="coverage/2DSHI$10_20_2019_Two_Streams_One_Histogram.coverage" NAME="10_20_2019_Two_Streams_One_Histogram Coverage Results" MODIFIED="1571706186544" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
-    <SUITE FILE_PATH="coverage/2DSHI$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1571705669835" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon" />
-    <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_a2.coverage" NAME="10_19_2019_a2 Coverage Results" MODIFIED="1571513108879" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
-    <SUITE FILE_PATH="coverage/2DSHI$stream_b24.coverage" NAME="stream_b24 Coverage Results" MODIFIED="1571596424724" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$displayPhoto.coverage" NAME="displayPhoto Coverage Results" MODIFIED="1571505715036" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/2DSHI$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1571705669835" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon" />
+    <SUITE FILE_PATH="coverage/2DSHI$10_20_2019_Two_Streams_One_Histogram__1_.coverage" NAME="10_20_2019_Two_Streams_One_Histogram (1) Coverage Results" MODIFIED="1571705497549" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/previous_versions_and_reference/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$10_20_2019_Two_Streams_One_Histogram.coverage" NAME="10_20_2019_Two_Streams_One_Histogram Coverage Results" MODIFIED="1571706186544" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$callback.coverage" NAME="callback Coverage Results" MODIFIED="1571510342858" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
+    <SUITE FILE_PATH="coverage/2DSHI$opencv.coverage" NAME="opencv Coverage Results" MODIFIED="1571513256014" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
+    <SUITE FILE_PATH="coverage/2DSHI$stream_b24.coverage" NAME="stream_b24 Coverage Results" MODIFIED="1571596424724" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$interactive_legend.coverage" NAME="interactive_legend Coverage Results" MODIFIED="1571711885885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/AppData/Local/Temp" />
-    <SUITE FILE_PATH="coverage/2DSHI$output_pixel.coverage" NAME="output_pixel Coverage Results" MODIFIED="1571935378885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/current_scripts" />
-    <SUITE FILE_PATH="coverage/2DSHI$scratch2.coverage" NAME="scratch2 Coverage Results" MODIFIED="1572121547692" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
-    <SUITE FILE_PATH="coverage/2DSHI$stream_a52.coverage" NAME="stream_a52 Coverage Results" MODIFIED="1571596416299" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
-    <SUITE FILE_PATH="coverage/2DSHI$realTimeVideoHistogram.coverage" NAME="realTimeVideoHistogram Coverage Results" MODIFIED="1571520289143" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="G:/" />
     <SUITE FILE_PATH="coverage/2DSHI$textLabelHistogram_bak.coverage" NAME="textLabelHistogram_bak Coverage Results" MODIFIED="1571796782920" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/reference" />
-    <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_a1.coverage" NAME="10_19_2019_a1 Coverage Results" MODIFIED="1571519715697" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$simplified_realTimeVideoHistogram.coverage" NAME="simplified_realTimeVideoHistogram Coverage Results" MODIFIED="1571591111756" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$try_grab_mult_cameras.coverage" NAME="try_grab_mult_cameras Coverage Results" MODIFIED="1571602816966" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$scratch3.coverage" NAME="scratch3 Coverage Results" MODIFIED="1572125088325" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/2DSHI$pixel_intensities.coverage" NAME="pixel_intensities Coverage Results" MODIFIED="1572122343752" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_a2.coverage" NAME="10_19_2019_a2 Coverage Results" MODIFIED="1571513108879" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$realTimeVideoHistogram.coverage" NAME="realTimeVideoHistogram Coverage Results" MODIFIED="1571520289143" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="G:/" />
     <SUITE FILE_PATH="coverage/2DSHI$grabmultiplecameras.coverage" NAME="grabmultiplecameras Coverage Results" MODIFIED="1571594597344" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
+    <SUITE FILE_PATH="coverage/2DSHI$grab_multiple_cameras.coverage" NAME="grab_multiple_cameras Coverage Results" MODIFIED="1571617337430" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/working_files_dont_edit" />
+    <SUITE FILE_PATH="coverage/2DSHI$scratch2.coverage" NAME="scratch2 Coverage Results" MODIFIED="1572121547692" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
     <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_Single_Stream_a1.coverage" NAME="10_19_2019_Single_Stream_a1 Coverage Results" MODIFIED="1571607762259" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$updating_legend.coverage" NAME="updating_legend Coverage Results" MODIFIED="1571793667974" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/reference" />
-    <SUITE FILE_PATH="coverage/2DSHI$simplified_realTimeVideoHistogram.coverage" NAME="simplified_realTimeVideoHistogram Coverage Results" MODIFIED="1571591111756" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
-    <SUITE FILE_PATH="coverage/2DSHI$pixel_intensities.coverage" NAME="pixel_intensities Coverage Results" MODIFIED="1572122343752" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
-    <SUITE FILE_PATH="coverage/2DSHI$try_grab_mult_cameras.coverage" NAME="try_grab_mult_cameras Coverage Results" MODIFIED="1571602816966" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$stream_cameras_and_histograms_10_23_2019.coverage" NAME="stream_cameras_and_histograms_10_23_2019 Coverage Results" MODIFIED="1571937271429" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/current_scripts" />
+    <SUITE FILE_PATH="coverage/2DSHI$captureDualVideo.coverage" NAME="captureDualVideo Coverage Results" MODIFIED="1571596084807" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/RelevantFiles" />
+    <SUITE FILE_PATH="coverage/2DSHI$stream_a52.coverage" NAME="stream_a52 Coverage Results" MODIFIED="1571596416299" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_a1.coverage" NAME="10_19_2019_a1 Coverage Results" MODIFIED="1571519715697" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
     <SUITE FILE_PATH="coverage/2DSHI$textLabelHistogram.coverage" NAME="textLabelHistogram Coverage Results" MODIFIED="1571793638211" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/reference/RelevantFiles" />
     <SUITE FILE_PATH="coverage/2DSHI$10_20_2019_Dual_Stream_a1.coverage" NAME="10_20_2019_Dual_Stream_a1 Coverage Results" MODIFIED="1571593699104" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
+    <SUITE FILE_PATH="coverage/2DSHI$output_pixel.coverage" NAME="output_pixel Coverage Results" MODIFIED="1571935378885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/current_scripts" />
     <SUITE FILE_PATH="coverage/2DSHI$10_19_2019_SingleStream_RealTimeVieoHistogram_a1.coverage" NAME="10_19_2019_SingleStream_RealTimeVieoHistogram_a1 Coverage Results" MODIFIED="1571591560695" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IS_Stream_Attempt" />
-    <SUITE FILE_PATH="coverage/2DSHI$10_20_2019_Two_Streams_One_Histogram__1_.coverage" NAME="10_20_2019_Two_Streams_One_Histogram (1) Coverage Results" MODIFIED="1571705497549" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/previous_versions_and_reference/IS_Stream_Attempt" />
-    <SUITE FILE_PATH="coverage/2DSHI$opencv.coverage" NAME="opencv Coverage Results" MODIFIED="1571513256014" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pypylon/samples" />
-    <SUITE FILE_PATH="coverage/2DSHI$scratch3.coverage" NAME="scratch3 Coverage Results" MODIFIED="1572125088325" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
 </project>

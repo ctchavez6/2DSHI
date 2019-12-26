@@ -20,6 +20,7 @@ def find_matches(img1, img2, matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossChec
 
     return matcher.match(d1, d2)  # Match the two sets of descriptors.
 
+
 def get_homography_components(homography_matrix):
     '''((translationx, translationy), rotation, (scalex, scaley), shear)'''
     a = homography_matrix[0,0]

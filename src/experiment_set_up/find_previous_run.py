@@ -2,8 +2,8 @@ import os
 from . import get_command_line_parameters as gclp
 
 def get_latest_run():
-    data_directory = "/Users/ivansepulveda/PycharmProjects/2DSHI/src/tests/D"  # Ivan's Mac
-    #data_directory = os.path.join("D:", "")  # Windows PC @ Franks' House
+    #data_directory = "/Users/ivansepulveda/PycharmProjects/2DSHI/src/tests/D"  # Ivan's Mac
+    data_directory = os.path.join("D:", "")  # Windows PC @ Franks' House
 
     all_runs = sorted([os.path.join(data_directory, path) for path in os.listdir(data_directory)
                        if os.path.isdir(os.path.join(data_directory, path))

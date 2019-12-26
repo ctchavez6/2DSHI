@@ -3,7 +3,7 @@
 import sys
 import argparse
 import os
-#import stream_cameras_and_histograms as streams
+import stream_cameras_and_histograms as streams
 from experiment_set_up import update_camera_configuration as ucc
 from experiment_set_up import request_experiment_parameters
 from experiment_set_up import write_experimental_params_to_file
@@ -12,7 +12,7 @@ from experiment_set_up import find_previous_run
 from experiment_set_up import config_file_setup as cam_setup
 
 import path_management.directory_management as dirs
-#from stream_tools import stream_tools
+from stream_tools import stream_tools
 from experiment_set_up import user_input_validation as uiv
 
 from datetime import datetime
@@ -39,13 +39,11 @@ if __name__ == "__main__":
         uiv.display_dict_values(prev_run)
         args = uiv.update_previous_params(prev_run)
 
-
-
     current_datetime = datetime.now().strftime("%Y_%m_%d__%H_%M")
 
     print("\nAll Experimental Data will be saved in the following directory:\n\tD:\\{}\n".format(current_datetime))
     print("\nStarting Run: {}\n".format(current_datetime))
-    sys.exit(1)
+
     config_file_parameters = ["ExposureTime", "AcquisitionFrameRate"]
     parameter_dictionary = ucc.reduce_dictionary(args, config_file_parameters)
 
@@ -54,7 +52,7 @@ if __name__ == "__main__":
 
     devices_found, tlFactory_found = streams.find_devices()
 
-    try_module = False
+    try_module = True
 
     if try_module:
         stream = stream_tools.Stream()
