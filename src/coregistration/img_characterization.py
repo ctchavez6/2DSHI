@@ -41,20 +41,44 @@ def get_homography_components(homography_matrix):
 
     return translation_, math.degrees(theta_), scale_, shear_
 
-def derive_homography(matches, kp1, kp2, threshold=90):
+def derive_homography(img1, img2):
+
+    orb_ = initialize_orb_detector()
+
+    kp1, d1 = characterize_img(img1, orb_)
+    kp2, d2 = characterize_img(img2, orb_)
+
+    # Match features between the two images.
+    # We create a Brute Force matcher with
+    # Hamming distance as measurement mode.
+    matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+
+    # Match the two sets of descriptors.
+    matches = matcher.match(d1, d2)
+
+    # Sort matches on the basis of their Hamming distance.
     matches.sort(key=lambda x: x.distance)
 
+    # Take the top 90 % matches forward.
+    matches = matches[:int(len(matches) * 90)]
 
-    matches = matches[:int(len(matches) * threshold)]  # Take the top 90 % matches forward.
+
     no_of_matches = len(matches)
-
+    print("Matches: ", no_of_matches)
     # Define empty matrices of shape no_of_matches * 2.
     p1 = np.zeros((no_of_matches, 2))
     p2 = np.zeros((no_of_matches, 2))
+    #print(len(kp1))
+    #print(len(kp1))
+    print("Len(p2): ", len(p2))
 
     for i in range(len(matches)):
-        p1[i, :] = kp1[matches[i].queryIdx].pt
-        p2[i, :] = kp2[matches[i].trainIdx].pt
+        try:
+            p1[i, :] = kp1[matches[i].queryIdx].pt
+            p2[i, :] = kp2[matches[i].trainIdx].pt
+        except Exception as e:
+            print(i)
+            raise e
 
     # Find the homography matrix.
     homography, mask = cv2.findHomography(p1, p2, cv2.RANSAC)

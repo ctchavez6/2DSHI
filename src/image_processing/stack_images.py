@@ -18,7 +18,6 @@ def match_shapes(first_img, second_image):
 
     if second_shape[0] != max_height or second_shape[1] != max_width:
         second_image = resize_img(second_shape, max_width, max_height)
-
     return first_img, second_image
 
 def vertical(top_image, bottom_image):

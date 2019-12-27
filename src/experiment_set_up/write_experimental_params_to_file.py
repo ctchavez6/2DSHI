@@ -1,6 +1,6 @@
 import os
 
-def document_run(command_line_parameters, user_input_parameters, run):
+def document_run(all_experimental_parameters, run):
     """
     Takes a dictionary and removes any keys not specified.
 
@@ -18,9 +18,6 @@ def document_run(command_line_parameters, user_input_parameters, run):
         os.mkdir(run_directory)
     os.chdir(run_directory)
 
-    all_experimental_parameters = dict()
-    all_experimental_parameters.update(command_line_parameters)
-    all_experimental_parameters.update(user_input_parameters)
     updated_file_as_string = ''
 
     for key in all_experimental_parameters:

@@ -48,11 +48,10 @@ def get_latest_run():
         split_by_tabs = line.split('\t')
         parameter = split_by_tabs[0]
         value = split_by_tabs[1].rstrip()
-
         if value.endswith("None"):
             all_params_dict[parameter] = None
         elif parameter in int_parameters:
-            all_params_dict[parameter] = int(value)
+            all_params_dict[parameter] = int(float(value))
         elif parameter in float_parameters:
             all_params_dict[parameter] = float(value)
         elif parameter in string_parameters:

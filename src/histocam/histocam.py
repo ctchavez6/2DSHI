@@ -28,6 +28,12 @@ class Histocam():
         self.avg_plus_sigma = self.subplot.axvspan(-100, -100, alpha=0.5, color='#f5beba')
         self.avg_minus_sigma = self.subplot.axvspan(-100, -100, alpha=0.5, color='#f5beba')
 
+        self.subplot.set_xlim(-100, self.num_bins - 1 + 100)
+        self.subplot.grid(True)
+        self.subplot.set_autoscale_on(False)
+        self.subplot.set_ylim(bottom=0, top=1)
+
+
     def set_xvalues(self, polygon, x0, x1):
         """
         Given a rectangular matplotlib.patches.Polygon object sets the horizontal values.

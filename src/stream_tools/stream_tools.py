@@ -4,6 +4,7 @@ import cv2
 from image_processing import bit_depth_conversion as bdc
 from image_processing import stack_images as stack
 from histocam import histocam
+from coregistration import img_characterization as ic
 import numpy as np
 
 
@@ -42,14 +43,16 @@ def add_histogram_representations(figure_a, figure_b, raw_array_a, raw_array_b):
 
 
 class Stream:
-    def __init__(self):
+    def __init__(self, fb=-1):
         self.cam_a = None
         self.cam_b = None
         self.all_cams = None
         self.latest_grab_results = {"a": None, "b": None}
         self.frame_count = 0
-        self.frame_break = 1000
+        self.frame_break = fb
         self.break_key = 'q'
+        self.coregistration_break_key = 'c'
+        self.keypoints_break_key = 'k'
         self.current_frame_a = None
         self.current_frame_b = None
         self.histocam_a = None
@@ -99,11 +102,21 @@ class Stream:
     def keep_streaming(self):
         if not self.all_cams.IsGrabbing():
             return False
-        if self.frame_count >= self.frame_break:
+        if self.frame_count == self.frame_break:
             return False
         if cv2.waitKey(1) & 0xFF == ord(self.break_key):
             return False
         return True
+
+    def does_user_want_to_coregister(self):
+        if cv2.waitKey(1) & 0xFF == ord(self.coregistration_break_key):
+            return True
+        return False
+
+    def does_user_want_to_show_keypoints(self):
+        if cv2.waitKey(1) & 0xFF == ord(self.coregistration_break_key):
+            return True
+        return False
 
     def grab_frames(self):
         try:
@@ -127,36 +140,89 @@ class Stream:
             self.histocam_b = histocam.Histocam()
 
         self.all_cams.StartGrabbing()
+        start_coregistration_step_1 = False
+        continue_stream = True
 
-        while self.keep_streaming():
+        while continue_stream:
             self.frame_count += 1
             self.current_frame_a, self.current_frame_b = self.grab_frames()
 
             if histogram:
                 self.histocam_a.update(self.current_frame_a)
                 self.histocam_b.update(self.current_frame_b)
-                a = add_histogram_representations(self.histocam_a.get_figure(), self.histocam_b.get_figure(),
-                                                  self.current_frame_a, self.current_frame_b)
-                cv2.imshow("trial", a)
+                histocams = add_histogram_representations(self.histocam_a.get_figure(),
+                                                          self.histocam_b.get_figure(),
+                                                          self.current_frame_a,
+                                                          self.current_frame_b)
+                cv2.imshow("Cameras with Histograms", histocams)
 
-                #p = self.histocam_a.get_plot()
-                #img_a_8bit_resized = cv2.cvtColor((resize_img(img_a_8bit_gray, hist_width, hist_height)),
-                #                                  cv2.COLOR_GRAY2BGR)
-                #img_b_8bit_resized = cv2.cvtColor((resize_img(img_b_8bit_gray, hist_width, hist_height)),
-                #                                  cv2.COLOR_GRAY2BGR)
+            else:
+                self.show_16bit_representations(self.current_frame_a, self.current_frame_b)
 
-                #stack_ = stack.horizontal(bdc.to_16_bit(self.current_frame_a), p)
-                #stack_ = cv2.resize(stack_, (1000, 500))
+            continue_stream = self.keep_streaming()
+            start_coregistration_step_1 = self.does_user_want_to_coregister()
+
+        cv2.destroyAllWindows()
+
+        find_keypoints = input("Attempt to last Images? (y/n)")
+        if find_keypoints.lower() == "y":
+            start_coregistration_step_1 = True
+
+        print("start_coregistration_step_1: ", start_coregistration_step_1)
 
 
-                #hist = self.histocam_a.get_plot()
-                #cv2.imshow("StackTest", stack_)
-            #else:
-            #self.show_16bit_representations(self.current_frame_a, self.current_frame_b)
-            #self.show_16bit_representations(self.current_frame_a, self.current_frame_b)
-            #r = stack.horizontal(bdc.to_16_bit(self.current_frame_a), bdc.to_16_bit(self.current_frame_b))
-            #r = cv2.resize(r, (1000, 500))
-            #cv2.imshow("stack", r)
+        print("You've hit the c key: starting coregistration process.")
 
+        homography = None
+
+        if start_coregistration_step_1:
+            orb_ = ic.initialize_orb_detector()
+            img_a_8bit = bdc.to_8_bit(self.current_frame_a)
+            img_b_8bit = bdc.to_8_bit(self.current_frame_a)
+
+            kp_a, d_a = ic.characterize_img(bdc.to_8_bit(self.current_frame_a), orb_)
+            kp_b, d_b = ic.characterize_img(bdc.to_8_bit(self.current_frame_b), orb_)
+
+            a_with_keypoints = ic.draw_keypoints(img_a_8bit, kp_a)
+            b_with_keypoints = ic.draw_keypoints(img_b_8bit, kp_b)
+
+            print("Camera A has {} keypoints".format(len(kp_a)))
+            cv2.imshow("Cam A: Keypoints", a_with_keypoints)
+            cv2.waitKey(3000)
+            cv2.destroyAllWindows()
+
+            print("Camera B has {} keypoints".format(len(kp_b)))
+            cv2.imshow("Cam B: Keypoints", b_with_keypoints)
+            cv2.waitKey(3000)
+            cv2.destroyAllWindows()
+
+            matches = ic.find_matches(img_a_8bit, img_b_8bit)
+            homography = ic.derive_homography(matches, kp_a, kp_b)
+            b_prime = ic.transform_img(self.current_frame_b*16, homography)
+
+            cv2.imshow("B Prime", b_prime)
+            cv2.waitKey(3000)
+            cv2.destroyAllWindows()
+
+
+        while continue_stream:
+            self.frame_count += 1
+            self.current_frame_a, self.current_frame_b = self.grab_frames()
+
+            if histogram:
+                self.histocam_a.update(self.current_frame_a)
+                self.histocam_b.update(self.current_frame_b)
+                histocams = add_histogram_representations(self.histocam_a.get_figure(),
+                                                          self.histocam_b.get_figure(),
+                                                          self.current_frame_a,
+                                                          self.current_frame_b)
+                cv2.imshow("Cameras with Histograms", histocams)
+
+            else:
+                self.show_16bit_representations(self.current_frame_a, self.current_frame_b)
+
+            continue_stream = self.keep_streaming()
 
         self.all_cams.StopGrabbing()
+
+
