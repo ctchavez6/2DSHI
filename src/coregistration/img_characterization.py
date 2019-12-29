@@ -99,8 +99,7 @@ def derive_homography(img_a_8bit, img_b_8bit, supress_shear=False):
     translation = homography_components[0]
     angle = homography_components[1]
     scale = homography_components[2]
-    if supress_shear:
-        shear = 0.0
+
 
     shear = homography_components[3]
 
