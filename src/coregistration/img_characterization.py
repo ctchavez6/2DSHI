@@ -12,13 +12,22 @@ def characterize_img(img, orb_detector, mask=None):
 def draw_keypoints(img, keypoints, color=(0, 255, 0)):
     return cv2.drawKeypoints(img, keypoints, color=color, flags=0, outImage=np.array([]))
 
-def find_matches(img1, img2, matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)):
+def find_matches(img1, img2, matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True), threshold=90):
     orb_ = initialize_orb_detector()
 
     kp1, d1 = characterize_img(img1, orb_)
     kp2, d2 = characterize_img(img2, orb_)
 
-    return matcher.match(d1, d2)  # Match the two sets of descriptors.
+    # Match the two sets of descriptors.
+    matches = matcher.match(d1, d2)
+
+    # Sort matches on the basis of their Hamming distance.
+    matches.sort(key=lambda x: x.distance)
+
+    # Take the top 90 % matches forward.
+    matches = matches[:int(len(matches) * threshold)]
+
+    return kp1, kp2, matches
 
 
 def get_homography_components(homography_matrix):
@@ -41,16 +50,15 @@ def get_homography_components(homography_matrix):
 
     return translation_, math.degrees(theta_), scale_, shear_
 
-def derive_homography(img1, img2):
+def derive_homography(img_a_8bit, img_b_8bit):
 
-    orb_ = initialize_orb_detector()
+    orb_detector = cv2.ORB_create(nfeatures=100000, scoreType=cv2.ORB_FAST_SCORE, nlevels=20)
+    # Find keypoints and descriptors.
+    # The first arg is the image, second arg is the mask
+    #  (which is not required in this case).
+    kp1, d1 = orb_detector.detectAndCompute(img_a_8bit, None)
+    kp2, d2 = orb_detector.detectAndCompute(img_b_8bit, None)
 
-    kp1, d1 = characterize_img(img1, orb_)
-    kp2, d2 = characterize_img(img2, orb_)
-
-    # Match features between the two images.
-    # We create a Brute Force matcher with
-    # Hamming distance as measurement mode.
     matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
     # Match the two sets of descriptors.
@@ -60,32 +68,37 @@ def derive_homography(img1, img2):
     matches.sort(key=lambda x: x.distance)
 
     # Take the top 90 % matches forward.
-    matches = matches[:int(len(matches) * 90)]
-
-
+    matches_ = matches[:int(len(matches) * 90)]
     no_of_matches = len(matches)
-    print("Matches: ", no_of_matches)
+    print("matches: ", no_of_matches)
     # Define empty matrices of shape no_of_matches * 2.
     p1 = np.zeros((no_of_matches, 2))
     p2 = np.zeros((no_of_matches, 2))
-    #print(len(kp1))
-    #print(len(kp1))
-    print("Len(p2): ", len(p2))
 
-    for i in range(len(matches)):
-        try:
-            p1[i, :] = kp1[matches[i].queryIdx].pt
-            p2[i, :] = kp2[matches[i].trainIdx].pt
-        except Exception as e:
-            print(i)
-            raise e
+    for i in range(len(matches_)):
+        p1[i, :] = kp1[matches_[i].queryIdx].pt
+        p2[i, :] = kp2[matches_[i].trainIdx].pt
 
     # Find the homography matrix.
     homography, mask = cv2.findHomography(p1, p2, cv2.RANSAC)
 
+    homography_components = get_homography_components(homography)
+    translation = homography_components[0]
+    angle = homography_components[1]
+    scale = homography_components[2]
+    shear = homography_components[3]
+
+    print("Suggested Angle of Rotation: {}".format(angle))
+    print("Suggested translation: {}".format(translation))
+    print("Suggested scale: {}".format(scale))
+    print("Suggested shear: {}".format(shear))
+
+
     return homography
 
 
-def transform_img(original_img, homography):
+def transform_img(img_b_16bit, homography):
+    height, width = img_b_16bit.shape
 
-    return cv2.warpPerspective(original_img, homography, (original_img.shape[0], original_img.shape[1]))
+    transformed_img = cv2.warpPerspective(img_b_16bit, homography, (width, height))
+    return transformed_img

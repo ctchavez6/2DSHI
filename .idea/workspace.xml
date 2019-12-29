@@ -3,15 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/coregistration/find_image_key_points.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/find_image_key_points.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/coregistration/img_characterization.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/img_characterization.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/experiment_set_up/find_previous_run.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/find_previous_run.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/experiment_set_up/write_experimental_params_to_file.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/write_experimental_params_to_file.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/histocam/histocam.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/histocam/histocam.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/image_processing/stack_images.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/image_processing/stack_images.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/stream_cameras_and_histograms.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_cameras_and_histograms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/image_processing/bit_depth_conversion.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/image_processing/bit_depth_conversion.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tests/test_coregistration_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/test_coregistration_module.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,15 +61,15 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\fwess\Documents\GitHub" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\image_processing" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\coregistration" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\image_algebra" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\experiment_set_up" />
-      <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\data_doc" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\fwess\Documents\GitHub" />
     </key>
   </component>
   <component name="RunManager" selected="Python.main">
@@ -319,7 +314,8 @@
       <workItem from="1577312627034" duration="11877000" />
       <workItem from="1577384512603" duration="1393000" />
       <workItem from="1577385998008" duration="2608000" />
-      <workItem from="1577392172786" duration="10001000" />
+      <workItem from="1577392172786" duration="10160000" />
+      <workItem from="1577653864877" duration="4921000" />
     </task>
     <task id="LOCAL-00001" summary="this is a test commit">
       <created>1571506272404</created>
@@ -643,7 +639,14 @@
       <option name="project" value="LOCAL" />
       <updated>1577388477581</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="close to streaming b prime">
+      <created>1577406303576</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1577406303576</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -667,7 +670,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="good progress" />
     <MESSAGE value="use main" />
     <MESSAGE value="saving video successfully" />
     <MESSAGE value="saving video successfully b" />
@@ -692,24 +694,25 @@
     <MESSAGE value="a little bit of work on user input validation" />
     <MESSAGE value="updates on histocam streaming capabilities" />
     <MESSAGE value="images for later tests" />
-    <option name="LAST_COMMIT_MESSAGE" value="images for later tests" />
+    <MESSAGE value="close to streaming b prime" />
+    <option name="LAST_COMMIT_MESSAGE" value="close to streaming b prime" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="330" y="25" key="CommitChangelistDialog2" timestamp="1577388476655">
-      <screen x="0" y="0" width="1440" height="860" />
+    <state x="587" y="45" key="CommitChangelistDialog2" timestamp="1577406302837">
+      <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
-    <state x="587" y="45" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1577066924236" />
-    <state x="312" y="164" key="Vcs.Push.Dialog.v2" timestamp="1577388479562">
-      <screen x="0" y="0" width="1440" height="860" />
+    <state x="587" y="45" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1577406302837" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1577406306220">
+      <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1577066928114" />
-    <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1577392176652">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1577406306220" />
+    <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1577653907639">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="416" y="255" key="com.intellij.ide.util.TipDialog/0.0.1440.860@0.0.1440.860" timestamp="1577386000262" />
-    <state x="740" y="463" key="com.intellij.ide.util.TipDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1577392176652" />
+    <state x="740" y="463" key="com.intellij.ide.util.TipDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1577653907639" />
     <state x="518" y="90" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1576983755808">
       <screen x="0" y="0" width="1440" height="860" />
     </state>

@@ -4,9 +4,9 @@ from matplotlib import pyplot as plt
 import math
 import os
 from PIL import Image
-from coregistration import img_characterization as ic
-import path_management.directory_management as dirs
-import path_management.image_management as img_tools
+#from coregistration import img_characterization as ic
+from path_management import directory_management as dirs
+from path_management import image_management as img_tools
 
 
 run = "2019_12_14__13_08"
@@ -47,30 +47,8 @@ def getComponents(normalised_homography):
     return (translation_, math.degrees(theta_), scale_, shear_)
 
 
-def getComponents_mod(normalised_homography):
-  '''((translationx, translationy), rotation, (scalex, scaley), shear)'''
-  a = normalised_homography[0,0]
-  b = normalised_homography[0,1]
-  c = normalised_homography[0,2]
-  d = normalised_homography[1,0]
-  e = normalised_homography[1,1]
-  f = normalised_homography[1,2]
 
-  p = math.sqrt(a*a + b*b)
-  r = (a*e - b*d)/(p)
-  q = (a*d+b*e)/(a*e - b*d)
-
-  translation_ = (c,f)
-  scale_ = (p,r)
-  shear_ = q
-  theta_ = math.atan2(b,a)
-
-  return (translation_, math.degrees(theta_), 0.00, 0.00)
-
-
-
-
-img_a_path = img_b_path =dirs.get_latest_run()
+img_a_path = img_b_path = dirs.get_latest_run()
 
 if not os.path.exists(os.path.join(img_a_path, "Image_Algebra")):
   os.mkdir(os.path.join(img_a_path, "Image_Algebra"))
@@ -103,17 +81,8 @@ print("Img B Shape:", img_b.shape)
 
 
 
-#rotated_img = cv2.imread(img_a_path, 0)
-#rotated_img = np.rot90(rotated_img, 1)
-
 height, width = img_a.shape
 
-img_a_color = cv2.cvtColor(img_a, cv2.COLOR_GRAY2BGR)
-img_b_color = cv2.cvtColor(img_b, cv2.COLOR_GRAY2BGR)
-#blank_image = np.zeros((height,width,3), np.uint8)
-
-# Create ORB detector with 5000 features.
-#orb_detector = cv2.ORB_create(5000)
 orb_detector = cv2.ORB_create(nfeatures=100000, scoreType=cv2.ORB_FAST_SCORE, nlevels=20)
 # Find keypoints and descriptors.
 # The first arg is the image, second arg is the mask
@@ -125,11 +94,6 @@ kp2, d2 = orb_detector.detectAndCompute(img_b_8bit, None)
 
 print("n-keypoints img 1: ", len(kp1))
 print("n-keypoints img 2: ", len(kp2))
-#for marker in kp1:
-#  img_a_w_keypoints = cv2.drawMarker(img_a_color, tuple(int(i) for i in marker.pt), color=(0, 255, 0))
-
-#for marker in kp2:
-#  img_b_w_keypoints = cv2.drawMarker(img_b_color, tuple(int(i) for i in marker.pt), color=(0, 255, 0))
 
 
 img_a_w_keypoints = cv2.drawKeypoints(img_a, kp1, color=(0, 255, 0), flags=0, outImage=np.array([]))
@@ -149,7 +113,7 @@ plt.close('all')
 # Match features between the two images.
 # We create a Brute Force matcher with
 # Hamming distance as measurement mode.
-matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck = True)
+matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
 # Match the two sets of descriptors.
 matches = matcher.match(d1, d2)
