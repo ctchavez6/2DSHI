@@ -196,37 +196,23 @@ class Stream:
             while homography_ is None or satisfaction.lower() == "n":
 
                 img_a_8bit = bdc.to_8_bit(self.current_frame_a)
-                img_b_8bit = bdc.to_8_bit(self.current_frame_a)
+                img_b_8bit = bdc.to_8_bit(self.current_frame_b)
 
-                kp_a, d_a = ic.characterize_img(bdc.to_8_bit(self.current_frame_a), orb_)
-                kp_b, d_b = ic.characterize_img(bdc.to_8_bit(self.current_frame_b), orb_)
+                homography_ = ic.derive_homography(img_a_8bit, img_b_8bit)
+                satisfaction = input("Are you satisfied with the suggestions? (y/n): ")
 
-                a_with_keypoints = ic.draw_keypoints(img_a_8bit, kp_a)
-                b_with_keypoints = ic.draw_keypoints(img_b_8bit, kp_b)
+                if satisfaction == 'y':
+                    b_prime = ic.transform_img(self.current_frame_b * 16, homography_)
 
-                print("Camera A has {} keypoints".format(len(kp_a)))
-                cv2.imshow("Cam A: Keypoints", a_with_keypoints)
-                cv2.waitKey(3000)
-                cv2.destroyAllWindows()
+                    cv2.imshow("B Prime", b_prime)
+                    cv2.waitKey(10000)
+                    cv2.destroyAllWindows()
 
-                print("Camera B has {} keypoints".format(len(kp_b)))
-                cv2.imshow("Cam B: Keypoints", b_with_keypoints)
-                cv2.waitKey(3000)
-                cv2.destroyAllWindows()
-
-                homography_ = ic.derive_homography(img_a_8bit, img_a_8bit)
-                b_prime = ic.transform_img(self.current_frame_b*16, homography_)
-
-                cv2.imshow("B Prime", b_prime)
-                cv2.waitKey(10000)
-                cv2.destroyAllWindows()
-
-                satisfaction = input("Are you satisfied with B-Prime? (y/n): ")
-
-                if satisfaction != 'y':
                     self.frame_count += 1
                     self.current_frame_a, self.current_frame_b = self.grab_frames()
                     homography_ = None
+
+                    satisfaction = input("Are you satisfied with B-Prime? (y/n): ")
 
         continue_stream = True
 

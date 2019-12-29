@@ -45,15 +45,12 @@ if __name__ == "__main__":
     print("\nAll Experimental Data will be saved in the following directory:\n\tD:\\{}\n".format(current_datetime))
     print("\nStarting Run: {}\n".format(current_datetime))
 
-
     config_file_parameters = ["ExposureTime", "AcquisitionFrameRate"]
     parameter_dictionary = ucc.reduce_dictionary(args, config_file_parameters)
-
 
     camera_configurations_folder = os.path.join(os.getcwd(), "camera_configuration_files")
     config_files_by_cam = cam_setup.assign_config_files(parameter_dictionary, args, camera_configurations_folder)
 
-    devices_found, tlFactory_found = streams.find_devices()
 
     try_module = True
 
@@ -63,6 +60,7 @@ if __name__ == "__main__":
         stream.start(histogram=args["DisplayHistocam"])
 
     if not try_module:
+        devices_found, tlFactory_found = streams.find_devices()
         cameras = streams.get_cameras(
             devices=devices_found,
             tlFactory=tlFactory_found,

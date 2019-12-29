@@ -50,15 +50,28 @@ def get_homography_components(homography_matrix):
 
     return translation_, math.degrees(theta_), scale_, shear_
 
-def derive_homography(img_a_8bit, img_b_8bit):
+def derive_homography(img_a_8bit, img_b_8bit, supress_shear=False):
 
     orb_detector = cv2.ORB_create(nfeatures=100000, scoreType=cv2.ORB_FAST_SCORE, nlevels=20)
     # Find keypoints and descriptors.
     # The first arg is the image, second arg is the mask
     #  (which is not required in this case).
     kp1, d1 = orb_detector.detectAndCompute(img_a_8bit, None)
-    kp2, d2 = orb_detector.detectAndCompute(img_b_8bit, None)
+    print("A has {} keypoints".format(len(kp1)))
 
+    kp2, d2 = orb_detector.detectAndCompute(img_b_8bit, None)
+    print("B has {} keypoints".format(len(kp2)))
+
+    a_with_keypoints = draw_keypoints(img_a_8bit, kp1)
+    b_with_keypoints = draw_keypoints(img_b_8bit, kp2)
+
+    cv2.imshow("Cam A: Keypoints", a_with_keypoints)
+    cv2.waitKey(3000)
+    cv2.destroyAllWindows()
+
+    cv2.imshow("Cam B: Keypoints", b_with_keypoints)
+    cv2.waitKey(3000)
+    cv2.destroyAllWindows()
     matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
     # Match the two sets of descriptors.
@@ -86,6 +99,9 @@ def derive_homography(img_a_8bit, img_b_8bit):
     translation = homography_components[0]
     angle = homography_components[1]
     scale = homography_components[2]
+    if supress_shear:
+        shear = 0.0
+
     shear = homography_components[3]
 
     print("Suggested Angle of Rotation: {}".format(angle))
