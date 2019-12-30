@@ -31,7 +31,7 @@ def test_img_characterization():
         cam_b_image_path = os.path.join(os.path.join(test_materials, "cam_b_frames"), "cam_b_frame_1.png")
         img_b = cv2.imread(cam_b_image_path, 0)
         key_points_b, descriptors_b = img_characterization.characterize_img(img_b, orb_detector)
-        img_b_with_keypoints = img_characterization.draw_keypoints(img_a, key_points_b)
+        img_b_with_keypoints = img_characterization.draw_keypoints(img_b, key_points_b)
 
         cv2.imshow("Img A", cv2.resize(img_a, (960, 600), interpolation=cv2.INTER_AREA))
         cv2.waitKey(5000)
@@ -72,7 +72,6 @@ def test_img_characterization():
                 print("\t\t\t{}_y: {}".format(key, round(float(components[key][1]), 2)))
             else:
                 print("\t\t\t{}: {}".format(key, components[key]))
-                #print("\t\t\t{}: {}".format(key, round(float(components[key]), 2)))
 
         cv2.imshow("Img B", cv2.resize(img_b, (960, 600), interpolation=cv2.INTER_AREA))
         cv2.waitKey(5000)

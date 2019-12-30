@@ -494,7 +494,6 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, frame_b
                 figures["b"].canvas.draw()  # Draw updates subplots in interactive mode
                 cam_w_histogram_frames.append(add_histogram_representations(figures["a"], figures["b"], raw_image_a, raw_image_b))
                 if display_live_histocam:
-                    print("hello")
                     cv2.imshow("Camera & Histogram Streams", cam_w_histogram_frames[len(cam_w_histogram_frames)-1])
 
 

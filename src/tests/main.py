@@ -1,6 +1,7 @@
 import sys
 import os
 
+
 sys.path.append("..")
 
 if __name__ == "__main__":
@@ -36,7 +37,6 @@ if __name__ == "__main__":
         print(coreg_import_check_string + "Fail")
         print("\tFor more detailed information, see the stack trace below.\n")
         raise e
-        #raise Exception()
 
     directory_check_string = "\tTest materials present: {}"
     test_materials = os.path.join(os.path.join(os.getcwd(), "tests"), "2019_12_14__13_08")
@@ -59,4 +59,5 @@ if __name__ == "__main__":
 
     print("\n\tStarting test_img_characterization()")
     test_coregistration_module.test_img_characterization()
+
 

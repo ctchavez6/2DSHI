@@ -24,9 +24,15 @@ class Histocam():
         self.grayscale_avg = self.subplot.axvline(-100, color='b', linestyle='dashed')
         self.grayscale_avg_plus = self.subplot.axvline(-100, color='r', linestyle='dotted')
         self.grayscale_avg_minus = self.subplot.axvline(-100, color='r', linestyle='dotted')
-        self.max_vert = self.subplot.axvline(-100, color='b', linestyle='solid', linewidth=1)
+        self.max_vert = self.subplot.axvline(-100, color='g', linestyle='solid', linewidth=1)
         self.avg_plus_sigma = self.subplot.axvspan(-100, -100, alpha=0.5, color='#f5beba')
         self.avg_minus_sigma = self.subplot.axvspan(-100, -100, alpha=0.5, color='#f5beba')
+
+        self.subplot.set_xlim(-100, self.num_bins - 1 + 100)
+        self.subplot.grid(True)
+        self.subplot.set_autoscale_on(False)
+        self.subplot.set_ylim(bottom=0, top=1)
+
 
     def set_xvalues(self, polygon, x0, x1):
         """
@@ -51,15 +57,14 @@ class Histocam():
         polygon.set_xy(_ndarray)
 
     def update(self,  raw_2d_array):
-        shape_ = raw_2d_array.shape[:2]
-        calculated_hist = cv2.calcHist([raw_2d_array], [0], None, [self.num_bins], [0, self.num_bins-1]) / np.prod(shape_)
+        calculated_hist = cv2.calcHist([raw_2d_array], [0], None, [self.num_bins], [0, self.num_bins-1]) / np.prod(raw_2d_array.shape[:2])
+
         histogram_maximum = np.amax(calculated_hist)
         greyscale_max = np.amax(raw_2d_array.flatten())
         greyscale_avg = np.mean(raw_2d_array)
         greyscale_stdev = np.std(raw_2d_array)
 
         self.intensity.set_ydata(calculated_hist)  # Intensities/Percent of Saturation
-
         self.maximum.set_ydata(greyscale_max)  # Maximums
         self.average.set_ydata(greyscale_avg)  # Averages
         self.st_dev.set_ydata(greyscale_stdev)  # Standard Deviations
@@ -79,17 +84,20 @@ class Histocam():
             loc="upper right"
         )
 
+        #print(histogram_maximum)
         if histogram_maximum > 0.001:
             self.subplot.set_ylim(bottom=0.000000, top=histogram_maximum * self.threshold)
         else:
             self.subplot.set_ylim(bottom=0.000000, top=0.001)
         self.figure.canvas.draw()
-        #self.figure.canvas.draw()
+
 
     def get_plot(self):
         plot = np.fromstring(self.figure.canvas.tostring_rgb(), dtype=np.uint8, sep='')
         plot = plot.reshape(self.figure.canvas.get_width_height()[::-1] + (3,))
-        hist_width, hist_height = plot.shape[0], plot.shape[1]
         plot = cv2.cvtColor(plot, cv2.COLOR_RGB2BGR)  # img is rgb, convert to opencv's default bgr
 
         return plot
+
+    def get_figure(self):
+        return self.figure

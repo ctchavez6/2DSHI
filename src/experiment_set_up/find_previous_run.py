@@ -2,8 +2,8 @@ import os
 from . import get_command_line_parameters as gclp
 
 def get_latest_run():
-    data_directory = "/Users/ivansepulveda/PycharmProjects/2DSHI/src/tests/D"  # Ivan's Mac
-    #data_directory = os.path.join("D:", "")  # Windows PC @ Franks' House
+    #data_directory = "/Users/ivansepulveda/PycharmProjects/2DSHI/src/tests/D"  # Ivan's Mac
+    data_directory = os.path.join("D:", "")  # Windows PC @ Franks' House
 
     all_runs = sorted([os.path.join(data_directory, path) for path in os.listdir(data_directory)
                        if os.path.isdir(os.path.join(data_directory, path))
@@ -48,11 +48,10 @@ def get_latest_run():
         split_by_tabs = line.split('\t')
         parameter = split_by_tabs[0]
         value = split_by_tabs[1].rstrip()
-
         if value.endswith("None"):
             all_params_dict[parameter] = None
         elif parameter in int_parameters:
-            all_params_dict[parameter] = int(value)
+            all_params_dict[parameter] = int(float(value))
         elif parameter in float_parameters:
             all_params_dict[parameter] = float(value)
         elif parameter in string_parameters:
