@@ -199,6 +199,29 @@ class Stream:
                 img_b_8bit = bdc.to_8_bit(self.current_frame_b)
 
                 homography_ = ic.derive_homography(img_a_8bit, img_b_8bit)
+
+                rows, cols = img_b_8bit.shape
+                M, inliers = ic.derive_euclidean_transform(img_b_8bit, img_a_8bit)
+                print("Euclidean Transform Matrix below")
+                print(M)
+
+                homography_components = ic.get_homography_components(homography_)
+                translation = homography_components[0]
+                angle = homography_components[1]
+                scale = homography_components[2]
+
+                shear = homography_components[3]
+
+                #translation_matrix_ = np.float32([[1, 0, 100], [0, 1, 50]])
+
+                #print("Suggested Angle of Rotation: {}".format(angle))
+                #print("Suggested translation: {}".format(translation))
+                #print("Suggested scale: {}".format(scale))
+                #print("Suggested shear: {}".format(shear))
+
+
+
+
                 satisfaction = input("Are you satisfied with the suggestions? (y/n): ")
 
                 if satisfaction == 'y':
