@@ -112,6 +112,14 @@ def derive_homography(img_a_8bit, img_b_8bit, supress_shear=False):
     return homography
 
 
+
+def derive_euclidean_transform(source_, target_):
+    #transformation = cv2.estimateAffinePartial2D(source_, target_)
+    return 1, 1
+
+
+
+
 def transform_img(img_b_16bit, homography):
     height, width = img_b_16bit.shape
 
