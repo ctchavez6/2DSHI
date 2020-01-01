@@ -2,11 +2,8 @@ import os
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-from astropy import modeling
 from scipy.optimize import curve_fit
-from lmfit import Model
 from PIL import Image
-from scipy.ndimage import rotate
 
 def gaussian_distribution(x, mu, sigma, coefficient):
     """
@@ -67,14 +64,12 @@ def get_coordinates_of_maximum(image):
         The image intensity maximum (assuming grayscale) as an int.
     """
     maximum_intensity_value = get_maximum_pixel_intensity(image)
-    print("maximum_intensity_value acording to  get_maximum_pixel_intensity(): ", maximum_intensity_value)
     x_coordinates = np.where(image == maximum_intensity_value)[1]
     y_coordinates = np.where(image == maximum_intensity_value)[0]
     if len(x_coordinates) > 1 or len(y_coordinates) > 1:
         x, y = [(int(np.mean(x_coordinates)), int(np.mean(y_coordinates)))][0]
     else:
         x, y = [(i, j) for i, j in zip(x_coordinates, y_coordinates)][0]
-    print("coordinates (x, y) [y=0 @ top of image]: ", (x, y))
     return x, y
 
 
@@ -348,7 +343,7 @@ def save_img(filename, directory, image, sixteen_bit=True):
     os.chdir(directory)
 
 
-
+"""
 
 img = read_image_from_file("./coregistration/cam_b_frame_186.png")
 coordinates_of_maximum = get_coordinates_of_maximum(img)
@@ -465,3 +460,5 @@ cv2.waitKey(3000)
 #plot_horizonal_lineout_intensity(img, get_coordinates_of_maximum(img), upper_limit_noise=10)
 #xs, ys = plot_horizonal_lineout_intensity(img_without_noise, get_coordinates_of_maximum(img_without_noise))
 #fit_function(xs, ys)
+
+"""
