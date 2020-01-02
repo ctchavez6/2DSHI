@@ -35,3 +35,4 @@ def document_run(all_experimental_parameters, run):
     params_file.close()
 
     os.chdir(current_working_directory)
+    return run_directory

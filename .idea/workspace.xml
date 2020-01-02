@@ -2,9 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/2DSHI.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/2DSHI.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/coregistration/find_gaussian_profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/find_gaussian_profile.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/experiment_set_up/write_experimental_params_to_file.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/write_experimental_params_to_file.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/image_registration/.idea/image_registration.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/image_registration/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/image_registration/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/image_registration/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/image_registration/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/path_management/image_management.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/path_management/image_management.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/test_coregistration_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/test_coregistration_module.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +83,7 @@
       <recent name="C:\Users\fwess\Documents\GitHub" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.translation">
+  <component name="RunManager">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="2DSHI" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -182,31 +194,8 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="translation" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="image_registration" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/image_registration/imreg_dft/imreg_dft/resources/code" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/image_registration/imreg_dft/imreg_dft/resources/code/translation.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="true" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.translation" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.find_previous_run" />
         <item itemvalue="Python.setup" />
@@ -317,14 +306,7 @@
       <workItem from="1577653864877" duration="9051000" />
       <workItem from="1577756475747" duration="1030000" />
       <workItem from="1577757524501" duration="6519000" />
-      <workItem from="1577914744795" duration="4354000" />
-    </task>
-    <task id="LOCAL-00005" summary="this is a test commit 2">
-      <created>1571506838340</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1571506838340</updated>
+      <workItem from="1577914744795" duration="16171000" />
     </task>
     <task id="LOCAL-00006" summary="able to simultaneously stream two basler cameras">
       <created>1571602596807</created>
@@ -662,7 +644,14 @@
       <option name="project" value="LOCAL" />
       <updated>1577764601316</updated>
     </task>
-    <option name="localTasksCounter" value="54" />
+    <task id="LOCAL-00054" summary="livestreaming centers">
+      <created>1577919170771</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1577919170771</updated>
+    </task>
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -686,7 +675,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="adding my file" />
     <MESSAGE value="now we know about noise" />
     <MESSAGE value="saving images at 16 bit" />
     <MESSAGE value="functionality updates" />
@@ -711,23 +699,24 @@
     <MESSAGE value="now streaming b prime" />
     <MESSAGE value="just found out about shear" />
     <MESSAGE value="priority realighment, focus on ROI" />
-    <option name="LAST_COMMIT_MESSAGE" value="priority realighment, focus on ROI" />
+    <MESSAGE value="livestreaming centers" />
+    <option name="LAST_COMMIT_MESSAGE" value="livestreaming centers" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="587" y="45" key="CommitChangelistDialog2" timestamp="1577764600152">
+    <state x="587" y="45" key="CommitChangelistDialog2" timestamp="1577919170131">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
-    <state x="587" y="45" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1577764600152" />
+    <state x="587" y="45" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1577919170131" />
     <state x="1042" y="526" key="SettingsEditor" timestamp="1577758445066">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1042" y="526" key="SettingsEditor/0.0.2560.1560@0.0.2560.1560" timestamp="1577758445066" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1577764606282">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1577919172401">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1577764606282" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1577919172401" />
     <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1577914747472">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>

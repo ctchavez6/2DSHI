@@ -27,10 +27,11 @@ def save_img(filename, directory, image, bit_depth=16):
     """
     TODO Add documentation.
     """
+    cwd = os.getcwd()
     os.chdir(directory)
     if bit_depth == 16:
         image = Image.fromarray(image)
         image.save(filename, compress_level=0)
     else:
         cv2.imwrite(filename, image.astype(np.uint16))
-    os.chdir(directory)
+    os.chdir(cwd)

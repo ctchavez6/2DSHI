@@ -1,7 +1,53 @@
 import cv2
+from src.coregistration import find_gaussian_profile as gp
+
 from src.coregistration import img_characterization
 import os
 
+def test_find_gaussian_profile():
+    test_materials = os.path.join(os.path.join(os.getcwd(), "tests"), "2020_01_01__18_01")
+    """
+    
+    a_frames_dir = os.path.join(test_materials, "cam_a_frames")
+    a1 = cv2.imread(os.path.join(a_frames_dir, "a_1.png"), 0)
+    center_a = gp.get_coordinates_of_maximum(a1)
+
+    print("\t\tTesting get_coordinates_of_maximum(): Pass")
+    print("\t\t\tTest Image shape: {}".format(a1.shape))
+    print("\t\t\tCenter at {}".format(center_a))
+    a1wc = cv2.circle(a1, center_a, 10, (0, 255, 0), 2)
+    cv2.imshow("Img A With Key Points", a1wc)
+    cv2.waitKey(5000)
+    cv2.destroyAllWindows()
+
+
+    """
+
+
+    b_frames_dir = os.path.join(test_materials, "cam_b_frames")
+    b1 = cv2.imread(os.path.join(b_frames_dir, "b_1.png"), 0)
+    center_b = gp.get_coordinates_of_maximum(b1)
+
+
+
+
+    print("\t\tTesting get_coordinates_of_maximum(): Pass")
+    print("\t\t\tTest Image shape: {}".format(b1.shape))
+    print("\t\t\tCenter at {}".format(center_b))
+    b1wc = cv2.circle(b1.copy(), center_b, 10, (0, 255, 0), 2)
+    cv2.imshow("b1 with center", b1wc)
+    cv2.waitKey(5000)
+    cv2.destroyAllWindows()
+
+    print("\t\tTesting plot_horizonal_lineout_intensity():")
+    gp.plot_horizonal_lineout_intensity(b1, center_b)
+    print()
+
+    print("\t\tTesting get_gaus_boundaries_x():")
+    mu_x, sigma_x, amp_x = gp.get_gaus_boundaries_x(b1, center_b)
+    print("\t\t\tMean (Horizontal): {}".format(mu_x))
+    print("\t\t\tStandard Deviation (Horizontal): {}".format(sigma_x,))
+    print("\t\t\tAmplitude (Horizontal): {}".format(amp_x))
 
 
 #current_submodule = "img_characterization"
@@ -49,10 +95,11 @@ def test_img_characterization():
 
         print("\t\tTesting draw_keypoints(): {}".format("Pass"))  # Sort matches on the basis of their Hamming distance.
 
+        """
         import matplotlib.pyplot as plt
 
-        matches = img_characterization.find_matches(img_a, img_b)
-
+        #matches = img_characterization.find_matches(img_a, img_b)
+        
         img3 = cv2.drawMatches(img_a, key_points_a, img_b, key_points_b, matches[:100], None, flags=2)
         cv2.imshow("Matches", img3)
         cv2.waitKey(5000)
@@ -82,6 +129,8 @@ def test_img_characterization():
 
 
         print("\t\tTesting transform_img(): {}".format("Pass"))
+        """
+
     except NameError as e:
         print(characterize_img_test_str.format("Fail"))
         print("\t\tFor more detailed information, see the stack trace below.\n")

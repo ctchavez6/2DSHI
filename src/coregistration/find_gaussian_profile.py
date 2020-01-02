@@ -127,22 +127,28 @@ def plot_horizonal_lineout_intensity(image, coordinates):
     """
     print("Inside Function plot_horizonal_lineout_intensity(image, coordinates)")
     #print("Image Shape: ", image.shape)
-    fig_c, cx = plt.subplots()
-    cx.title.set_text('Horizontal & Vertical Region of Interest (Above Noise)')
-    cx.imshow(image)
-    fig_c.savefig("Horizontal_&_Vertical_Region_of_Interest_(Above_Noise).png")
-    plt.close('all')
-    x_max, y_max = coordinates
+    #fig_c, cx = plt.subplots()
+    #cx.title.set_text('Horizontal & Vertical Region of Interest (Above Noise)')
+    #cx.imshow(image)
+    #fig_c.savefig("Horizontal_&_Vertical_Region_of_Interest_(Above_Noise).png")
+    #plt.close('all')
+    fig = plt.figure()
+    #x_max, y_max = coordinates
+    y_max, x_max = coordinates
+
     print("Maxima at: ", (x_max, y_max))
     print("image[%s, %s] = %s" % (str(x_max), str(y_max), str(image[y_max, x_max])))
     lineout = np.asarray(image[x_max:x_max+1, :])[0]
+    print("lineout: ", lineout)
     #lineout = np.asarray(image[:, y_max:y_max+1])[0]
     indices = np.arange(0, len(lineout))
     #print("Lineout Shape: ", lineout.shape)
     plt.plot(indices, lineout)
     plt.title("Left-Right Trimmed Line-out")
     #plt.show()
+    plt.show()
     plt.close('all')
+    fig.savefig("Lineout.png")
     return indices, lineout
 
 
@@ -250,20 +256,22 @@ def get_noise_boundaries(image, coordinates_of_maxima, upper_limit_noise=10):
 
 
 def get_gaus_boundaries_x(image, coords_of_max):
-    fig = plt.figure()
+    #fig = plt.figure()
     xs = np.arange(0, image.shape[1])
+    #xm, ym = coords_of_max
 
     ym, xm = coords_of_max
-    # Horizontal Line Out
-    #test = test[x_max:x_max + 1, :]  # Horizontal Line Out
+    #print("xs: ", xs)
 
     ys = image[xm:xm + 1, :].flatten()
-    print("Scipy Optimize Curve Fit Parameters: x")
+    #print("ys: ", ys)
+
+    #print("Scipy Optimize Curve Fit Parameters: x")
     popt, pcov = curve_fit(gaussian_distribution, xs, ys)
     mu, sigma, amp = popt[0], popt[1], popt[2]
-    print('Mean: {} +\- {}'.format(mu, np.sqrt(pcov[0, 0])))
-    print('Standard Deviation: {} +\- {}'.format(sigma, np.sqrt(pcov[1, 1])))
-    print('Amplitude: {} +\- {}'.format(amp, np.sqrt(pcov[2, 2])))
+    #print('Mean: {} +\- {}'.format(mu, np.sqrt(pcov[0, 0])))
+    #print('Standard Deviation: {} +\- {}'.format(sigma, np.sqrt(pcov[1, 1])))
+    #print('Amplitude: {} +\- {}'.format(amp, np.sqrt(pcov[2, 2])))
 
     mu, sigma, amp = popt[0], popt[1], popt[2]
     plt.axvline(mu + (1 * sigma), color='b', linestyle='dashed', linewidth=1, label="1sigma")
@@ -276,34 +284,40 @@ def get_gaus_boundaries_x(image, coords_of_max):
     plt.axvline(mu - (4 * sigma), color='gray', linestyle='dashed', linewidth=1)
 
     y_model_output = gaussian_distribution(xs, *popt)
-    plt.plot(xs, ys, label='Data')
-    plt.plot(xs, y_model_output, label='Model')
-    plt.title("Scipy Optimize Fit X - ./coregistration/cam_b_frame_186.png")
-    plt.legend()
+    #plt.plot(xs, ys, label='Data')
+    #plt.plot(xs, y_model_output, label='Model')
+    #plt.title("Scipy Optimize Fit X - ./coregistration/cam_b_frame_186.png")
+    #plt.legend()
     #plt.show()
-    fig.savefig("ScipyOptimizeCurveFit_X-coregistration-cam_b_frame_186.png")
+    #fig.savefig("ScipyOptimizeCurveFit_X-coregistration-cam_b_frame_186.png")
 
-    plt.close('all')
+    #plt.close('all')
     return mu, sigma, amp
 
 
 
 def get_gaus_boundaries_y(image, coords_of_max):
+    image = np.array(image)
     fig = plt.figure()
     xs = np.arange(0, image.shape[1])
-    print(xs)
-    print("coords of max")
-    print(coords_of_max)
-    ym, xm = coords_of_max
-    ys = image[:, ym:ym+1].flatten()  # Vertical Line Out
+    xs = np.array(xs)
+    print("xs: ", xs)
 
-    print(ys)
-    print("Scipy Optimize Curve Fit Parameters: y")
+    #print("coords of max")
+    #print(coords_of_max)
+    ym, xm = coords_of_max
+    ys = np.array(image[:, ym:ym+1].flatten())  # Vertical Line Out
+    print("ys: ", ys)
+
+    #print(ys)
+    #print("ys: ", ys)
+
+    #print("Scipy Optimize Curve Fit Parameters: y")
     popt, pcov = curve_fit(gaussian_distribution, xs, ys)
     mu, sigma, amp = popt[0], popt[1], popt[2]
-    print('Mean: {} +\- {}'.format(mu, np.sqrt(pcov[0, 0])))
-    print('Standard Deviation: {} +\- {}'.format(sigma, np.sqrt(pcov[1, 1])))
-    print('Amplitude: {} +\- {}'.format(amp, np.sqrt(pcov[2, 2])))
+    #print('Mean: {} +\- {}'.format(mu, np.sqrt(pcov[0, 0])))
+    #print('Standard Deviation: {} +\- {}'.format(sigma, np.sqrt(pcov[1, 1])))
+    #print('Amplitude: {} +\- {}'.format(amp, np.sqrt(pcov[2, 2])))
 
     mu, sigma, amp = popt[0], popt[1], popt[2]
     plt.axvline(mu + (1 * sigma), color='b', linestyle='dashed', linewidth=1, label="1sigma")
