@@ -27,6 +27,17 @@ def test_find_gaussian_profile():
     b_frames_dir = os.path.join(test_materials, "cam_b_frames")
     b1 = cv2.imread(os.path.join(b_frames_dir, "b_1.png"), 0)
     center_b = gp.get_coordinates_of_maximum(b1)
+    print("Image has Shape: ", b1.shape)
+    #max_ = 0
+    #h, v = None, None
+    #for i in range(b1.shape[0]):
+        #for j in range(b1.shape[1]):
+            #if b1[i, j] > max_:
+                #max_ = b1[i, j]
+                #h = i
+                #v = j
+
+    #print("Maximum Intensity value of {} Recorded at:\n\t({}, {})".format(max_, h, v))
 
 
 
@@ -40,14 +51,17 @@ def test_find_gaussian_profile():
     cv2.destroyAllWindows()
 
     print("\t\tTesting plot_horizonal_lineout_intensity():")
-    gp.plot_horizonal_lineout_intensity(b1, center_b)
+    #gp.plot_horizonal_lineout_intensity(b1, center_b)
     print()
 
     print("\t\tTesting get_gaus_boundaries_x():")
     mu_x, sigma_x, amp_x = gp.get_gaus_boundaries_x(b1, center_b)
-    print("\t\t\tMean (Horizontal): {}".format(mu_x))
-    print("\t\t\tStandard Deviation (Horizontal): {}".format(sigma_x,))
-    print("\t\t\tAmplitude (Horizontal): {}".format(amp_x))
+    #print("\t\t\tMean (Horizontal): {}".format(mu_x))
+    #print("\t\t\tStandard Deviation (Horizontal): {}".format(sigma_x,))
+    #print("\t\t\tAmplitude (Horizontal): {}".format(amp_x))
+
+    mu_y, sigma_y, amp_y = gp.get_gaus_boundaries_y(b1, center_b)
+
 
 
 #current_submodule = "img_characterization"

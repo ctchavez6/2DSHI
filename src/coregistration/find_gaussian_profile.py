@@ -4,6 +4,7 @@ import cv2
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from PIL import Image
+from astropy import modeling
 
 def gaussian_distribution(x, mu, sigma, coefficient):
     """
@@ -22,6 +23,15 @@ def gaussian_distribution(x, mu, sigma, coefficient):
     return coefficient * np.exp(-(x-mu)**2/(2.0*sigma**2))
     #return distribution
 
+
+
+
+
+# Create a function which returns a Gaussian (normal) distribution.
+def gauss(x, *p):
+    a, b, c, d = p
+    y = a*np.exp(-np.power((x - b), 2.)/(2. * c**2.)) + d
+    return y
 
 def read_image_from_file(image_path, file_bit_depth=16, original_bit_depth=12):
     """
@@ -126,21 +136,12 @@ def plot_horizonal_lineout_intensity(image, coordinates):
         (np.ndarray, np.ndarray): A tuple equal to (indices, intensity values). Both components as a np.ndarray
     """
     print("Inside Function plot_horizonal_lineout_intensity(image, coordinates)")
-    #print("Image Shape: ", image.shape)
-    #fig_c, cx = plt.subplots()
-    #cx.title.set_text('Horizontal & Vertical Region of Interest (Above Noise)')
-    #cx.imshow(image)
-    #fig_c.savefig("Horizontal_&_Vertical_Region_of_Interest_(Above_Noise).png")
-    #plt.close('all')
+
     fig = plt.figure()
-    #x_max, y_max = coordinates
     y_max, x_max = coordinates
 
-    print("Maxima at: ", (x_max, y_max))
-    print("image[%s, %s] = %s" % (str(x_max), str(y_max), str(image[y_max, x_max])))
+
     lineout = np.asarray(image[x_max:x_max+1, :])[0]
-    print("lineout: ", lineout)
-    #lineout = np.asarray(image[:, y_max:y_max+1])[0]
     indices = np.arange(0, len(lineout))
     #print("Lineout Shape: ", lineout.shape)
     plt.plot(indices, lineout)
@@ -257,23 +258,65 @@ def get_noise_boundaries(image, coordinates_of_maxima, upper_limit_noise=10):
 
 def get_gaus_boundaries_x(image, coords_of_max):
     #fig = plt.figure()
-    xs = np.arange(0, image.shape[1])
     #xm, ym = coords_of_max
-
     ym, xm = coords_of_max
+    lineout = np.array(np.asarray(image[xm:xm+1, :])[0])
+    indices = np.arange(0, len(lineout))
+    #print("Maximum has a value of image[xm, ym], which is: ", image[xm, ym])
+
+    p_initial = [image[xm, ym]*1.0, 960.00, 5.0, 0.0]
+
+    popt, pcov = curve_fit(gauss, indices, lineout, p0=p_initial)
+
+    amp, mu, sigma = popt[0], popt[1], popt[2]
+    offset = popt[3]
+    #print("mu: ", mu)
+    #print("sigma: ", sigma)
+    #print("amp: ", amp)
+    #print("offset: ", offset)
+
     #print("xs: ", xs)
 
-    ys = image[xm:xm + 1, :].flatten()
+
+
+    """
+    y_fit = gauss(indices, *popt)
+
+    # Create a plot of our work, showing both the data and the fit.
+    fig, ax = plt.subplots()
+
+    #ax.errorbar(x, y, e)
+    ax.plot(indices, lineout, label='data')
+    ax.plot(indices, y_fit, color='red', label='fit')
+    ax.axvline(x=mu)
+    ax.axvline(x=mu - sigma)
+    ax.axvline(x=mu + sigma)
+
+    ax.axvline(x=mu - 4*sigma, c='g')
+    ax.axvline(x=mu + 4*sigma, c='g')
+
+    ax.axhline(y=amp + offset)
+
+    #print(popt)
+    ax.legend()
+    ax.set_xlabel(r'$x$')
+    ax.set_ylabel(r'$f(x)$')
+    ax.set_title('Horizontal')
+
+    plt.show()
+    plt.close('all')    
+
+    print("Lineout max - ", np.max(lineout))
     #print("ys: ", ys)
+    print("indices:\n\t", indices)
+    print("ys:\n\t", lineout)
+    #for a in ys:
+        #print(a)
+    m = modeling.models.Gaussian1D(amplitude=10, mean=30, stddev=5)
 
-    #print("Scipy Optimize Curve Fit Parameters: x")
-    popt, pcov = curve_fit(gaussian_distribution, xs, ys)
-    mu, sigma, amp = popt[0], popt[1], popt[2]
-    #print('Mean: {} +\- {}'.format(mu, np.sqrt(pcov[0, 0])))
-    #print('Standard Deviation: {} +\- {}'.format(sigma, np.sqrt(pcov[1, 1])))
-    #print('Amplitude: {} +\- {}'.format(amp, np.sqrt(pcov[2, 2])))
+    #popt, pcov = curve_fit(gaussian_distribution, indices, lineout)
 
-    mu, sigma, amp = popt[0], popt[1], popt[2]
+    #mu, sigma, amp = popt[0], popt[1], popt[2]
     plt.axvline(mu + (1 * sigma), color='b', linestyle='dashed', linewidth=1, label="1sigma")
     plt.axvline(mu - (1 * sigma), color='b', linestyle='dashed', linewidth=1)
     plt.axvline(mu + (2 * sigma), color='r', linestyle='dashed', linewidth=1, label="2sigma")
@@ -283,13 +326,18 @@ def get_gaus_boundaries_x(image, coords_of_max):
     plt.axvline(mu + (4 * sigma), color='gray', linestyle='dashed', linewidth=1, label="4sigma")
     plt.axvline(mu - (4 * sigma), color='gray', linestyle='dashed', linewidth=1)
 
-    y_model_output = gaussian_distribution(xs, *popt)
-    #plt.plot(xs, ys, label='Data')
-    #plt.plot(xs, y_model_output, label='Model')
-    #plt.title("Scipy Optimize Fit X - ./coregistration/cam_b_frame_186.png")
-    #plt.legend()
-    #plt.show()
-    #fig.savefig("ScipyOptimizeCurveFit_X-coregistration-cam_b_frame_186.png")
+    #y_model_output = gaussian_distribution(indices, *popt)
+    #y_model_output = gaussian_distribution(indices, *popt)
+    y_model_output = indices
+
+    plt.plot(indices, lineout, label='Data')
+    plt.plot(indices, indices, label='Model')
+    plt.title("Scipy Optimize Fit")
+    plt.legend()
+    plt.show()
+        
+    """
+#fig.savefig("ScipyOptimizeCurveFit_X-coregistration-cam_b_frame_186.png")
 
     #plt.close('all')
     return mu, sigma, amp
@@ -297,18 +345,64 @@ def get_gaus_boundaries_x(image, coords_of_max):
 
 
 def get_gaus_boundaries_y(image, coords_of_max):
+
+
     image = np.array(image)
-    fig = plt.figure()
     xs = np.arange(0, image.shape[1])
-    xs = np.array(xs)
-    print("xs: ", xs)
+
+
 
     #print("coords of max")
     #print(coords_of_max)
     ym, xm = coords_of_max
-    ys = np.array(image[:, ym:ym+1].flatten())  # Vertical Line Out
-    print("ys: ", ys)
+    p_initial = [image[xm, ym]*1.0, 600.00, 5.0, 0.0]
 
+    ys = np.array(image[:, ym:ym+1].flatten())  # Vertical Line Out
+    lineout = ys
+    indices = np.arange(0, len(lineout))
+
+    #print("indices len ", len(indices))
+    #print("Lineout len ", len(lineout))
+    popt, pcov = curve_fit(gauss, indices, lineout, p0=p_initial)
+
+    amp, mu, sigma = popt[0], popt[1], popt[2]
+    offset = popt[3]
+    #print("mu: ", mu)
+    #print("sigma: ", sigma)
+    #print("amp: ", amp)
+    #print("offset: ", offset)
+
+    #print("xs: ", xs)
+
+    #y_fit = gauss(indices, *popt)
+
+    # Create a plot of our work, showing both the data and the fit.
+    #fig, ax = plt.subplots()
+
+    #ax.errorbar(x, y, e)
+    #ax.plot(indices, lineout, label='data')
+    #ax.plot(indices, y_fit, color='red', label='fit')
+    #ax.axvline(x=mu)
+    #ax.axvline(x=mu - sigma)
+    #ax.axvline(x=mu + sigma)
+
+    #ax.axvline(x=mu - 4*sigma, c='g')
+    #ax.axvline(x=mu + 4*sigma, c='g')
+
+    #ax.axhline(y=amp + offset)
+
+    #print(popt)
+    #ax.legend()
+    #ax.set_xlabel(r'$x$')
+    #ax.set_ylabel(r'$f(x)$')
+    #ax.set_title('Vertical')
+
+    #plt.show()
+    #plt.close('all')
+
+
+    """
+    
     #print(ys)
     #print("ys: ", ys)
 
@@ -338,6 +432,8 @@ def get_gaus_boundaries_y(image, coords_of_max):
     fig.savefig("ScipyOptimizeCurveFit_Y-coregistration-cam_b_frame_186.png")
 
     plt.close('all')
+    
+    """
     return mu, sigma, amp
 
 

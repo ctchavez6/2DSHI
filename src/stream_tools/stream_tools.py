@@ -170,15 +170,24 @@ class Stream:
         return img_a, img_b
 
     def full_img_w_roi_borders(self, img_12bit, center_):
-        #print("Calculating x")
-        mean_x, stdev_x, amplitude_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
-        #print("\nCalculating y")
-        #mean_y, stdev_y, amplitude_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
+        mu_x, sigma_x, amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
+        mu_y, sigma_y, amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
 
-        # Guassian: 5 Sigma X Direction
         x_max, y_max = center_
-        img_12bit[:, x_max + int(stdev_x * 5)] = 4095
-        img_12bit[:, x_max - int(stdev_x * 5)] = 4095
+
+        if x_max + int(sigma_x * 4) > 1919 or x_max - int(sigma_x * 4) < 1:
+            pass
+        elif y_max + int(sigma_y * 4) > 1199 or y_max - int(sigma_y * 4) < 1:
+            pass
+        else:
+            img_12bit[:, x_max + int(sigma_x * 4)] = 4095
+            img_12bit[:, x_max - int(sigma_x * 4)] = 4095
+
+            img_12bit[y_max + int(sigma_y * 4), :] = 4095
+            img_12bit[y_max - int(sigma_y * 4), :] = 4095
+        # Guassian: 5 Sigma X Direction
+
+
 
         # Guassian: 5 Sigma y Direction
         #img_12bit[y_max + int(stdev_y * 5), :] = 4095
