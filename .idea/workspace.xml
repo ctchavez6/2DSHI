@@ -2,11 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/scratch.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scratch.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/coregistration/find_gaussian_profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/find_gaussian_profile.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/coregistration/img_characterization.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/img_characterization.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/experiment_set_up/request_experiment_parameters.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/experiment_set_up/user_input_validation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/user_input_validation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tests/test_coregistration_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/test_coregistration_module.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -166,6 +169,9 @@
       <module name="2DSHI" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -317,14 +323,8 @@
       <workItem from="1577756475747" duration="1030000" />
       <workItem from="1577757524501" duration="6519000" />
       <workItem from="1577914744795" duration="16337000" />
-      <workItem from="1578016393690" duration="6058000" />
-    </task>
-    <task id="LOCAL-00007" summary="able to simultaneously stream two basler cameras">
-      <created>1571611768381</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1571611768381</updated>
+      <workItem from="1578016393690" duration="7023000" />
+      <workItem from="1578101748225" duration="9789000" />
     </task>
     <task id="LOCAL-00008" summary="file management">
       <created>1571706741108</created>
@@ -662,7 +662,14 @@
       <option name="project" value="LOCAL" />
       <updated>1577933890450</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <task id="LOCAL-00056" summary="progress on ROI">
+      <created>1578022621200</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1578022621200</updated>
+    </task>
+    <option name="localTasksCounter" value="57" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -686,7 +693,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="saving images at 16 bit" />
     <MESSAGE value="functionality updates" />
     <MESSAGE value="some updated stuff" />
     <MESSAGE value="roi stuff" />
@@ -711,28 +717,29 @@
     <MESSAGE value="priority realighment, focus on ROI" />
     <MESSAGE value="livestreaming centers" />
     <MESSAGE value="static tests" />
-    <option name="LAST_COMMIT_MESSAGE" value="static tests" />
+    <MESSAGE value="progress on ROI" />
+    <option name="LAST_COMMIT_MESSAGE" value="progress on ROI" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="587" y="45" key="CommitChangelistDialog2" timestamp="1577933889529">
+    <state x="587" y="45" key="CommitChangelistDialog2" timestamp="1578022620420">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
-    <state x="587" y="45" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1577933889529" />
+    <state x="587" y="45" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1578022620420" />
     <state x="1042" y="526" key="SettingsEditor" timestamp="1577758445066">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1042" y="526" key="SettingsEditor/0.0.2560.1560@0.0.2560.1560" timestamp="1577758445066" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1577933892618">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1578022623942">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1577933892618" />
-    <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1578016397571">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1578022623942" />
+    <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1578101748838">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="416" y="255" key="com.intellij.ide.util.TipDialog/0.0.1440.860@0.0.1440.860" timestamp="1577386000262" />
-    <state x="740" y="463" key="com.intellij.ide.util.TipDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1578016397571" />
+    <state x="740" y="463" key="com.intellij.ide.util.TipDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1578101748838" />
     <state x="518" y="90" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1576983755808">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
@@ -741,10 +748,10 @@
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1443" y="792" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1560@0.0.2560.1560" timestamp="1577757205725" />
-    <state x="943" y="355" width="672" height="678" key="search.everywhere.popup" timestamp="1578019067283">
+    <state x="943" y="355" width="672" height="678" key="search.everywhere.popup" timestamp="1578107689172">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
-    <state x="943" y="355" width="672" height="678" key="search.everywhere.popup/0.0.2560.1560@0.0.2560.1560" timestamp="1578019067283" />
+    <state x="943" y="355" width="672" height="678" key="search.everywhere.popup/0.0.2560.1560@0.0.2560.1560" timestamp="1578107689172" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/2DSHI$displayPhoto.coverage" NAME="displayPhoto Coverage Results" MODIFIED="1571505715036" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

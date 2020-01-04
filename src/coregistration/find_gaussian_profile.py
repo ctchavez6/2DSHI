@@ -30,7 +30,7 @@ def gaussian_distribution(x, mu, sigma, coefficient):
 # Create a function which returns a Gaussian (normal) distribution.
 def gauss(x, *p):
     a, b, c, d = p
-    y = a*np.exp(-np.power((x - b), 2.)/(2. * c**2.)) + d
+    y = a*np.exp(-np.power((x - b), 2.)/(2. * c**2.)) # + d
     return y
 
 def read_image_from_file(image_path, file_bit_depth=16, original_bit_depth=12):
@@ -337,72 +337,61 @@ def get_gaus_boundaries_x(image, coords_of_max):
     plt.show()
         
     """
-#fig.savefig("ScipyOptimizeCurveFit_X-coregistration-cam_b_frame_186.png")
 
-    #plt.close('all')
     return mu, sigma, amp
 
 
 
 def get_gaus_boundaries_y(image, coords_of_max):
 
-
     image = np.array(image)
-    xs = np.arange(0, image.shape[1])
 
-
-
-    #print("coords of max")
-    #print(coords_of_max)
     ym, xm = coords_of_max
+
     p_initial = [image[xm, ym]*1.0, 600.00, 5.0, 0.0]
 
     ys = np.array(image[:, ym:ym+1].flatten())  # Vertical Line Out
-    lineout = ys
-    indices = np.arange(0, len(lineout))
 
-    #print("indices len ", len(indices))
-    #print("Lineout len ", len(lineout))
+    lineout = ys
+
+    indices = np.arange(0, len(lineout)) # 0 to 1199
+
     popt, pcov = curve_fit(gauss, indices, lineout, p0=p_initial)
 
-    amp, mu, sigma = popt[0], popt[1], popt[2]
-    offset = popt[3]
-    #print("mu: ", mu)
-    #print("sigma: ", sigma)
-    #print("amp: ", amp)
-    #print("offset: ", offset)
+    amp, mu, sigma, offset = popt[0], popt[1], popt[2], popt[3]
 
-    #print("xs: ", xs)
 
-    #y_fit = gauss(indices, *popt)
-
-    # Create a plot of our work, showing both the data and the fit.
-    #fig, ax = plt.subplots()
-
-    #ax.errorbar(x, y, e)
-    #ax.plot(indices, lineout, label='data')
-    #ax.plot(indices, y_fit, color='red', label='fit')
-    #ax.axvline(x=mu)
-    #ax.axvline(x=mu - sigma)
-    #ax.axvline(x=mu + sigma)
-
-    #ax.axvline(x=mu - 4*sigma, c='g')
-    #ax.axvline(x=mu + 4*sigma, c='g')
-
-    #ax.axhline(y=amp + offset)
-
-    #print(popt)
-    #ax.legend()
-    #ax.set_xlabel(r'$x$')
-    #ax.set_ylabel(r'$f(x)$')
-    #ax.set_title('Vertical')
-
-    #plt.show()
-    #plt.close('all')
 
 
     """
+    y_fit = gauss(indices, *popt)
+
+    # Create a plot of our work, showing both the data and the fit.
+    fig, ax = plt.subplots()
+
+    #ax.errorbar(x, y, e)
+    ax.plot(indices, lineout, label='data')
+    ax.plot(indices, y_fit, color='red', label='fit')
+    ax.axvline(x=mu)
+    ax.axvline(x=mu - sigma)
+    ax.axvline(x=mu + sigma)
+
+    ax.axvline(x=mu - 4*sigma, c='g')
+    ax.axvline(x=mu + 4*sigma, c='g')
+
+    ax.axhline(y=amp + offset)
+
+    print(popt)
+    ax.legend()
+    ax.set_xlabel(r'$x$')
+    ax.set_ylabel(r'$f(x)$')
+    ax.set_title('Vertical')
+
+    plt.show()
+    plt.close('all')
     
+    
+        
     #print(ys)
     #print("ys: ", ys)
 

@@ -94,7 +94,7 @@ def derive_homography(img_a_8bit, img_b_8bit, supress_shear=False):
 
     # Find the homography matrix.
     homography, mask = cv2.findHomography(p1, p2, cv2.RANSAC)
-
+    transform_matrix, mask = cv2.findTransformECC()
     homography_components = get_homography_components(homography)
     translation = homography_components[0]
     angle = homography_components[1]

@@ -1,14 +1,11 @@
 from pypylon import genicam, pylon  # Import relevant pypylon packages/modules
-import traceback  # exception handling
 import cv2
 from image_processing import bit_depth_conversion as bdc
 from image_processing import stack_images as stack
 from histocam import histocam
 from coregistration import img_characterization as ic
 from coregistration import find_gaussian_profile as fgp
-import os
 import numpy as np
-import sys
 
 
 
@@ -56,8 +53,8 @@ class Stream:
         self.frame_count = 0
         self.frame_break = fb
         self.break_key = 'q'
-        self.coregistration_break_key = 'c'
-        self.keypoints_break_key = 'k'
+        self.coregistration_break_key = 'c'  # Irrelevant
+        self.keypoints_break_key = 'k'       # Irrelevant
         self.current_frame_a = None
         self.current_frame_b = None
         self.histocam_a = None
@@ -65,11 +62,34 @@ class Stream:
         self.stacked_streams = None
         self.data_directory = None
 
+        self.static_center_a = None
+        self.static_center_b = None
+
+        self.static_sigmas_a = None
+        self.static_sigmas_b = None
+
+
+
     def get_12bit_a_frames(self):
         return self.a_frames
 
     def get_12bit_b_frames(self):
         return self.b_frames
+
+    def get_max_sigmas(self, guas_params_a_x, guas_params_a_y, guas_params_b_x, guas_params_b_y):
+        mu_a_x, sigma_a_x, amp_a_x = guas_params_a_x
+        mu_a_y, sigma_a_y, amp_a_y = guas_params_a_y
+
+        mu_b_x, sigma_b_x, amp_b__x = guas_params_b_x
+        mu_b_y, sigma_b_y, amp_b_y = guas_params_b_y
+
+        max_sigma_x = max(sigma_a_x, sigma_b_x)
+        max_sigma_y = max(sigma_a_y, sigma_b_y)
+
+        return max_sigma_x, max_sigma_y
+
+
+
 
     def get_cameras(self, config_files):
         """
@@ -119,15 +139,11 @@ class Stream:
         return True
 
     def find_centers(self, frame_a_16bit, frame_b_16bit):
+
         x_a, y_a = fgp.get_coordinates_of_maximum(frame_a_16bit)
         x_b, y_b = fgp.get_coordinates_of_maximum(frame_b_16bit)
 
-        #print("Gassian Center of Frame A: ", x_a, y_a)
-        #print("Gassian Center of Frame B: ", x_b, y_b)
-
         return (x_a, y_a), (x_b, y_b)
-
-
 
 
     def grab_frames(self):
@@ -170,28 +186,44 @@ class Stream:
         return img_a, img_b
 
     def full_img_w_roi_borders(self, img_12bit, center_):
-        mu_x, sigma_x, amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
-        mu_y, sigma_y, amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
-
         x_max, y_max = center_
 
-        if x_max + int(sigma_x * 4) > 1919 or x_max - int(sigma_x * 4) < 1:
-            pass
-        elif y_max + int(sigma_y * 4) > 1199 or y_max - int(sigma_y * 4) < 1:
-            pass
-        else:
-            img_12bit[:, x_max + int(sigma_x * 4)] = 4095
-            img_12bit[:, x_max - int(sigma_x * 4)] = 4095
-
-            img_12bit[y_max + int(sigma_y * 4), :] = 4095
-            img_12bit[y_max - int(sigma_y * 4), :] = 4095
-        # Guassian: 5 Sigma X Direction
+        try:
+            mu_x, sigma_x, amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
+            mu_y, sigma_y, amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
 
 
+            try:
+                print("\tx_max={}".format(x_max))
+                print("\tmu_x={}".format(mu_x))
+                print("\tsigma_x={}".format(sigma_x))
 
-        # Guassian: 5 Sigma y Direction
-        #img_12bit[y_max + int(stdev_y * 5), :] = 4095
-        #img_12bit[y_max - int(stdev_y * 5), :] = 4095
+                print("\ty_max={}".format(y_max))
+                print("\tmu_y={}".format(mu_y))
+                print("\tsigma_y={}".format(sigma_y))
+
+                print("\t\tSetting x={} to 4095.".format(int(mu_x) + int(sigma_x * 4)))
+                print("\t\tSetting x={} to 4095.".format(int(mu_x) - int(sigma_x * 4)))
+
+                img_12bit[:, int(mu_x) + int(sigma_x * 4)] = 4095
+                img_12bit[:, int(mu_x) - int(sigma_x * 4)] = 4095
+
+                print("\t\tSetting y={} to 4095.".format(mu_y + int(sigma_y * 4)))
+                print("\t\tSetting y={} to 4095.".format(mu_y - int(sigma_y * 4)))
+
+                img_12bit[int(mu_y) + int(sigma_y * 4), :] = 4095
+                img_12bit[int(mu_y) - int(sigma_y * 4), :] = 4095
+
+            except IndexError:
+                print("Warning: 4 sigma > frame height or width.")
+
+        except RuntimeError:
+            print("Warning: RuntimeError occurred while trying to calculate gaussian! ")
+
+
+
+
+
 
         return img_12bit
 
@@ -201,9 +233,20 @@ class Stream:
         if roi_borders:
             a_as_16bit = bdc.to_16_bit(a)
             b_as_16bit = bdc.to_16_bit(b)
-            ca, cb = self.find_centers(a_as_16bit, b_as_16bit)
-            a = self.full_img_w_roi_borders(a, ca)
-            b = self.full_img_w_roi_borders(b, cb)
+
+
+
+            if self.static_center_a is None or self.static_center_b is None:
+                ca, cb = self.find_centers(a_as_16bit, b_as_16bit)
+                a = self.full_img_w_roi_borders(a, ca)
+                b = self.full_img_w_roi_borders(b, cb)
+            else:
+                print("Cam A:")
+                a = self.full_img_w_roi_borders(a, self.static_center_a)
+                print("Cam B:")
+                b = self.full_img_w_roi_borders(b, self.static_center_b)
+
+
 
         if histogram:
             self.histocam_a.update(a)
@@ -220,32 +263,20 @@ class Stream:
             else:
                 self.show_16bit_representations(a, b, False, centers)
 
-    def post_alignment(self, histogram=False, homography=None):
 
-        if histogram:
-            self.histocam_a.update(self.current_frame_a)
-            self.histocam_b.update(self.current_frame_b)
-            histocams = add_histogram_representations(self.histocam_a.get_figure(),
-                                                      self.histocam_b.get_figure(),
-                                                      self.current_frame_a,
-                                                      self.current_frame_b)
-            cv2.imshow("Cameras with Histograms", histocams)
-
-        else:
-            if homography is not None:
-                img_b_prime = ic.transform_img(self.current_frame_b, homography)
-                self.show_16bit_representations(self.current_frame_a, img_b_prime, b_prime=True)
-            else:
-                self.show_16bit_representations(self.current_frame_a, self.current_frame_b)
 
     def start(self, histogram=False):
+        continue_stream = False
+        start = input("Step 1 - Stream Raw Camera Feed: Proceed? (y/n): ")
 
         if (self.histocam_a is None or self.histocam_b is None) and histogram:
             self.histocam_a = histocam.Histocam()
             self.histocam_b = histocam.Histocam()
 
         self.all_cams.StartGrabbing()
-        continue_stream = True
+
+        if start.lower() == 'y':
+            continue_stream = True
 
         while continue_stream:
             self.frame_count += 1
@@ -255,7 +286,7 @@ class Stream:
 
         cv2.destroyAllWindows()
 
-        find_centers_ = input("Step 1 - Find Centers: Proceed? (y/n): ")
+        find_centers_ = input("Step 2 - Find Brightest Pixel Location: Proceed? (y/n): ")
 
         if find_centers_.lower() == "y":
             continue_stream = True
@@ -270,15 +301,34 @@ class Stream:
 
         cv2.destroyAllWindows()
 
-        find_rois_ = input("Step 2 - Find Regions of Interest: Proceed? (y/n): ")
+        max_pixel_a, max_pixel_b = self.find_centers(
+            bdc.to_16_bit(self.current_frame_a), bdc.to_16_bit(self.current_frame_b))
+
+        self.static_center_a = max_pixel_a
+        self.static_center_b = max_pixel_b
+
+        #print("Coordinates of Brightest Pixel: Camera A\n\t{}".format(max_pixel_a))
+        #print("Coordinates of Brightest Pixel: Camera B\n\t{}".format(max_pixel_b))
+
+        #mu_a_x, sigma_a_x, amp_a_x = fgp.get_gaus_boundaries_x(self.current_frame_a, max_pixel_a)
+        #mu_a_y, sigma_a_y, amp_a_y = fgp.get_gaus_boundaries_y(self.current_frame_a, max_pixel_a)
+
+        #mu_b_x, sigma_b_x, amp_b_x = fgp.get_gaus_boundaries_x(self.current_frame_b, max_pixel_b)
+        #mu_b_y, sigma_b_y, amp_b_y = fgp.get_gaus_boundaries_y(self.current_frame_b, max_pixel_b)
+
+
+
+
+        #self.static_center_a = (mu_a_x, mu_a_y)
+        #self.static_center_b = (mu_b_x, mu_b_y)
+
+        find_rois_ = input("Step 3 - Find Regions of Interest: Proceed? (y/n): ")
 
         if find_rois_.lower() == "y":
-            print("FINDING ROIs")
             continue_stream = True
         elif find_rois_.lower() == "n":
             self.all_cams.StopGrabbing()
             continue_stream = False
-
         while continue_stream:
             self.frame_count += 1
             self.current_frame_a, self.current_frame_b = self.grab_frames()
@@ -287,8 +337,8 @@ class Stream:
 
         cv2.destroyAllWindows()
 
-
-
+        """
+        
 
         find_keypoints = input("Attempt to characterize last Images? (y/n): ")
         if find_keypoints.lower() == "n":
@@ -317,16 +367,6 @@ class Stream:
                 scale = homography_components[2]
                 shear = homography_components[3]
 
-                #translation_matrix_ = np.float32([[1, 0, 100], [0, 1, 50]])
-
-                #print("Suggested Angle of Rotation: {}".format(angle))
-                #print("Suggested translation: {}".format(translation))
-                #print("Suggested scale: {}".format(scale))
-                #print("Suggested shear: {}".format(shear))
-
-
-
-
                 satisfaction = input("Are you satisfied with the suggestions? (y/n): ")
 
                 if satisfaction == 'y':
@@ -344,6 +384,8 @@ class Stream:
 
                 if satisfaction == 'q':
                     break
+        
+        """
 
         """
         continue_stream = True
