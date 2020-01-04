@@ -5,6 +5,8 @@ from image_processing import bit_depth_conversion as bdc
 from image_processing import stack_images as stack
 from histocam import histocam
 from coregistration import img_characterization as ic
+from coregistration import find_gaussian_profile as fgp
+import os
 import numpy as np
 import sys
 
@@ -14,7 +16,6 @@ def add_histogram_representations(figure_a, figure_b, raw_array_a, raw_array_b):
     """
     Adds a matplotlib.pyplot.subplot to two matplotlib.pyplot.figure objects. The subplots are histograms of intensity
     data from raw_array_a and raw_array_b.
-
     Args:
         figure_a:
         figure_b:
@@ -44,7 +45,10 @@ def add_histogram_representations(figure_a, figure_b, raw_array_a, raw_array_b):
 
 
 class Stream:
-    def __init__(self, fb=-1):
+    def __init__(self, fb=-1, save_imgs=False):
+        self.save_imgs = save_imgs
+        self.a_frames = list()
+        self.b_frames = list()
         self.cam_a = None
         self.cam_b = None
         self.all_cams = None
@@ -59,12 +63,17 @@ class Stream:
         self.histocam_a = None
         self.histocam_b = None
         self.stacked_streams = None
+        self.data_directory = None
+
+    def get_12bit_a_frames(self):
+        return self.a_frames
+
+    def get_12bit_b_frames(self):
+        return self.b_frames
 
     def get_cameras(self, config_files):
         """
         Should be called AFTER and with the return value of find_devices() (as implied by the first parameter: devices)
-
-
         Args:
             devices: An instance of tlFactory.EnumerateDevices()
             num_cameras (int): An integer
@@ -109,48 +118,107 @@ class Stream:
             return False
         return True
 
-    def does_user_want_to_coregister(self):
-        if cv2.waitKey(1) & 0xFF == ord(self.coregistration_break_key):
-            return True
-        return False
+    def find_centers(self, frame_a_16bit, frame_b_16bit):
+        x_a, y_a = fgp.get_coordinates_of_maximum(frame_a_16bit)
+        x_b, y_b = fgp.get_coordinates_of_maximum(frame_b_16bit)
 
-    def does_user_want_to_show_keypoints(self):
-        if cv2.waitKey(1) & 0xFF == ord(self.coregistration_break_key):
-            return True
-        return False
+        #print("Gassian Center of Frame A: ", x_a, y_a)
+        #print("Gassian Center of Frame B: ", x_b, y_b)
+
+        return (x_a, y_a), (x_b, y_b)
+
+
+
 
     def grab_frames(self):
         try:
             grab_result_a = self.cam_a.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
             grab_result_b = self.cam_b.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
             if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
-                return grab_result_a.GetArray(), grab_result_b.GetArray()
+                a, b = grab_result_a.GetArray(), grab_result_b.GetArray()
+                if self.save_imgs:
+                    self.a_frames.append(a)
+                    self.b_frames.append(b)
+                return a, b
         except Exception as e:
             raise e
 
-    def show_16bit_representations(self, a_as_12bit, b_as_12bit, b_prime=False):
+    def show_16bit_representations(self, a_as_12bit, b_as_12bit, b_prime=False, show_centers=False):
         a_as_16bit = bdc.to_16_bit(a_as_12bit)
         b_as_16bit = bdc.to_16_bit(b_as_12bit)
-        if not b_prime:
-            cv2.imshow("Cam A", a_as_16bit)
-            cv2.imshow("Cam B", b_as_16bit)
+        if not show_centers:
+            if not b_prime:
+                cv2.imshow("Cam A", a_as_16bit)
+                cv2.imshow("Cam B", b_as_16bit)
+            else:
+                cv2.imshow("A", a_as_16bit)
+                cv2.imshow("B Prime", b_as_16bit)
         else:
-            cv2.imshow("A", a_as_16bit)
-            cv2.imshow("B Prime", b_as_16bit)
+            center_a, center_b = self.find_centers(a_as_16bit, b_as_16bit)
+            a, b = self.imgs_w_centers(a_as_16bit, center_a, b_as_16bit, center_b)
+            if not b_prime:
+                cv2.imshow("Cam A", a)
+                cv2.imshow("Cam B", b)
+            else:
+                cv2.imshow("A", a)
+                cv2.imshow("B Prime", b)
 
-    def pre_alignment(self, histogram=False):
+
+    def imgs_w_centers(self, a_16bit_color, center_a, b_16bit_color, center_b):
+        img_a = cv2.circle(a_16bit_color, center_a, 10, (0, 255, 0), 2)
+        img_b = cv2.circle(b_16bit_color, center_b, 10, (0, 255, 0), 2)
+        return img_a, img_b
+
+    def full_img_w_roi_borders(self, img_12bit, center_):
+        mu_x, sigma_x, amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
+        mu_y, sigma_y, amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
+
+        x_max, y_max = center_
+
+        if x_max + int(sigma_x * 4) > 1919 or x_max - int(sigma_x * 4) < 1:
+            pass
+        elif y_max + int(sigma_y * 4) > 1199 or y_max - int(sigma_y * 4) < 1:
+            pass
+        else:
+            img_12bit[:, x_max + int(sigma_x * 4)] = 4095
+            img_12bit[:, x_max - int(sigma_x * 4)] = 4095
+
+            img_12bit[y_max + int(sigma_y * 4), :] = 4095
+            img_12bit[y_max - int(sigma_y * 4), :] = 4095
+        # Guassian: 5 Sigma X Direction
+
+
+
+        # Guassian: 5 Sigma y Direction
+        #img_12bit[y_max + int(stdev_y * 5), :] = 4095
+        #img_12bit[y_max - int(stdev_y * 5), :] = 4095
+
+        return img_12bit
+
+    def pre_alignment(self, histogram=False, centers=False, roi_borders=False, crop=False):
+        a, b = self.current_frame_a, self.current_frame_b
+
+        if roi_borders:
+            a_as_16bit = bdc.to_16_bit(a)
+            b_as_16bit = bdc.to_16_bit(b)
+            ca, cb = self.find_centers(a_as_16bit, b_as_16bit)
+            a = self.full_img_w_roi_borders(a, ca)
+            b = self.full_img_w_roi_borders(b, cb)
 
         if histogram:
-            self.histocam_a.update(self.current_frame_a)
-            self.histocam_b.update(self.current_frame_b)
+            self.histocam_a.update(a)
+            self.histocam_b.update(b)
             histocams = add_histogram_representations(self.histocam_a.get_figure(),
                                                       self.histocam_b.get_figure(),
-                                                      self.current_frame_a,
-                                                      self.current_frame_b)
+                                                      a,
+                                                      b)
             cv2.imshow("Cameras with Histograms", histocams)
 
         else:
-            self.show_16bit_representations(self.current_frame_a, self.current_frame_b)
+            if roi_borders or crop:
+                self.show_16bit_representations(a, b, False, False)
+            else:
+                self.show_16bit_representations(a, b, False, centers)
 
     def post_alignment(self, histogram=False, homography=None):
 
@@ -187,18 +255,78 @@ class Stream:
 
         cv2.destroyAllWindows()
 
+        find_centers_ = input("Step 1 - Find Centers: Proceed? (y/n): ")
+
+        if find_centers_.lower() == "y":
+            continue_stream = True
+        elif find_centers_.lower() == "n":
+            continue_stream = False
+
+        while continue_stream:
+            self.frame_count += 1
+            self.current_frame_a, self.current_frame_b = self.grab_frames()
+            self.pre_alignment(histogram, True)
+            continue_stream = self.keep_streaming()
+
+        cv2.destroyAllWindows()
+
+        find_rois_ = input("Step 2 - Find Regions of Interest: Proceed? (y/n): ")
+
+        if find_rois_.lower() == "y":
+            print("FINDING ROIs")
+            continue_stream = True
+        elif find_rois_.lower() == "n":
+            self.all_cams.StopGrabbing()
+            continue_stream = False
+
+        while continue_stream:
+            self.frame_count += 1
+            self.current_frame_a, self.current_frame_b = self.grab_frames()
+            self.pre_alignment(histogram, True, True)
+            continue_stream = self.keep_streaming()
+
+        cv2.destroyAllWindows()
+
+
+
+
         find_keypoints = input("Attempt to characterize last Images? (y/n): ")
+        if find_keypoints.lower() == "n":
+            self.all_cams.StopGrabbing()
+            continue_stream = False
+
         satisfaction = "n"
         homography_ = None
-        orb_ = ic.initialize_orb_detector()
 
-        if find_keypoints == "y":
+        if find_keypoints.lower() == "y":
             while homography_ is None or satisfaction.lower() == "n":
 
                 img_a_8bit = bdc.to_8_bit(self.current_frame_a)
                 img_b_8bit = bdc.to_8_bit(self.current_frame_b)
 
                 homography_ = ic.derive_homography(img_a_8bit, img_b_8bit)
+
+                rows, cols = img_b_8bit.shape
+                M, inliers = ic.derive_euclidean_transform(img_b_8bit, img_a_8bit)
+                print("Euclidean Transform Matrix below")
+                print(M)
+
+                homography_components = ic.get_homography_components(homography_)
+                translation = homography_components[0]
+                angle = homography_components[1]
+                scale = homography_components[2]
+                shear = homography_components[3]
+
+                #translation_matrix_ = np.float32([[1, 0, 100], [0, 1, 50]])
+
+                #print("Suggested Angle of Rotation: {}".format(angle))
+                #print("Suggested translation: {}".format(translation))
+                #print("Suggested scale: {}".format(scale))
+                #print("Suggested shear: {}".format(shear))
+
+
+
+
                 satisfaction = input("Are you satisfied with the suggestions? (y/n): ")
 
                 if satisfaction == 'y':
@@ -214,6 +342,10 @@ class Stream:
 
                     satisfaction = input("Are you satisfied with B-Prime? (y/n): ")
 
+                if satisfaction == 'q':
+                    break
+
+        """
         continue_stream = True
 
         if homography_ is None:
@@ -225,7 +357,9 @@ class Stream:
             self.current_frame_a, self.current_frame_b = self.grab_frames()
             self.post_alignment(histogram, homography_)
             continue_stream = self.keep_streaming()
+        
+        
+        """
 
         self.all_cams.StopGrabbing()
-
 

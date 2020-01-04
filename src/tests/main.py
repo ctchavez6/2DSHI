@@ -57,7 +57,10 @@ if __name__ == "__main__":
         raise Exception("Can not run this test. You do not have your tests module set up properly.\n"
                         "Obtain image {} and add it to the tests directory, then try again.".format(cam_b_image_path))
 
-    print("\n\tStarting test_img_characterization()")
-    test_coregistration_module.test_img_characterization()
+    print("\n\tStarting test_find_gaussian_profile()")
+    test_coregistration_module.test_find_gaussian_profile()
+
+    #print("\n\tStarting test_img_characterization()")
+    #test_coregistration_module.test_img_characterization()
 
 

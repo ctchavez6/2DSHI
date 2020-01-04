@@ -14,7 +14,8 @@ from experiment_set_up import config_file_setup as cam_setup
 import path_management.directory_management as dirs
 from stream_tools import stream_tools
 from experiment_set_up import user_input_validation as uiv
-
+from image_processing import bit_depth_conversion as bdc
+from path_management import image_management as im
 from datetime import datetime
 # Create an instance of an ArgumentParser Object
 parser = argparse.ArgumentParser()
@@ -39,8 +40,20 @@ if __name__ == "__main__":
         uiv.display_dict_values(prev_run)
         args = uiv.update_previous_params(prev_run)
 
+
+
     current_datetime = datetime.now().strftime("%Y_%m_%d__%H_%M")
+
+    run_directory = os.path.join("D:", "\\" +current_datetime)
+
+    if not os.path.exists(run_directory):
+        os.mkdir(run_directory)
+        os.mkdir(os.path.join(run_directory, "cam_a_frames"))
+        os.mkdir(os.path.join(run_directory, "cam_b_frames"))
+
     wptf.document_run(args, current_datetime)
+
+
 
     print("\nAll Experimental Data will be saved in the following directory:\n\tD:\\{}\n".format(current_datetime))
     print("\nStarting Run: {}\n".format(current_datetime))
@@ -55,9 +68,29 @@ if __name__ == "__main__":
     try_module = True
 
     if try_module:
-        stream = stream_tools.Stream(fb=args["FrameBreak"])
+        stream = stream_tools.Stream(fb=args["FrameBreak"], save_imgs=args["SaveImages"])
         stream.get_cameras(config_files_by_cam)
         stream.start(histogram=args["DisplayHistocam"])
+
+        print("Stream has ended.")
+
+
+        if args["SaveImages"]:
+            a_frames_dir = os.path.join(run_directory, "cam_a_frames")
+            b_frames_dir = os.path.join(run_directory, "cam_b_frames")
+
+            print("Saving 12 bit frames as 16 bit png files.")
+            a_frames = stream.get_12bit_a_frames()
+            b_frames = stream.get_12bit_b_frames()
+
+            for i in range(len(a_frames)):
+                a16 = bdc.to_16_bit(a_frames[i])
+                im.save_img("a_{}.png".format(i+1), a_frames_dir, a16)
+
+            for j in range(len(b_frames)):
+                b16 = bdc.to_16_bit(b_frames[j])
+                im.save_img("b_{}.png".format(j+1), b_frames_dir, b16)
+
 
     if not try_module:
         devices_found, tlFactory_found = streams.find_devices()

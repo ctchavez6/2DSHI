@@ -266,7 +266,6 @@ def save_img(filename, directory, image, sixteen_bit=True):
         cv2.imwrite(filename, image.astype(np.uint16))
     os.chdir(directory)
 
-
 def add_histogram_representations(figure_a, figure_b, raw_array_a, raw_array_b):
     """
     Adds a matplotlib.pyplot.subplot to two matplotlib.pyplot.figure objects. The subplots are histograms of intensity
@@ -388,7 +387,7 @@ def create_and_save_videos(cam_a_frames_direc, cam_b_frames_direc, videos_direct
     os.chdir(initial_directory)
 
 
-def clear_prev_run():
+def clear_prev_run(data_directory):
     """
     Creates a new directory that corresponds to today's date and time to save the videos/images in. Unlikely, but if
     for some reason two runs happen within the same minute, overwrites first run to keep latest.
@@ -399,7 +398,6 @@ def clear_prev_run():
     now = datetime.now()
     current_datetime = now.strftime("%Y_%m_%d__%H_%M")
 
-    data_directory = os.path.join("D:\\2DSHI_Runs", current_datetime)
     if not os.path.exists(data_directory):
         os.mkdir(data_directory)
     camera_a_frames_directory = data_directory + "\\cam_a_frames"
