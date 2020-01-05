@@ -3,13 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scratch.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/coregistration/find_gaussian_profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/find_gaussian_profile.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/coregistration/img_characterization.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/img_characterization.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/experiment_set_up/request_experiment_parameters.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/experiment_set_up/user_input_validation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/user_input_validation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/test_coregistration_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/test_coregistration_module.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -324,14 +320,8 @@
       <workItem from="1577757524501" duration="6519000" />
       <workItem from="1577914744795" duration="16337000" />
       <workItem from="1578016393690" duration="7023000" />
-      <workItem from="1578101748225" duration="9789000" />
-    </task>
-    <task id="LOCAL-00008" summary="file management">
-      <created>1571706741108</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1571706741108</updated>
+      <workItem from="1578101748225" duration="10018000" />
+      <workItem from="1578170379674" duration="10135000" />
     </task>
     <task id="LOCAL-00009" summary="double histogram">
       <created>1571715180206</created>
@@ -669,7 +659,14 @@
       <option name="project" value="LOCAL" />
       <updated>1578022621200</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="more progress on ROI, but static mu center having issues because of laser pulsation (no data equals no gaussian equals python barfs at us)">
+      <created>1578111593336</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1578111593336</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -693,7 +690,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="functionality updates" />
     <MESSAGE value="some updated stuff" />
     <MESSAGE value="roi stuff" />
     <MESSAGE value="got it to rotate the roi" />
@@ -718,28 +714,30 @@
     <MESSAGE value="livestreaming centers" />
     <MESSAGE value="static tests" />
     <MESSAGE value="progress on ROI" />
-    <option name="LAST_COMMIT_MESSAGE" value="progress on ROI" />
+    <MESSAGE value="more progress on ROI, but static mu center having issues because of laser pulsation (no data equals no gaussian equals python barfs at us)" />
+    <option name="LAST_COMMIT_MESSAGE" value="more progress on ROI, but static mu center having issues because of laser pulsation (no data equals no gaussian equals python barfs at us)" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="587" y="45" key="CommitChangelistDialog2" timestamp="1578022620420">
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1578185011917">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
-    <state x="587" y="45" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1578022620420" />
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1578111592466" />
+    <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578185011917" />
     <state x="1042" y="526" key="SettingsEditor" timestamp="1577758445066">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1042" y="526" key="SettingsEditor/0.0.2560.1560@0.0.2560.1560" timestamp="1577758445066" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1578022623942">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1578111595742">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1578022623942" />
-    <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1578101748838">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1578111595742" />
+    <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1578170380176">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="416" y="255" key="com.intellij.ide.util.TipDialog/0.0.1440.860@0.0.1440.860" timestamp="1577386000262" />
-    <state x="740" y="463" key="com.intellij.ide.util.TipDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1578101748838" />
+    <state x="740" y="463" key="com.intellij.ide.util.TipDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1578170380176" />
     <state x="518" y="90" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1576983755808">
       <screen x="0" y="0" width="1440" height="860" />
     </state>

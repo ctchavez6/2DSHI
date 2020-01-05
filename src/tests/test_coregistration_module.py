@@ -1,8 +1,117 @@
 import cv2
 from src.coregistration import find_gaussian_profile as gp
-
+import numpy as np
 from src.coregistration import img_characterization
+from src.path_management import image_management as im
 import os
+
+
+def test_find_ecc():
+    print("Testing try_euclidean_transform(gray1, gray2)")
+
+    test_materials = os.path.join(os.path.join(os.getcwd(), "tests"), "2020_01_04__15_56")
+    a_frames_dir = os.path.join(test_materials, "cam_a_frames")
+    a1 = cv2.imread(os.path.join(a_frames_dir, "a_1.png"), 0)
+    #a1_16bit = cv2.imread(os.path.join(a_frames_dir, "a_1.png"), cv2.IMREAD_ANYDEPTH)
+    #a1 = a1_16bit
+
+    b_frames_dir = os.path.join(test_materials, "cam_b_frames")
+    b1 = cv2.imread(os.path.join(b_frames_dir, "b_1.png"), 0)
+    b1_16bit = cv2.imread(os.path.join(b_frames_dir, "b_1.png"), cv2.IMREAD_ANYDEPTH)
+    #b1 = b1_16bit
+
+    a1_matrix = np.asarray(a1)
+    print("Max a1: {}".format(np.max(a1_matrix.flatten())))
+
+    b1_matrix = np.asarray(b1)
+    print("Max b_prime_matrix: {}".format(np.max(b1_matrix.flatten())))
+
+    b1_shape = b1.shape[1], b1.shape[0]
+
+    cv2.imshow("Image A", a1)
+    cv2.waitKey(10000)
+    cv2.destroyAllWindows()
+
+
+    cv2.imshow("Image B", b1)
+    cv2.waitKey(10000)
+    cv2.destroyAllWindows()
+
+
+    warp = img_characterization.try_euclidean_transform(a1, b1)
+
+    print("Warp Matrix Below:\n\n{}\n".format(warp))
+    a = warp[0][0]
+    b = warp[0][1]
+    tx = warp[0][2]
+    c = warp[1][0]
+    d = warp[1][1]
+    ty = warp[1][2]
+
+
+
+
+    print("\tTranslation X:{}".format(tx))
+    print("\tTranslation Y:{}\n".format(ty))
+
+    scale_x = np.sign(a)*(np.sqrt(a**2 + b**2))
+    scale_y = np.sign(d)*(np.sqrt(c**2 + d**2))
+
+    print("\tScale X:{}".format(scale_x))
+    print("\tScale Y:{}\n".format(scale_y))
+
+    phi = np.arctan2(-1.0*b, a)
+    print("\tPhi Y (rad):{}".format(phi))
+    print("\tPhi Y (deg):{}\n".format(np.degrees(phi)))
+    #  | cv2.INTER_LINEAR
+    b_prime = cv2.warpAffine(b1, warp, b1_shape, flags=cv2.WARP_INVERSE_MAP)
+    b_prime_16bit = cv2.warpAffine(b1_16bit, warp, b1_shape, flags=cv2.WARP_INVERSE_MAP)
+
+    b_prime_matrix = np.asarray(b_prime)
+    print("Max b_prime_matrix: {}".format(np.max(b_prime_matrix.flatten())))
+    im.save_img("B_Prime.png", test_materials, b_prime_16bit)
+    #cv2.imwrite(os.path.join(test_materials, "B_Prime.png"), b_prime)
+
+    cv2.imshow("B Prime?", b_prime)
+    cv2.waitKey(10000)
+    cv2.destroyAllWindows()
+
+    GOOD_MATCH_PERCENT = 0.5
+
+    orb = cv2.ORB_create(nfeatures=100000, scoreType=cv2.ORB_FAST_SCORE, nlevels=20)
+    keypoints1, descriptors1 = orb.detectAndCompute(a1, None)
+    keypoints2, descriptors2 = orb.detectAndCompute(b_prime, None)
+
+    # Match features.
+    matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
+    matches = matcher.match(descriptors1, descriptors2, None)
+
+    # Sort matches by score
+    matches.sort(key=lambda x: x.distance, reverse=False)
+
+    # Remove not so good matches
+    numGoodMatches = int(len(matches) * GOOD_MATCH_PERCENT)
+    matches = matches[:numGoodMatches]
+
+    # Draw top matches
+    imMatches = cv2.drawMatches(a1, keypoints1, b_prime, keypoints2, matches, None)
+    im.save_img("A_matched_w_B_Prime.png", test_materials, imMatches)
+
+    #cv2.imwrite(os.path.join(test_materials, "A_matched_w_B_Prime.png"), imMatches)
+    #imMatches_resized = cv2.resize(imMatches, (imMatches.shape[1], imMatches.shape[0]), interpolation=cv2.INTER_AREA)
+
+    cv2.imshow("A Matched with B Prime", imMatches)
+    cv2.waitKey(10000)
+    cv2.destroyAllWindows()
+
+
+    #cv2.imwrite("matches.jpg", imMatches)
+
+    # Extract location of good matches
+    points1 = np.zeros((len(matches), 2), dtype=np.float32)
+    points2 = np.zeros((len(matches), 2), dtype=np.float32)
+
+
 
 def test_find_gaussian_profile():
     test_materials = os.path.join(os.path.join(os.getcwd(), "tests"), "2020_01_01__18_01")
