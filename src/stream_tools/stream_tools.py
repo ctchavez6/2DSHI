@@ -464,7 +464,7 @@ class Stream:
 
 
                     if self.frame_count % 10 == 0:
-                        print("\tA  - Sigma X, Sigma Y - {}".format((sigma_x_a, sigma_y_a)))
+                        print("\tA  - Sigma X, Sigma Y - {}".format((int(sigma_x_a), int(sigma_y_a))))
 
 
                 for img_12bit in [self.current_frame_b]:
@@ -483,7 +483,7 @@ class Stream:
                     b_as_16bit = bdc.to_16_bit(self.current_frame_b)
 
                     if self.frame_count % 10 == 0:
-                        print("\tB' - Sigma X, Sigma Y - {}".format((sigma_x_b, sigma_y_b)))
+                        print("\tB' - Sigma X, Sigma Y - {}".format((int(sigma_x_b), int(sigma_y_b))))
 
                 cv2.imshow("A", a_as_16bit)
                 cv2.imshow("B Prime", b_as_16bit)

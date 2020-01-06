@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="finally getting correct rotation angle and good looking b prime">
+    <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/coregistration/find_gaussian_profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/find_gaussian_profile.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/coregistration/img_characterization.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/img_characterization.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tests/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tests/test_coregistration_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/test_coregistration_module.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -324,14 +320,7 @@
       <workItem from="1578016393690" duration="7023000" />
       <workItem from="1578101748225" duration="10018000" />
       <workItem from="1578170379674" duration="11329000" />
-      <workItem from="1578256963104" duration="14094000" />
-    </task>
-    <task id="LOCAL-00011" summary="updating max,stdev, avg values on histograms">
-      <created>1571803537525</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1571803537525</updated>
+      <workItem from="1578256963104" duration="14387000" />
     </task>
     <task id="LOCAL-00012" summary="todays version">
       <created>1571885515684</created>
@@ -669,7 +658,14 @@
       <option name="project" value="LOCAL" />
       <updated>1578185981201</updated>
     </task>
-    <option name="localTasksCounter" value="60" />
+    <task id="LOCAL-00060" summary="roi_finished">
+      <created>1578274786393</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1578274786393</updated>
+    </task>
+    <option name="localTasksCounter" value="61" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -693,7 +689,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="got it to rotate the roi" />
     <MESSAGE value="default config file" />
     <MESSAGE value="keypoints and matches" />
     <MESSAGE value="deleting files no longer needed" />
@@ -718,25 +713,26 @@
     <MESSAGE value="more progress on ROI, but static mu center having issues because of laser pulsation (no data equals no gaussian equals python barfs at us)" />
     <MESSAGE value="finally getting correct rotation angle and good looking b prime" />
     <MESSAGE value="run with crosshairs" />
-    <option name="LAST_COMMIT_MESSAGE" value="run with crosshairs" />
+    <MESSAGE value="roi_finished" />
+    <option name="LAST_COMMIT_MESSAGE" value="roi_finished" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1578185980328">
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1578274785327">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
     <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1578111592466" />
-    <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578185980328" />
+    <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578274785327" />
     <state x="1042" y="526" key="SettingsEditor" timestamp="1577758445066">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1042" y="526" key="SettingsEditor/0.0.2560.1560@0.0.2560.1560" timestamp="1577758445066" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1578185986068">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1578274789259">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
     <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1578111595742" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578185986068" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578274789259" />
     <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1578256965330">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
