@@ -9,7 +9,7 @@ import os
 def test_find_ecc():
     print("Testing try_euclidean_transform(gray1, gray2)")
 
-    test_materials = os.path.join(os.path.join(os.getcwd(), "tests"), "2020_01_04__15_56")
+    test_materials = os.path.join(os.path.join(os.getcwd(), "tests"), "2020_01_04__16_54")
     a_frames_dir = os.path.join(test_materials, "cam_a_frames")
     a1 = cv2.imread(os.path.join(a_frames_dir, "a_1.png"), 0)
     #a1_16bit = cv2.imread(os.path.join(a_frames_dir, "a_1.png"), cv2.IMREAD_ANYDEPTH)
@@ -38,7 +38,7 @@ def test_find_ecc():
     cv2.destroyAllWindows()
 
 
-    warp = img_characterization.try_euclidean_transform(a1, b1)
+    warp = img_characterization.get_euclidean_transform_matrix(a1, b1)
 
     print("Warp Matrix Below:\n\n{}\n".format(warp))
     a = warp[0][0]
@@ -108,59 +108,33 @@ def test_find_ecc():
     #cv2.imwrite("matches.jpg", imMatches)
 
     # Extract location of good matches
-    points1 = np.zeros((len(matches), 2), dtype=np.float32)
-    points2 = np.zeros((len(matches), 2), dtype=np.float32)
+    #points1 = np.zeros((len(matches), 2), dtype=np.float32)
+    #points2 = np.zeros((len(matches), 2), dtype=np.float32)
 
 
 
 def test_find_gaussian_profile():
-    test_materials = os.path.join(os.path.join(os.getcwd(), "tests"), "2020_01_01__18_01")
-    """
-    
-    a_frames_dir = os.path.join(test_materials, "cam_a_frames")
-    a1 = cv2.imread(os.path.join(a_frames_dir, "a_1.png"), 0)
-    center_a = gp.get_coordinates_of_maximum(a1)
-
-    print("\t\tTesting get_coordinates_of_maximum(): Pass")
-    print("\t\t\tTest Image shape: {}".format(a1.shape))
-    print("\t\t\tCenter at {}".format(center_a))
-    a1wc = cv2.circle(a1, center_a, 10, (0, 255, 0), 2)
-    cv2.imshow("Img A With Key Points", a1wc)
-    cv2.waitKey(5000)
-    cv2.destroyAllWindows()
+    test_materials = os.path.join(os.path.join(os.getcwd(), "tests"), "2020_01_05__13_59")
 
 
-    """
 
-
-    b_frames_dir = os.path.join(test_materials, "cam_b_frames")
-    b1 = cv2.imread(os.path.join(b_frames_dir, "b_1.png"), 0)
+    b_frames_dir = os.path.join(test_materials, "cam_a_frames")
+    b1 = cv2.imread(os.path.join(b_frames_dir, "a_1.png"), cv2.IMREAD_ANYDEPTH)
     center_b = gp.get_coordinates_of_maximum(b1)
     print("Image has Shape: ", b1.shape)
-    #max_ = 0
-    #h, v = None, None
-    #for i in range(b1.shape[0]):
-        #for j in range(b1.shape[1]):
-            #if b1[i, j] > max_:
-                #max_ = b1[i, j]
-                #h = i
-                #v = j
-
-    #print("Maximum Intensity value of {} Recorded at:\n\t({}, {})".format(max_, h, v))
-
-
-
 
     print("\t\tTesting get_coordinates_of_maximum(): Pass")
     print("\t\t\tTest Image shape: {}".format(b1.shape))
-    print("\t\t\tCenter at {}".format(center_b))
+    print("\t\t\tMaximum Intensity Pixel at {}".format(center_b))
+    print("\t\t\tIntensity: {}".format(b1[center_b[1], center_b[0]]))
+
     b1wc = cv2.circle(b1.copy(), center_b, 10, (0, 255, 0), 2)
     cv2.imshow("b1 with center", b1wc)
     cv2.waitKey(5000)
     cv2.destroyAllWindows()
 
     print("\t\tTesting plot_horizonal_lineout_intensity():")
-    #gp.plot_horizonal_lineout_intensity(b1, center_b)
+    gp.plot_horizonal_lineout_intensity(b1, center_b)
     print()
 
     print("\t\tTesting get_gaus_boundaries_x():")

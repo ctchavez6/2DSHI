@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
+    <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="finally getting correct rotation angle and good looking b prime">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/coregistration/find_gaussian_profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/find_gaussian_profile.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/coregistration/img_characterization.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/img_characterization.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/tests/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/tests/test_coregistration_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/test_coregistration_module.py" afterDir="false" />
     </list>
@@ -321,21 +323,8 @@
       <workItem from="1577914744795" duration="16337000" />
       <workItem from="1578016393690" duration="7023000" />
       <workItem from="1578101748225" duration="10018000" />
-      <workItem from="1578170379674" duration="10135000" />
-    </task>
-    <task id="LOCAL-00009" summary="double histogram">
-      <created>1571715180206</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1571715180206</updated>
-    </task>
-    <task id="LOCAL-00010" summary="updating max,stdev, avg values on histograms">
-      <created>1571796220969</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1571796220969</updated>
+      <workItem from="1578170379674" duration="11329000" />
+      <workItem from="1578256963104" duration="14094000" />
     </task>
     <task id="LOCAL-00011" summary="updating max,stdev, avg values on histograms">
       <created>1571803537525</created>
@@ -666,7 +655,21 @@
       <option name="project" value="LOCAL" />
       <updated>1578111593336</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <task id="LOCAL-00058" summary="finally getting correct rotation angle and good looking b prime">
+      <created>1578185062872</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1578185062872</updated>
+    </task>
+    <task id="LOCAL-00059" summary="run with crosshairs">
+      <created>1578185981201</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1578185981201</updated>
+    </task>
+    <option name="localTasksCounter" value="60" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -690,8 +693,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="some updated stuff" />
-    <MESSAGE value="roi stuff" />
     <MESSAGE value="got it to rotate the roi" />
     <MESSAGE value="default config file" />
     <MESSAGE value="keypoints and matches" />
@@ -715,29 +716,32 @@
     <MESSAGE value="static tests" />
     <MESSAGE value="progress on ROI" />
     <MESSAGE value="more progress on ROI, but static mu center having issues because of laser pulsation (no data equals no gaussian equals python barfs at us)" />
-    <option name="LAST_COMMIT_MESSAGE" value="more progress on ROI, but static mu center having issues because of laser pulsation (no data equals no gaussian equals python barfs at us)" />
+    <MESSAGE value="finally getting correct rotation angle and good looking b prime" />
+    <MESSAGE value="run with crosshairs" />
+    <option name="LAST_COMMIT_MESSAGE" value="run with crosshairs" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1578185011917">
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1578185980328">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
     <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1578111592466" />
-    <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578185011917" />
+    <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578185980328" />
     <state x="1042" y="526" key="SettingsEditor" timestamp="1577758445066">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1042" y="526" key="SettingsEditor/0.0.2560.1560@0.0.2560.1560" timestamp="1577758445066" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1578111595742">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1578185986068">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
     <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1578111595742" />
-    <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1578170380176">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578185986068" />
+    <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1578256965330">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="416" y="255" key="com.intellij.ide.util.TipDialog/0.0.1440.860@0.0.1440.860" timestamp="1577386000262" />
-    <state x="740" y="463" key="com.intellij.ide.util.TipDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1578170380176" />
+    <state x="740" y="463" key="com.intellij.ide.util.TipDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1578256965330" />
     <state x="518" y="90" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1576983755808">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
@@ -746,10 +750,10 @@
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1443" y="792" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1560@0.0.2560.1560" timestamp="1577757205725" />
-    <state x="943" y="355" width="672" height="678" key="search.everywhere.popup" timestamp="1578107689172">
+    <state x="943" y="355" width="672" height="678" key="search.everywhere.popup" timestamp="1578258201239">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
-    <state x="943" y="355" width="672" height="678" key="search.everywhere.popup/0.0.2560.1560@0.0.2560.1560" timestamp="1578107689172" />
+    <state x="943" y="355" width="672" height="678" key="search.everywhere.popup/0.0.2560.1560@0.0.2560.1560" timestamp="1578258201239" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/2DSHI$displayPhoto.coverage" NAME="displayPhoto Coverage Results" MODIFIED="1571505715036" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

@@ -12,7 +12,7 @@ def characterize_img(img, orb_detector, mask=None):
 def draw_keypoints(img, keypoints, color=(0, 255, 0)):
     return cv2.drawKeypoints(img, keypoints, color=color, flags=0, outImage=np.array([]))
 
-def try_euclidean_transform(gray1, gray2):
+def get_euclidean_transform_matrix(gray1, gray2):
     n_iters = 1000
     e_thresh = 1e-6
     criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, n_iters, e_thresh)

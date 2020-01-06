@@ -46,6 +46,8 @@ class Stream:
         self.save_imgs = save_imgs
         self.a_frames = list()
         self.b_frames = list()
+        self.b_prime_frames = list()
+
         self.cam_a = None
         self.cam_b = None
         self.all_cams = None
@@ -65,8 +67,11 @@ class Stream:
         self.static_center_a = None
         self.static_center_b = None
 
-        self.static_sigmas_a = None
-        self.static_sigmas_b = None
+        self.static_sigmas_x = None
+        self.static_sigmas_y = None
+
+        self.roi_a = None
+        self.roi_b = None
 
 
 
@@ -146,7 +151,7 @@ class Stream:
         return (x_a, y_a), (x_b, y_b)
 
 
-    def grab_frames(self):
+    def grab_frames(self, warp_matrix=None):
         try:
             grab_result_a = self.cam_a.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
             grab_result_b = self.cam_b.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
@@ -155,7 +160,15 @@ class Stream:
                 if self.save_imgs:
                     self.a_frames.append(a)
                     self.b_frames.append(b)
-                return a, b
+
+                if warp_matrix is None:
+                    return a, b
+                else:
+                    #print("Grabbing B Prime")
+                    b1_shape = b.shape[1], b.shape[0]
+                    b_prime = cv2.warpAffine(b, warp_matrix, b1_shape, flags=cv2.WARP_INVERSE_MAP)
+                    self.b_prime_frames.append(b_prime)
+                    return a, b_prime
         except Exception as e:
             raise e
 
@@ -186,14 +199,41 @@ class Stream:
         return img_a, img_b
 
     def full_img_w_roi_borders(self, img_12bit, center_):
-        x_max, y_max = center_
 
         try:
             mu_x, sigma_x, amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
             mu_y, sigma_y, amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
+            center_x,  center_y = int(center_[0]), int(center_[1])
 
+            """
+            print("center_x, center_y")
+            print(center_x, center_y)
+            print("X Direction")
+            print("1 Sigma: {}".format(int(sigma_x)))
+            print("2 Sigma: {}".format(int(2*sigma_x)))
+            print("3 Sigma: {}".format(int(3*sigma_x)))
+            print("4 Sigma: {}".format(int(4*sigma_x)))
+
+
+            print("Y Direction")
+            print("1 Sigma: {}".format(int(sigma_y)))
+            print("2 Sigma: {}".format(int(2*sigma_y)))
+            print("3 Sigma: {}".format(int(3*sigma_y)))
+            print("4 Sigma: {}".format(int(4*sigma_y)))
+
+            """
 
             try:
+
+                img_12bit[:, int(center_[0]) + int(sigma_x * 4)] = 4095
+                img_12bit[:, int(center_[0]) - int(sigma_x * 4)] = 4095
+
+                img_12bit[int(center_[1]) + int(sigma_y * 4), :] = 4095
+                img_12bit[int(center_[1]) - int(sigma_y * 4), :] = 4095
+
+                """
+                x_max, y_max = center_
+
                 print("\tx_max={}".format(x_max))
                 print("\tmu_x={}".format(mu_x))
                 print("\tsigma_x={}".format(sigma_x))
@@ -202,17 +242,15 @@ class Stream:
                 print("\tmu_y={}".format(mu_y))
                 print("\tsigma_y={}".format(sigma_y))
 
+
                 print("\t\tSetting x={} to 4095.".format(int(mu_x) + int(sigma_x * 4)))
                 print("\t\tSetting x={} to 4095.".format(int(mu_x) - int(sigma_x * 4)))
-
-                img_12bit[:, int(mu_x) + int(sigma_x * 4)] = 4095
-                img_12bit[:, int(mu_x) - int(sigma_x * 4)] = 4095
 
                 print("\t\tSetting y={} to 4095.".format(mu_y + int(sigma_y * 4)))
                 print("\t\tSetting y={} to 4095.".format(mu_y - int(sigma_y * 4)))
 
-                img_12bit[int(mu_y) + int(sigma_y * 4), :] = 4095
-                img_12bit[int(mu_y) - int(sigma_y * 4), :] = 4095
+                
+                """
 
             except IndexError:
                 print("Warning: 4 sigma > frame height or width.")
@@ -247,7 +285,6 @@ class Stream:
                 b = self.full_img_w_roi_borders(b, self.static_center_b)
 
 
-
         if histogram:
             self.histocam_a.update(a)
             self.histocam_b.update(b)
@@ -262,8 +299,6 @@ class Stream:
                 self.show_16bit_representations(a, b, False, False)
             else:
                 self.show_16bit_representations(a, b, False, centers)
-
-
 
     def start(self, histogram=False):
         continue_stream = False
@@ -286,7 +321,51 @@ class Stream:
 
         cv2.destroyAllWindows()
 
-        find_centers_ = input("Step 2 - Find Brightest Pixel Location: Proceed? (y/n): ")
+        coregister_ = input("Step 2 - Co-Register with Euclidean Transform: Proceed? (y/n): ")
+        warp_ = None
+
+        if coregister_.lower() == "y":
+            continue_stream = True
+            a_8bit = bdc.to_8_bit(self.current_frame_a)
+            b_8bit = bdc.to_8_bit(self.current_frame_b)
+            warp_ = ic.get_euclidean_transform_matrix(a_8bit, b_8bit)
+
+            print("Warp Matrix Below:\n\n{}\n".format(warp_))
+            a = warp_[0][0]
+            b = warp_[0][1]
+            tx = warp_[0][2]
+            c = warp_[1][0]
+            d = warp_[1][1]
+            ty = warp_[1][2]
+
+            print("\tTranslation X:{}".format(tx))
+            print("\tTranslation Y:{}\n".format(ty))
+
+            scale_x = np.sign(a) * (np.sqrt(a ** 2 + b ** 2))
+            scale_y = np.sign(d) * (np.sqrt(c ** 2 + d ** 2))
+
+            print("\tScale X:{}".format(scale_x))
+            print("\tScale Y:{}\n".format(scale_y))
+
+            phi = np.arctan2(-1.0 * b, a)
+            print("\tPhi Y (rad):{}".format(phi))
+            print("\tPhi Y (deg):{}\n".format(np.degrees(phi)))
+
+        elif coregister_.lower() == "n":
+            continue_stream = False
+
+        while continue_stream:
+            self.frame_count += 1
+            self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=warp_)
+            a_as_16bit = bdc.to_16_bit(self.current_frame_a)
+            b_as_16bit = bdc.to_16_bit(self.current_frame_b)
+            cv2.imshow("A", a_as_16bit)
+            cv2.imshow("B Prime", b_as_16bit)
+            continue_stream = self.keep_streaming()
+
+        cv2.destroyAllWindows()
+
+        find_centers_ = input("Step 3 - Find Brightest Pixel Locations: Proceed? (y/n): ")
 
         if find_centers_.lower() == "y":
             continue_stream = True
@@ -295,34 +374,65 @@ class Stream:
 
         while continue_stream:
             self.frame_count += 1
-            self.current_frame_a, self.current_frame_b = self.grab_frames()
-            self.pre_alignment(histogram, True)
+            self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=warp_)
+
+            a_as_16bit = bdc.to_16_bit(self.current_frame_a)
+            b_as_16bit = bdc.to_16_bit(self.current_frame_b)
+            max_pixel_a, max_pixel_b = self.find_centers(a_as_16bit, b_as_16bit)
+
+            a_as_16bit = cv2.circle(a_as_16bit, max_pixel_a, 10, (0, 255, 0), 2)
+            b_as_16bit = cv2.circle(b_as_16bit, max_pixel_b, 10, (0, 255, 0), 2)
+
+
+            cv2.imshow("A", a_as_16bit)
+            cv2.imshow("B Prime", b_as_16bit)
             continue_stream = self.keep_streaming()
 
         cv2.destroyAllWindows()
 
-        max_pixel_a, max_pixel_b = self.find_centers(
-            bdc.to_16_bit(self.current_frame_a), bdc.to_16_bit(self.current_frame_b))
 
-        self.static_center_a = max_pixel_a
-        self.static_center_b = max_pixel_b
+        set_centers_ = input("Step 4 - Set Gaussian-Based Static Centers: Proceed? (y/n): ")
 
-        #print("Coordinates of Brightest Pixel: Camera A\n\t{}".format(max_pixel_a))
-        #print("Coordinates of Brightest Pixel: Camera B\n\t{}".format(max_pixel_b))
+        if set_centers_.lower() == "y":
+            continue_stream = True
+            a_as_16bit = bdc.to_16_bit(self.current_frame_a)
+            b_as_16bit = bdc.to_16_bit(self.current_frame_b)
 
-        #mu_a_x, sigma_a_x, amp_a_x = fgp.get_gaus_boundaries_x(self.current_frame_a, max_pixel_a)
-        #mu_a_y, sigma_a_y, amp_a_y = fgp.get_gaus_boundaries_y(self.current_frame_a, max_pixel_a)
-
-        #mu_b_x, sigma_b_x, amp_b_x = fgp.get_gaus_boundaries_x(self.current_frame_b, max_pixel_b)
-        #mu_b_y, sigma_b_y, amp_b_y = fgp.get_gaus_boundaries_y(self.current_frame_b, max_pixel_b)
+            max_pixel_a, max_pixel_b = self.find_centers(a_as_16bit, b_as_16bit)
 
 
+            print("Characterizing A")
+            mu_a_x, sigma_a_x, amp_a_x = fgp.get_gaus_boundaries_x(self.current_frame_a, max_pixel_a)
+            mu_a_y, sigma_a_y, amp_a_y = fgp.get_gaus_boundaries_y(self.current_frame_a, max_pixel_a)
 
+            print("Characterizing B Prime")
+            mu_b_x, sigma_b_x, amp_b_x = fgp.get_gaus_boundaries_x(self.current_frame_b, max_pixel_b)
+            mu_b_y, sigma_b_y, amp_b_y = fgp.get_gaus_boundaries_y(self.current_frame_b, max_pixel_b)
 
-        #self.static_center_a = (mu_a_x, mu_a_y)
-        #self.static_center_b = (mu_b_x, mu_b_y)
+            self.static_center_a = (int(mu_a_x), int(mu_a_y))
+            self.static_center_b = (int(mu_b_x), int(mu_b_y))
 
-        find_rois_ = input("Step 3 - Find Regions of Interest: Proceed? (y/n): ")
+            #self.static_center_a = max_pixel_a
+            #self.static_center_b = max_pixel_b
+
+        elif set_centers_.lower() == "n":
+            continue_stream = False
+
+        while continue_stream:
+            self.frame_count += 1
+            self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=warp_)
+            a_as_16bit = bdc.to_16_bit(self.current_frame_a)
+            b_as_16bit = bdc.to_16_bit(self.current_frame_b)
+            a_as_16bit = cv2.circle(a_as_16bit, self.static_center_a, 10, (0, 255, 0), 2)
+            b_as_16bit = cv2.circle(b_as_16bit, self.static_center_b, 10, (0, 255, 0), 2)
+            cv2.imshow("A", a_as_16bit)
+            cv2.imshow("B Prime", b_as_16bit)
+            continue_stream = self.keep_streaming()
+
+        cv2.destroyAllWindows()
+
+        find_rois_ = input("Step 5 - Find Regions of Interest: Proceed? (y/n): ")
+        print("\tNote: Printing Sigma X, Sigma Y for each Camera every 10 Frames")
 
         if find_rois_.lower() == "y":
             continue_stream = True
@@ -331,77 +441,203 @@ class Stream:
             continue_stream = False
         while continue_stream:
             self.frame_count += 1
-            self.current_frame_a, self.current_frame_b = self.grab_frames()
-            self.pre_alignment(histogram, True, True)
+            self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=warp_)
+            sigma_x_a = 0
+            sigma_y_a = 0
+
+            sigma_x_b = 0
+            sigma_y_b = 0
+
+            try:
+                for img_12bit in [self.current_frame_a]:
+                    center_ = self.static_center_a
+
+                    mu_x, sigma_x_a, amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
+                    mu_y, sigma_y_a, amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
+
+                    img_12bit[:, int(center_[0]) + int(sigma_x_a * 4)] = 4095
+                    img_12bit[:, int(center_[0]) - int(sigma_x_a * 4)] = 4095
+
+                    img_12bit[int(center_[1]) + int(sigma_y_a * 4), :] = 4095
+                    img_12bit[int(center_[1]) - int(sigma_y_a * 4), :] = 4095
+
+
+
+                    if self.frame_count % 10 == 0:
+                        print("\tA  - Sigma X, Sigma Y - {}".format((sigma_x_a, sigma_y_a)))
+
+
+                for img_12bit in [self.current_frame_b]:
+                    center_ = self.static_center_b
+
+                    mu_x, sigma_x_b, amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
+                    mu_y, sigma_y_b, amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
+
+                    img_12bit[:, int(center_[0]) + int(sigma_x_b * 4)] = 4095
+                    img_12bit[:, int(center_[0]) - int(sigma_x_b * 4)] = 4095
+
+                    img_12bit[int(center_[1]) + int(sigma_y_b * 4), :] = 4095
+                    img_12bit[int(center_[1]) - int(sigma_y_b * 4), :] = 4095
+
+                    a_as_16bit = bdc.to_16_bit(self.current_frame_a)
+                    b_as_16bit = bdc.to_16_bit(self.current_frame_b)
+
+                    if self.frame_count % 10 == 0:
+                        print("\tB' - Sigma X, Sigma Y - {}".format((sigma_x_b, sigma_y_b)))
+
+                cv2.imshow("A", a_as_16bit)
+                cv2.imshow("B Prime", b_as_16bit)
+
+            except Exception:
+                print("Exception Occurred")
+                pass
+
+            #self.pre_alignment(histogram, True, True)
             continue_stream = self.keep_streaming()
+
+            if continue_stream is False:
+                self.static_sigmas_x = int(max(sigma_a_x, sigma_b_x))
+                self.static_sigmas_y = int(max(sigma_a_y, sigma_b_y))
+
+                print("Setting static sigmas:")
+                print("self.static_sigmas_x: {}".format(self.static_sigmas_x))
+                print("self.static_sigmas_y: {}".format(self.static_sigmas_y))
 
         cv2.destroyAllWindows()
 
-        """
-        
 
-        find_keypoints = input("Attempt to characterize last Images? (y/n): ")
-        if find_keypoints.lower() == "n":
-            self.all_cams.StopGrabbing()
+        close_in = input("Step 6 - Close in on ROI: Proceed? (y/n): ")
+
+        if close_in.lower() == "y":
+            continue_stream = True
+        elif close_in.lower() == "n":
             continue_stream = False
 
-        satisfaction = "n"
-        homography_ = None
-
-        if find_keypoints.lower() == "y":
-            while homography_ is None or satisfaction.lower() == "n":
-
-                img_a_8bit = bdc.to_8_bit(self.current_frame_a)
-                img_b_8bit = bdc.to_8_bit(self.current_frame_b)
-
-                homography_ = ic.derive_homography(img_a_8bit, img_b_8bit)
-
-                rows, cols = img_b_8bit.shape
-                M, inliers = ic.derive_euclidean_transform(img_b_8bit, img_a_8bit)
-                print("Euclidean Transform Matrix below")
-                print(M)
-
-                homography_components = ic.get_homography_components(homography_)
-                translation = homography_components[0]
-                angle = homography_components[1]
-                scale = homography_components[2]
-                shear = homography_components[3]
-
-                satisfaction = input("Are you satisfied with the suggestions? (y/n): ")
-
-                if satisfaction == 'y':
-                    b_prime = ic.transform_img(self.current_frame_b * 16, homography_)
-
-                    cv2.imshow("B Prime", b_prime)
-                    cv2.waitKey(10000)
-                    cv2.destroyAllWindows()
-
-                    self.frame_count += 1
-                    self.current_frame_a, self.current_frame_b = self.grab_frames()
-                    homography_ = None
-
-                    satisfaction = input("Are you satisfied with B-Prime? (y/n): ")
-
-                if satisfaction == 'q':
-                    break
-        
-        """
-
-        """
-        continue_stream = True
-
-        if homography_ is None:
-            print("No Homography: this is a A & B stream (No B-Prime)")
-
         while continue_stream:
-
             self.frame_count += 1
-            self.current_frame_a, self.current_frame_b = self.grab_frames()
-            self.post_alignment(histogram, homography_)
+            self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=warp_)
+
+            x_a, y_a = self.static_center_a
+            x_b, y_b = self.static_center_b
+
+            self.roi_a = self.current_frame_a[
+                         y_a - 4 * self.static_sigmas_y: y_a + 4 * self.static_sigmas_y + 1,
+                         x_a - 4*self.static_sigmas_x: x_a + 4*self.static_sigmas_x + 1
+                         ]
+
+            self.roi_b = self.current_frame_b[
+                         y_b - 4 * self.static_sigmas_y: y_b + 4 * self.static_sigmas_y + 1,
+                         x_b - 4*self.static_sigmas_x: x_b + 4*self.static_sigmas_x + 1
+                         ]
+
+
+            roi_a_16bit = bdc.to_16_bit(self.roi_a)
+            cv2.imshow("ROI A", roi_a_16bit)
+
+            roi_b_16bit = bdc.to_16_bit(self.roi_b)
+            cv2.imshow("ROI B", roi_b_16bit)
             continue_stream = self.keep_streaming()
-        
-        
+
+
         """
+        if close_in.lower() == "y":
+
+
+            continue_stream = True
+            print("\nClosing in on ROI.")
+            print("Stream A:")
+            print("\tCenter: {}".format(self.static_center_a))
+            x_a, y_a = self.static_center_a
+            print("\tX will go from {} to {}".format(x_a - 4*self.static_sigmas_x, x_a + 4*self.static_sigmas_x))
+            print("\tY will go from {} to {}".format(y_a - 4*self.static_sigmas_x, y_a + 4*self.static_sigmas_x))
+
+
+            print("Stream B Prime:")
+            print("\tCenter: {}".format(self.static_center_b))
+            x_b, y_b = self.static_center_b
+            print("\tX will go from {} to {}".format(x_b - 4 * self.static_sigmas_x, x_b + 4 * self.static_sigmas_x))
+            print("\tY will go from {} to {}".format(y_b - 4 * self.static_sigmas_y, y_b + 4 * self.static_sigmas_y))
+
+            print("Most Recent Frame")
+            self.roi_a = self.current_frame_a[
+                         y_a - 4 * self.static_sigmas_y: y_a + 4 * self.static_sigmas_y + 1,
+                         x_a - 4*self.static_sigmas_x: x_a + 4*self.static_sigmas_x + 1
+                         ]
+
+            self.roi_b = self.current_frame_b[
+                         y_b - 4 * self.static_sigmas_y: y_b + 4 * self.static_sigmas_y + 1,
+                         x_b - 4*self.static_sigmas_x: x_b + 4*self.static_sigmas_x + 1
+                         ]
+
+
+            print("MOMENT OF TRUTH")
+            print("Shape of ROI A : {}".format(self.roi_a.shape))
+            print("Shape of ROI B': {}".format(self.roi_b.shape))
+
+                        #self.current_frame_a[
+                         #x_a - 4*self.static_sigmas_x: x_a + 4*self.static_sigmas_x + 1,
+                         #y_a - 4 * self.static_sigmas_x, y_a + 4 * self.static_sigmas_x
+                         #]
+
+            roi_a_16bit = bdc.to_16_bit(self.roi_a)
+            cv2.imshow("ROI A", roi_a_16bit)
+            cv2.waitKey(10000)
+
+            roi_b_16bit = bdc.to_16_bit(self.roi_b)
+            cv2.imshow("ROI B", roi_b_16bit)
+            cv2.waitKey(10000)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            self.frame_count += 1
+            self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=warp_)
+
+            x_a, y_a = self.static_center_a
+
+
+
+            x_b, y_b = self.static_center_b
+
+            self.roi_a = self.current_frame_a[
+                         y_a - 4 * self.static_sigmas_y: y_a + 4 * self.static_sigmas_y + 1,
+                         x_a - 4*self.static_sigmas_x: x_a + 4*self.static_sigmas_x + 1
+                         ]
+
+            self.roi_b = self.current_frame_b[
+                         y_b - 4 * self.static_sigmas_y: y_b + 4 * self.static_sigmas_y + 1,
+                         x_b - 4*self.static_sigmas_x: x_b + 4*self.static_sigmas_x + 1
+                         ]
+
+
+            roi_a_16bit = bdc.to_16_bit(self.roi_a)
+            cv2.imshow("ROI A", roi_a_16bit)
+            #cv2.waitKey(10000)
+
+            roi_b_16bit = bdc.to_16_bit(self.roi_b)
+            cv2.imshow("ROI B", roi_b_16bit)
+            #cv2.waitKey(10000)
+
+
+        """
+
+
+
+        cv2.destroyAllWindows()
+
+
 
         self.all_cams.StopGrabbing()
 
