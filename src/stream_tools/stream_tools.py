@@ -13,6 +13,29 @@ from image_processing import img_algebra as ia
 EPSILON = sys.float_info.epsilon  # Smallest possible difference
 sixteen_bit_max = (2 ** 16) - 1
 
+#plt.ion()  # Turn the interactive mode on.
+
+
+def set_xvalues(polygon, x0, x1):
+    """
+    Given a rectangular matplotlib.patches.Polygon object sets the horizontal values.
+
+    Args:
+        polygon: An instance of tlFactory.EnumerateDevices()
+        x0: An integer
+        x1: An integer
+    Raises:
+        Exception: TODO Add some error handling.
+
+    """
+    if len(polygon.get_xy()) == 4:
+        _ndarray = polygon.get_xy()
+        _ndarray[:, 0] = [x0, x0, x1, x1]
+        polygon.set_xy(_ndarray)
+    if len(polygon.get_xy()) == 5:
+        _ndarray = polygon.get_xy()
+        _ndarray[:, 0] = [x0, x0, x1, x1, x0]
+        polygon.set_xy(_ndarray)
 
 def add_histogram_representations(figure_a, figure_b, raw_array_a, raw_array_b):
     """
@@ -45,29 +68,224 @@ def add_histogram_representations(figure_a, figure_b, raw_array_a, raw_array_b):
 
     return np.vstack((np.hstack((hist_img_a, img_a_8bit_resized)), np.hstack((hist_img_b, img_b_8bit_resized))))
 
+def initialize_histograms_rois(line_width=3):
+    """
+    Initializes histogram matplotlib.pyplot figures/subplots.
 
-def convert_to_rgb_all(val):
-    minval, maxval = -2*((2**12) - 1), 2*((2**12) - 1)
-    colors = [(sixteen_bit_max, 0, 0), (sixteen_bit_max, sixteen_bit_max, sixteen_bit_max), (0, 0, sixteen_bit_max)]  # [Blue, WHITE, RED]
+    Args:
+        num_cameras: An integer
+        line_width: An integer
+    Raises:
+        Exception: Any error/exception other than 'no such file or directory'.
+    Returns:
+        dict: A dictionary of histograms with ascending lowercase alphabetical letters (that match cameras) as keys
+    """
+    bins = 4096
+    stream_subplots = dict()
+    lines = {
+        "intensities": dict(),
+        "maxima": dict(),
+        "averages": dict(),
+        "stdevs": dict(),
+        "max_vert": dict(),
+        "avg+sigma": dict(),
+        "avg-sigma": dict(),
+        "grayscale_avg": dict(),
+        "grayscale_avg+0.5sigma": dict(),
+        "grayscale_avg-0.5sigma": dict()
+    }
+    fig_a = plt.figure(figsize=(5, 5))
+    stream_subplots["a"] = fig_a.add_subplot()
+    fig_b = plt.figure(figsize=(5, 5))
+    stream_subplots["b"] = fig_b.add_subplot()
 
-    # "colors" is a series of RGB colors delineating a series of
-    # adjacent linear color gradients between each pair.
-    # Determine where the given value falls proportionality within
-    # the range from minval->maxval and scale that fractional value
-    # by the total number in the "colors" pallette.
-    i_f = float(val-minval) / float(maxval-minval) * (len(colors)-1)
-    # Determine the lower index of the pair of color indices this
-    # value corresponds and its fractional distance between the lower
-    # and the upper colors.
-    i, f = int(i_f // 1), i_f % 1  # Split into whole & fractional parts.
-    # Does it fall exactly on one of the color points?
-    if f < EPSILON:
-        return colors[i]
-    else:  # Otherwise return a color within the range between them.
-        (r1, g1, b1), (r2, g2, b2) = colors[i], colors[i+1]
-        return int(r1 + f*(r2-r1)), int(g1 + f*(g2-g1)), int(b1 + f*(b2-b1))
 
-func = np.vectorize(convert_to_rgb_all)
+
+    for camera_identifier in ["a", "b"]:
+        #camera_identifier = chr(97 + i)
+        stream_subplots[camera_identifier].set_title('Camera ' + camera_identifier.capitalize())
+        stream_subplots[camera_identifier].set_xlabel('Bin')
+        stream_subplots[camera_identifier].set_ylabel('Frequency')
+
+        lines["intensities"][camera_identifier], = stream_subplots[camera_identifier] \
+            .plot(np.arange(bins), np.zeros((bins, 1)), c='k', lw=line_width, label='intensity')
+
+        lines["maxima"][camera_identifier], = stream_subplots[camera_identifier] \
+            .plot(np.arange(bins), np.zeros((bins, 1)), c='g', lw=1, label='maximum')
+
+        lines["averages"][camera_identifier], = stream_subplots[camera_identifier] \
+            .plot(np.arange(bins), np.zeros((bins, 1)), c='b', linestyle='dashed', lw=1, label='average')
+
+        lines["stdevs"][camera_identifier], = stream_subplots[camera_identifier] \
+            .plot(np.arange(bins), np.zeros((bins, 1)), c='r', linestyle='dotted', lw=2, label='stdev')
+
+        lines["grayscale_avg"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='b', linestyle='dashed', linewidth=1)
+
+        lines["grayscale_avg+0.5sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='r', linestyle='dotted', linewidth=1)
+
+        lines["grayscale_avg-0.5sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='r', linestyle='dotted', linewidth=1)
+
+
+        lines["max_vert"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='g', linestyle='solid', linewidth=1)
+
+        lines["avg+sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvspan(-100, -100, alpha=0.5, color='#f5beba')
+
+        lines["avg-sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvspan(-100, -100, alpha=0.5, color='#f5beba')
+
+        stream_subplots[camera_identifier].set_xlim(-100, bins - 1 + 100)
+        stream_subplots[camera_identifier].grid(True)
+        stream_subplots[camera_identifier].set_autoscale_on(False)
+        stream_subplots[camera_identifier].set_ylim(bottom=0, top=1)
+
+    figs = dict()
+    figs["a"], figs["b"] = fig_a, fig_b
+
+    return figs, stream_subplots, lines
+
+
+
+def initialize_histograms_algebra(line_width=3):
+    """
+    Initializes histogram matplotlib.pyplot figures/subplots.
+
+    Args:
+        num_cameras: An integer
+        line_width: An integer
+    Raises:
+        Exception: Any error/exception other than 'no such file or directory'.
+    Returns:
+        dict: A dictionary of histograms with ascending lowercase alphabetical letters (that match cameras) as keys
+    """
+    bins = 4096
+    stream_subplots = dict()
+    lines = {
+        "intensities": dict(),
+        "maxima": dict(),
+        "averages": dict(),
+        "stdevs": dict(),
+        "max_vert": dict(),
+        "avg+sigma": dict(),
+        "avg-sigma": dict(),
+        "grayscale_avg": dict(),
+        "grayscale_avg+0.5sigma": dict(),
+        "grayscale_avg-0.5sigma": dict()
+    }
+    fig_a = plt.figure(figsize=(5, 5))
+    stream_subplots["plus"] = fig_a.add_subplot()
+    fig_b = plt.figure(figsize=(5, 5))
+    stream_subplots["minus"] = fig_b.add_subplot()
+
+
+
+    for camera_identifier in ["plus", "minus"]:
+        #camera_identifier = chr(97 + i)
+        stream_subplots[camera_identifier].set_title('Camera ' + camera_identifier.capitalize())
+        stream_subplots[camera_identifier].set_xlabel('Bin')
+        stream_subplots[camera_identifier].set_ylabel('Frequency')
+
+        lines["intensities"][camera_identifier], = stream_subplots[camera_identifier] \
+            .plot(np.arange(bins), np.zeros((bins, 1)), c='k', lw=line_width, label='intensity')
+
+        lines["maxima"][camera_identifier], = stream_subplots[camera_identifier] \
+            .plot(np.arange(bins), np.zeros((bins, 1)), c='g', lw=1, label='maximum')
+
+        lines["averages"][camera_identifier], = stream_subplots[camera_identifier] \
+            .plot(np.arange(bins), np.zeros((bins, 1)), c='b', linestyle='dashed', lw=1, label='average')
+
+        lines["stdevs"][camera_identifier], = stream_subplots[camera_identifier] \
+            .plot(np.arange(bins), np.zeros((bins, 1)), c='r', linestyle='dotted', lw=2, label='stdev')
+
+        lines["grayscale_avg"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='b', linestyle='dashed', linewidth=1)
+
+        lines["grayscale_avg+0.5sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='r', linestyle='dotted', linewidth=1)
+
+        lines["grayscale_avg-0.5sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='r', linestyle='dotted', linewidth=1)
+
+
+        lines["max_vert"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='g', linestyle='solid', linewidth=1)
+
+        lines["avg+sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvspan(-100, -100, alpha=0.5, color='#f5beba')
+
+        lines["avg-sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvspan(-100, -100, alpha=0.5, color='#f5beba')
+
+        stream_subplots[camera_identifier].set_xlim(-100, bins - 1 + 100)
+        stream_subplots[camera_identifier].grid(True)
+        stream_subplots[camera_identifier].set_autoscale_on(False)
+        stream_subplots[camera_identifier].set_ylim(bottom=0, top=1)
+
+    figs = dict()
+    figs["plus"], figs["minus"] = fig_a, fig_b
+
+    return figs, stream_subplots, lines
+
+
+
+def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,threshold=1.2):
+    """
+    Updates histograms for a given camera given the histogram of intensity values.
+
+    Args:
+        histogram_dict: TODO Add Description
+        lines_dict: TODO Add Description
+        identifier: TODO Add Description
+        bins: TODO Add Description
+        raw_2d_array: TODO Add Description
+        threshold: TODO Add Description
+    Raises:
+        Exception: TODO Add Description
+    Returns:
+        TODO Add Description
+    """
+    calculated_hist = cv2.calcHist([raw_2d_array], [0], None, [bins], [0, 4095]) / np.prod(raw_2d_array.shape[:2])
+
+    histogram_maximum = np.amax(calculated_hist)
+    greyscale_max = np.amax(raw_2d_array.flatten())
+    greyscale_avg = np.mean(raw_2d_array)
+    greyscale_stdev = np.std(raw_2d_array)
+
+    lines_dict["intensities"][identifier].set_ydata(calculated_hist)  # Intensities/Percent of Saturation
+
+    lines_dict["maxima"][identifier].set_ydata(greyscale_max)  # Maximums
+    lines_dict["averages"][identifier].set_ydata(greyscale_avg)  # Averages
+    lines_dict["stdevs"][identifier].set_ydata(greyscale_stdev)  # Standard Deviations
+    lines_dict["max_vert"][identifier].set_xdata(greyscale_max)  # Maximum Indicator as vertical line
+    lines_dict["grayscale_avg"][identifier].set_xdata(greyscale_avg)  # Maximum Indicator as vertical line
+    lines_dict["grayscale_avg+0.5sigma"][identifier].set_xdata(min([bins, greyscale_avg+(greyscale_stdev*0.5)]))  # Maximum Indicator as vertical line
+    lines_dict["grayscale_avg-0.5sigma"][identifier].set_xdata(max([greyscale_avg-(greyscale_stdev*0.5), 0]))  # Maximum Indicator as vertical line
+
+    set_xvalues(lines_dict["avg+sigma"][identifier], greyscale_avg, min([bins, greyscale_avg+(greyscale_stdev*0.5)]))
+    set_xvalues(lines_dict["avg-sigma"][identifier], max([greyscale_avg-(greyscale_stdev*0.5), 0]), greyscale_avg)
+
+    histogram_dict[identifier].legend(
+        labels=(
+            "intensity",
+            "maximum %.0f" % greyscale_max,
+            "average %.2f" % greyscale_avg,
+            "stdev %.4f" % greyscale_stdev,),
+        loc="upper right"
+    )
+
+    if histogram_maximum > 0.001:
+        histogram_dict[identifier].set_ylim(bottom=0.000000, top=histogram_maximum * threshold)
+    else:
+        histogram_dict[identifier].set_ylim(bottom=0.000000, top=0.001)
+
+
+
+
+
 
 
 class Stream:
@@ -193,7 +411,6 @@ class Stream:
                 if warp_matrix is None:
                     return a, b
                 else:
-                    #print("Grabbing B Prime")
                     b1_shape = b.shape[1], b.shape[0]
                     b_prime = cv2.warpAffine(b, warp_matrix, b1_shape, flags=cv2.WARP_INVERSE_MAP)
                     self.b_prime_frames.append(b_prime)
@@ -234,63 +451,21 @@ class Stream:
             mu_y, sigma_y, amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
             center_x,  center_y = int(center_[0]), int(center_[1])
 
-            """
-            print("center_x, center_y")
-            print(center_x, center_y)
-            print("X Direction")
-            print("1 Sigma: {}".format(int(sigma_x)))
-            print("2 Sigma: {}".format(int(2*sigma_x)))
-            print("3 Sigma: {}".format(int(3*sigma_x)))
-            print("4 Sigma: {}".format(int(4*sigma_x)))
-
-
-            print("Y Direction")
-            print("1 Sigma: {}".format(int(sigma_y)))
-            print("2 Sigma: {}".format(int(2*sigma_y)))
-            print("3 Sigma: {}".format(int(3*sigma_y)))
-            print("4 Sigma: {}".format(int(4*sigma_y)))
-
-            """
 
             try:
 
-                img_12bit[:, int(center_[0]) + int(sigma_x * 4)] = 4095
-                img_12bit[:, int(center_[0]) - int(sigma_x * 4)] = 4095
+                img_12bit[:, int(center_[0]) + int(sigma_x * 2)] = 4095
+                img_12bit[:, int(center_[0]) - int(sigma_x * 2)] = 4095
 
-                img_12bit[int(center_[1]) + int(sigma_y * 4), :] = 4095
-                img_12bit[int(center_[1]) - int(sigma_y * 4), :] = 4095
+                img_12bit[int(center_[1]) + int(sigma_y * 2), :] = 4095
+                img_12bit[int(center_[1]) - int(sigma_y * 2), :] = 4095
 
-                """
-                x_max, y_max = center_
-
-                print("\tx_max={}".format(x_max))
-                print("\tmu_x={}".format(mu_x))
-                print("\tsigma_x={}".format(sigma_x))
-
-                print("\ty_max={}".format(y_max))
-                print("\tmu_y={}".format(mu_y))
-                print("\tsigma_y={}".format(sigma_y))
-
-
-                print("\t\tSetting x={} to 4095.".format(int(mu_x) + int(sigma_x * 4)))
-                print("\t\tSetting x={} to 4095.".format(int(mu_x) - int(sigma_x * 4)))
-
-                print("\t\tSetting y={} to 4095.".format(mu_y + int(sigma_y * 4)))
-                print("\t\tSetting y={} to 4095.".format(mu_y - int(sigma_y * 4)))
-
-                
-                """
 
             except IndexError:
                 print("Warning: 4 sigma > frame height or width.")
 
         except RuntimeError:
             print("Warning: RuntimeError occurred while trying to calculate gaussian! ")
-
-
-
-
-
 
         return img_12bit
 
@@ -300,8 +475,6 @@ class Stream:
         if roi_borders:
             a_as_16bit = bdc.to_16_bit(a)
             b_as_16bit = bdc.to_16_bit(b)
-
-
 
             if self.static_center_a is None or self.static_center_b is None:
                 ca, cb = self.find_centers(a_as_16bit, b_as_16bit)
@@ -317,12 +490,8 @@ class Stream:
         if histogram:
             self.histocam_a.update(a)
             self.histocam_b.update(b)
-            histocams = add_histogram_representations(self.histocam_a.get_figure(),
-                                                      self.histocam_b.get_figure(),
-                                                      a,
-                                                      b)
+            histocams = add_histogram_representations(self.histocam_a.get_figure(), self.histocam_b.get_figure(), a, b)
             cv2.imshow("Cameras with Histograms", histocams)
-
         else:
             if roi_borders or crop:
                 self.show_16bit_representations(a, b, False, False)
@@ -380,9 +549,6 @@ class Stream:
             print("\tPhi Y (rad):{}".format(phi))
             print("\tPhi Y (deg):{}\n".format(np.degrees(phi)))
 
-        elif coregister_.lower() == "n":
-            continue_stream = False
-
         while continue_stream:
             self.frame_count += 1
             self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=warp_)
@@ -398,8 +564,6 @@ class Stream:
 
         if find_centers_.lower() == "y":
             continue_stream = True
-        elif find_centers_.lower() == "n":
-            continue_stream = False
 
         while continue_stream:
             self.frame_count += 1
@@ -430,22 +594,14 @@ class Stream:
             max_pixel_a, max_pixel_b = self.find_centers(a_as_16bit, b_as_16bit)
 
 
-            print("Characterizing A")
             mu_a_x, sigma_a_x, amp_a_x = fgp.get_gaus_boundaries_x(self.current_frame_a, max_pixel_a)
             mu_a_y, sigma_a_y, amp_a_y = fgp.get_gaus_boundaries_y(self.current_frame_a, max_pixel_a)
 
-            print("Characterizing B Prime")
             mu_b_x, sigma_b_x, amp_b_x = fgp.get_gaus_boundaries_x(self.current_frame_b, max_pixel_b)
             mu_b_y, sigma_b_y, amp_b_y = fgp.get_gaus_boundaries_y(self.current_frame_b, max_pixel_b)
 
             self.static_center_a = (int(mu_a_x), int(mu_a_y))
             self.static_center_b = (int(mu_b_x), int(mu_b_y))
-
-            #self.static_center_a = max_pixel_a
-            #self.static_center_b = max_pixel_b
-
-        elif set_centers_.lower() == "n":
-            continue_stream = False
 
         while continue_stream:
             self.frame_count += 1
@@ -461,13 +617,10 @@ class Stream:
         cv2.destroyAllWindows()
 
         find_rois_ = input("Step 5 - Find Regions of Interest: Proceed? (y/n): ")
-        print("\tNote: Printing Sigma X, Sigma Y for each Camera every 10 Frames")
 
         if find_rois_.lower() == "y":
             continue_stream = True
-        elif find_rois_.lower() == "n":
-            self.all_cams.StopGrabbing()
-            continue_stream = False
+
         while continue_stream:
             self.frame_count += 1
             self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=warp_)
@@ -484,11 +637,11 @@ class Stream:
                     mu_x, sigma_x_a, amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
                     mu_y, sigma_y_a, amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
 
-                    img_12bit[:, int(center_[0]) + int(sigma_x_a * 4)] = 4095
-                    img_12bit[:, int(center_[0]) - int(sigma_x_a * 4)] = 4095
+                    img_12bit[:, int(center_[0]) + int(sigma_x_a * 2)] = 4095
+                    img_12bit[:, int(center_[0]) - int(sigma_x_a * 2)] = 4095
 
-                    img_12bit[int(center_[1]) + int(sigma_y_a * 4), :] = 4095
-                    img_12bit[int(center_[1]) - int(sigma_y_a * 4), :] = 4095
+                    img_12bit[int(center_[1]) + int(sigma_y_a * 2), :] = 4095
+                    img_12bit[int(center_[1]) - int(sigma_y_a * 2), :] = 4095
 
 
 
@@ -502,17 +655,15 @@ class Stream:
                     mu_x, sigma_x_b, amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
                     mu_y, sigma_y_b, amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
 
-                    img_12bit[:, int(center_[0]) + int(sigma_x_b * 4)] = 4095
-                    img_12bit[:, int(center_[0]) - int(sigma_x_b * 4)] = 4095
+                    img_12bit[:, int(center_[0]) + int(sigma_x_b * 2)] = 4095
+                    img_12bit[:, int(center_[0]) - int(sigma_x_b * 2)] = 4095
 
-                    img_12bit[int(center_[1]) + int(sigma_y_b * 4), :] = 4095
-                    img_12bit[int(center_[1]) - int(sigma_y_b * 4), :] = 4095
+                    img_12bit[int(center_[1]) + int(sigma_y_b * 2), :] = 4095
+                    img_12bit[int(center_[1]) - int(sigma_y_b * 2), :] = 4095
 
                     a_as_16bit = bdc.to_16_bit(self.current_frame_a)
                     b_as_16bit = bdc.to_16_bit(self.current_frame_b)
 
-                    if self.frame_count % 10 == 0:
-                        print("\tB' - Sigma X, Sigma Y - {}".format((int(sigma_x_b), int(sigma_y_b))))
 
                 cv2.imshow("A", a_as_16bit)
                 cv2.imshow("B Prime", b_as_16bit)
@@ -521,28 +672,18 @@ class Stream:
                 print("Exception Occurred")
                 pass
 
-            #self.pre_alignment(histogram, True, True)
             continue_stream = self.keep_streaming()
 
             if continue_stream is False:
                 self.static_sigmas_x = int(max(sigma_a_x, sigma_b_x))
                 self.static_sigmas_y = int(max(sigma_a_y, sigma_b_y))
 
-                print("Setting static sigmas:")
-                print("self.static_sigmas_x: {}".format(self.static_sigmas_x))
-                print("self.static_sigmas_y: {}".format(self.static_sigmas_y))
-
         cv2.destroyAllWindows()
-
-        add_lineout_horizontal = None
-        sub_lineout_horizontal = None
 
         close_in = input("Step 6 - Close in on ROI: Proceed? (y/n): ")
 
         if close_in.lower() == "y":
             continue_stream = True
-        elif close_in.lower() == "n":
-            continue_stream = False
 
         while continue_stream:
             self.frame_count += 1
@@ -551,7 +692,7 @@ class Stream:
             x_a, y_a = self.static_center_a
             x_b, y_b = self.static_center_b
 
-            n_sigma = 3
+            n_sigma = 2
 
             self.roi_a = self.current_frame_a[
                          y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + 1,
@@ -563,56 +704,33 @@ class Stream:
                          x_b - n_sigma*self.static_sigmas_x: x_b + n_sigma*self.static_sigmas_x + 1
                          ]
 
-
-            roi_a_16bit = bdc.to_16_bit(self.roi_a)
-            roi_b_16bit = bdc.to_16_bit(self.roi_b)
-
-            cv2.imshow("ROI A", roi_a_16bit)
-
-            cv2.imshow("ROI B", roi_b_16bit)
+            cv2.imshow("ROI A", bdc.to_16_bit(self.roi_a))
+            cv2.imshow("ROI B Prime", bdc.to_16_bit(self.roi_b))
             continue_stream = self.keep_streaming()
-
-        #roi_a_16_lineout = np.asarray(self.roi_a[int(self.roi_a.shape[0] * 0.5), :] * (1 / 16), dtype='int16')
-        #roi_b_16_lineout = np.asarray(self.roi_b[int(self.roi_b.shape[0] * 0.5), :] * (1 / 16), dtype='int16')
-        #print("Plus")
-        #print(roi_a_16_lineout + roi_b_16_lineout)
-        #print("Minus")
-        #print(roi_a_16_lineout - roi_b_16_lineout)
 
 
         cv2.destroyAllWindows()
 
-        #self.all_cams.StopGrabbing()
-        #sys.exit()
-
         start_algebra = input("Step 7 - Commence Image Algebra: Proceed? (y/n): ")
+        figs, histograms, lines = initialize_histograms_rois()
+        figs_alg, histograms_alg, lines_alg = initialize_histograms_algebra()
 
-        fig, ax = plt.subplots(figsize=(12, 12))
-        add_lineout_horizontal = None
-        sub_lineout_horizontal = None
         if start_algebra.lower() == "y":
             continue_stream = True
-            #plt.figure()
 
-            #npplus = bdc.to_16_bit(np.add(self.roi_a, self.roi_b))
-
-            #ax.imshow(npplus)
-            #plt.ion()  # Turn the interactive mode on.
+            #figs["a"].canvas.draw()  # Draw updates subplots in interactive mode
+            #figs["b"].canvas.draw()  # Draw updates subplots in interactive mode
             #plt.show()
 
-
-        elif start_algebra.lower() == "n":
-            continue_stream = False
-
         while continue_stream:
-
             self.frame_count += 1
             self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=warp_)
+
 
             x_a, y_a = self.static_center_a
             x_b, y_b = self.static_center_b
 
-            n_sigma = 3
+            n_sigma = 2
 
             self.roi_a = self.current_frame_a[
                          y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + 1,
@@ -620,140 +738,92 @@ class Stream:
                          ]
 
             self.roi_b = self.current_frame_b[
-                         y_b - n_sigma* self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + 1,
-                         x_b - n_sigma*self.static_sigmas_x: x_b + n_sigma*self.static_sigmas_x + 1
+                         y_b - n_sigma * self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + 1,
+                         x_b - n_sigma *self.static_sigmas_x: x_b + n_sigma*self.static_sigmas_x + 1
                          ]
 
+            h = self.roi_a.shape[0]
+            w = self.roi_a.shape[1]
+
+            update_histogram(histograms, lines, "a", 4096, self.roi_a)
+            update_histogram(histograms, lines, "b", 4096, self.roi_b)
+            figs["a"].canvas.draw()  # Draw updates subplots in interactive mode
+            figs["b"].canvas.draw()  # Draw updates subplots in interactive mode
+            hist_img_a = np.fromstring(figs["a"].canvas.tostring_rgb(), dtype=np.uint8, sep='')
+            hist_img_b = np.fromstring(figs["b"].canvas.tostring_rgb(), dtype=np.uint8, sep='')  # convert  to image
+            hist_img_a = hist_img_a.reshape(figs["a"].canvas.get_width_height()[::-1] + (3,))
+            hist_img_b = hist_img_b.reshape(figs["b"].canvas.get_width_height()[::-1] + (3,))
+            hist_img_a = cv2.resize(hist_img_a, (w, h), interpolation=cv2.INTER_AREA)
+            hist_img_b = cv2.resize(hist_img_b, (w, h), interpolation=cv2.INTER_AREA)
+            hist_img_a = bdc.to_16_bit(cv2.resize(hist_img_a, (w, h), interpolation=cv2.INTER_AREA), 8)
+            hist_img_b = bdc.to_16_bit(cv2.resize(hist_img_b, (w, h), interpolation=cv2.INTER_AREA), 8)
 
 
 
-            #print("In Image A: Range of pixel intensity is {} to {}".format(np.min(self.roi_a), np.max(self.roi_a)))
-            #print("In Image B': Range of pixel intensity is {} to {}".format(np.min(self.roi_b),
-                                                                             #np.max(self.roi_b)))
+            ROI_A_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR), cv2.cvtColor(self.roi_a * 16, cv2.COLOR_GRAY2BGR)), axis=1)
+            ROI_B_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR), cv2.cvtColor(self.roi_b * 16, cv2.COLOR_GRAY2BGR)), axis=1)
 
-            #npplus = bdc.to_16_bit(np.add(self.roi_a, self.roi_b))
-            #cv2plus = cv2.add(bdc.to_16_bit(self.roi_a), bdc.to_16_bit(self.roi_b))
-            #print("Max np_plus: {}".format(np.max(npplus.flatten())))
-            #print("Max cv2_plus: {}".format(np.max(cv2plus.flatten())))
-            #minus = np.add(bdc.to_16_bit(self.roi_a), bdc.to_16_bit(self.roi_b) * (-1))
-            roi_a_16bit = bdc.to_16_bit(self.roi_a)
-            roi_b_16bit = bdc.to_16_bit(self.roi_b)
-            plus = cv2.add(self.roi_a, self.roi_b)
-            minus = cv2.subtract(self.roi_a, self.roi_b)
-
-            #print("First 50 values of bottom row\n")
-            #print(minus[-1, 0:50])
-            #print("Last 50 values of bottom row\n")
-            #print(minus[-1, -50:])
-
-            plus = plus*16
-            minus = minus*16
+            A_ON_B = np.concatenate((ROI_A_WITH_HISTOGRAM, ROI_B_WITH_HISTOGRAM), axis=0)
+            cv2.imshow("ROIs", A_ON_B)
 
 
-            cv2.imshow("Add", plus)
-            cv2.imshow("Subtract", minus)
-            #continue_stream = self.keep_streaming()
+            #cv2.imshow("ROI A", ROI_A_WITH_HISTOGRAM)
+            #cv2.imshow("ROI B Prime", ROI_B_WITH_HISTOGRAM)
 
-            #print(plus.shape)
-            #print(minus.shape)
-            #add_lineout_horizontal = np.asarray(plus[int(plus.shape[0]*0.5), :] * (1/16), dtype='int16')
 
-            #sub_lineout_horizontal = np.asarray(minus[int(minus.shape[0]*0.5), :] * (1/16), dtype='int16')
+            plus = cv2.add(self.roi_a, self.roi_b)*16
+            minus = cv2.subtract(self.roi_a, self.roi_b)*16
+
+            update_histogram(histograms_alg, lines_alg, "plus", 4096, plus)
+            update_histogram(histograms_alg, lines_alg, "minus", 4096, minus)
+
+            figs_alg["plus"].canvas.draw()  # Draw updates subplots in interactive mode
+            figs_alg["minus"].canvas.draw()  # Draw updates subplots in interactive mode
+            hist_img_plus = np.fromstring(figs_alg["plus"].canvas.tostring_rgb(), dtype=np.uint8, sep='')
+            hist_img_minus = np.fromstring(figs_alg["minus"].canvas.tostring_rgb(), dtype=np.uint8, sep='')  # convert  to image
+            hist_img_plus = hist_img_plus.reshape(figs_alg["plus"].canvas.get_width_height()[::-1] + (3,))
+            hist_img_minus = hist_img_minus.reshape(figs_alg["minus"].canvas.get_width_height()[::-1] + (3,))
+            hist_img_plus = cv2.resize(hist_img_plus, (w, h), interpolation=cv2.INTER_AREA)
+            hist_img_minus = cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA)
+            hist_img_plus = bdc.to_16_bit(cv2.resize(hist_img_plus, (w, h), interpolation=cv2.INTER_AREA), 8)
+            hist_img_minus = bdc.to_16_bit(cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA), 8)
+            PLUS_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_plus, cv2.COLOR_RGB2BGR), cv2.cvtColor(plus, cv2.COLOR_GRAY2BGR)), axis=1)
+            MINUS_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_minus, cv2.COLOR_RGB2BGR), cv2.cvtColor(minus, cv2.COLOR_GRAY2BGR)), axis=1)
+
+            """
+            """
+
+            ALGEBRA = np.concatenate((PLUS_WITH_HISTOGRAM, MINUS_WITH_HISTOGRAM), axis=0)
+            cv2.imshow("ALGEBRA", ALGEBRA)
+
+            #cv2.imshow("A PLUS B PRIME", PLUS_WITH_HISTOGRAM)
+            #cv2.imshow("A MINUS B PRIME", MINUS_WITH_HISTOGRAM)
+
+            #cv2.imshow("ROI B Prime", ROI_B_WITH_HISTOGRAM)
+
+            #cv2.imshow("Add", cv2.add(self.roi_a, self.roi_b)*16)
+            #cv2.imshow("Subtract", cv2.subtract(self.roi_a, self.roi_b)*16)
+
+            #print("Shape ROI A: {}".format(self.roi_a.shape))
+            #print("Shape ROI B': {}\n\n".format(self.roi_b.shape))
+
+
+            #print("Shape Hist Image A: {}".format(hist_img_a.shape))
+            #print("Shape Hist Image B: {}".format(hist_img_b.shape))
+
+
+            #hist_img_a = cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR)  # img is rgb, convert to opencv's default bgr
+            #hist_img_b = cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR)  # img is rgb, convert to opencv's default bgr
+
+
+
+            #cv2.imshow("Hist Cam A", hist_img_a)
+            #cv2.imshow("Hist Cam B", hist_img_b)
+
+            #print("hist_img_a\n", hist_img_a)
+
+            #print("hist_img_b\n", hist_img_b)
 
             continue_stream = self.keep_streaming()
 
-            #continue_stream = False
-
-
-
-
-            #cv2.imshow("CV2_Plus", cv2plus)
-
-            #shape = npplus.shape
-            #height = shape[0]
-            #width = shape[1]
-
-            #data = np.random.random((size, size))
-            #ax.imshow(npplus)
-
-
-            #fig.canvas.draw()
-
-
-
-            """
-            
-                        img_a = np.asarray(self.roi_a, dtype='uint16')
-            img_b_prime = np.asarray(self.roi_b, dtype='uint16')
-
-            print("In Image A: Range of pixel intensity is {} to {}".format(np.min(img_a) / 16, np.max(img_a) / 16))
-            print("In Image B': Range of pixel intensity is {} to {}".format(np.min(img_b_prime) / 16,
-                                                                             np.max(img_b_prime) / 16))
-
-            added = ia.add_imgs(img_a / 16, img_b_prime / 16)
-            subtracted = np.add(img_a / 16, (-1) * (img_b_prime * (1 / 16)))
-
-            print("In A + B': Range of pixel intensity is {} to {}".format(np.min(added), np.max(added)))
-            print("In A - B': Range of pixel intensity is {} to {}".format(np.min(subtracted), np.max(subtracted)))
-
-            # print("In Image B': Range of pixel intensity is {} to {}".format(np.min(img_b_prime)/16, np.max(img_b_prime)/16))
-
-            # added = ia.add_imgs(img_a, img_b_prime)
-            # subtracted = ia.subtract_imgs(img_a, img_b_prime)
-
-            zeroes = np.zeros((added.shape[0], added.shape[1], 3), 'uint16')
-
-            # cv2.imshow("temp", temp)
-            # cv2.waitKey(10000)
-
-            # print(temp)
-
-            added_bgr_array = np.add(zeroes.copy(), sixteen_bit_max).copy()
-            added_bgr_array[:, :, 2] = func(added)[2]
-            added_bgr_array[:, :, 1] = func(added)[1]
-            added_bgr_array[:, :, 0] = func(added)[0]
-
-            subtracted_bgr_array = np.add(zeroes.copy(), sixteen_bit_max).copy()
-            subtracted_bgr_array[:, :, 2] = func(subtracted)[2]
-            subtracted_bgr_array[:, :, 1] = func(subtracted)[1]
-            subtracted_bgr_array[:, :, 0] = func(subtracted)[0]
-
-            # print(bgr_array)
-            # print(np.max(temp))
-
-            cv2.imshow("added", added_bgr_array)
-            cv2.waitKey(10000)
-
-            cv2.imshow("subtracted", subtracted_bgr_array)
-            cv2.waitKey(10000)            
-            """
-
-
-
-            #plt.ion()
-
-
-
-
-            #plt.draw()
-            #print("Showing again")
-            #plt.show()
-
-            #roi_a_16bit = bdc.to_16_bit(self.roi_a)
-            #cv2.imshow("ROI A", roi_a_16bit)
-
-            #roi_b_16bit = bdc.to_16_bit(self.roi_b)
-            #cv2.imshow("ROI B", roi_b_16bit)
-            #continue_stream = self.keep_streaming()
-
-
-        #cv2.destroyAllWindows()
-        plt.close('all')
-        #print("Linelouts")
-        #print("plus: len of ", len(add_lineout_horizontal))
-        #print(add_lineout_horizontal)
-        #print("minus: len of ", len(sub_lineout_horizontal))
-        #print(sub_lineout_horizontal)
-
         self.all_cams.StopGrabbing()
-

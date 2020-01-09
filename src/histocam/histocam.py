@@ -6,9 +6,6 @@ import cv2
 
 class Histocam():
     """This class is the histogram that goes with the camera streams or Image Algebra streams"""
-    #plt.ion()
-    #plt.close('all')
-    #plt.ioff()
     def __init__(self):
         self.num_bins = 4096
         self.bins = np.arange(self.num_bins)
@@ -83,8 +80,6 @@ class Histocam():
                 "stdev %.4f" % greyscale_stdev,),
             loc="upper right"
         )
-
-        #print(histogram_maximum)
         if histogram_maximum > 0.001:
             self.subplot.set_ylim(bottom=0.000000, top=histogram_maximum * self.threshold)
         else:

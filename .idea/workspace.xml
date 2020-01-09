@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/image_processing/img_algebra.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/histocam/histocam.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/histocam/histocam.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/stream_cameras_and_histograms.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_cameras_and_histograms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tests/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -324,28 +324,7 @@
       <workItem from="1578170379674" duration="11329000" />
       <workItem from="1578256963104" duration="14998000" />
       <workItem from="1578447872877" duration="10350000" />
-      <workItem from="1578533798811" duration="1359000" />
-    </task>
-    <task id="LOCAL-00014" summary="use main">
-      <created>1572058102176</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1572058102176</updated>
-    </task>
-    <task id="LOCAL-00015" summary="use main">
-      <created>1572134439433</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1572134439433</updated>
-    </task>
-    <task id="LOCAL-00016" summary="saving video successfully">
-      <created>1572827234755</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1572827234755</updated>
+      <workItem from="1578533798811" duration="8526000" />
     </task>
     <task id="LOCAL-00017" summary="saving video successfully b">
       <created>1572827342897</created>
@@ -669,7 +648,28 @@
       <option name="project" value="LOCAL" />
       <updated>1578458430158</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="livestreaming algebra (bw good enough for now)">
+      <created>1578536454281</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1578536454281</updated>
+    </task>
+    <task id="LOCAL-00064" summary="livestreaming algebra (bw good enough for now)">
+      <created>1578536492418</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1578536492418</updated>
+    </task>
+    <task id="LOCAL-00065" summary="livestreaming algebra (bw good enough for now)">
+      <created>1578536504693</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1578536504693</updated>
+    </task>
+    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -721,21 +721,21 @@
     <option name="LAST_COMMIT_MESSAGE" value="livestreaming algebra (bw good enough for now)" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1578536491583">
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1578536503943">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1578536491583" />
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1578536503943" />
     <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578275054515" />
     <state x="1042" y="526" key="SettingsEditor" timestamp="1577758445066">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1042" y="526" key="SettingsEditor/0.0.2560.1560@0.0.2560.1560" timestamp="1577758445066" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1578536494628">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1578536506005">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1578536494628" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1578536506005" />
     <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578275056585" />
     <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1578447876037">
       <screen x="0" y="0" width="2560" height="1560" />
