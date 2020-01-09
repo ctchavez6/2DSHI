@@ -6,7 +6,12 @@ from histocam import histocam
 from coregistration import img_characterization as ic
 from coregistration import find_gaussian_profile as fgp
 import numpy as np
+import matplotlib.pyplot as plt
+import sys
+from image_processing import img_algebra as ia
 
+EPSILON = sys.float_info.epsilon  # Smallest possible difference
+sixteen_bit_max = (2 ** 16) - 1
 
 
 def add_histogram_representations(figure_a, figure_b, raw_array_a, raw_array_b):
@@ -39,6 +44,30 @@ def add_histogram_representations(figure_a, figure_b, raw_array_a, raw_array_b):
     img_b_8bit_resized = cv2.cvtColor((stack.resize_img(img_b_8bit_gray, hist_width, hist_height)), cv2.COLOR_GRAY2BGR)
 
     return np.vstack((np.hstack((hist_img_a, img_a_8bit_resized)), np.hstack((hist_img_b, img_b_8bit_resized))))
+
+
+def convert_to_rgb_all(val):
+    minval, maxval = -2*((2**12) - 1), 2*((2**12) - 1)
+    colors = [(sixteen_bit_max, 0, 0), (sixteen_bit_max, sixteen_bit_max, sixteen_bit_max), (0, 0, sixteen_bit_max)]  # [Blue, WHITE, RED]
+
+    # "colors" is a series of RGB colors delineating a series of
+    # adjacent linear color gradients between each pair.
+    # Determine where the given value falls proportionality within
+    # the range from minval->maxval and scale that fractional value
+    # by the total number in the "colors" pallette.
+    i_f = float(val-minval) / float(maxval-minval) * (len(colors)-1)
+    # Determine the lower index of the pair of color indices this
+    # value corresponds and its fractional distance between the lower
+    # and the upper colors.
+    i, f = int(i_f // 1), i_f % 1  # Split into whole & fractional parts.
+    # Does it fall exactly on one of the color points?
+    if f < EPSILON:
+        return colors[i]
+    else:  # Otherwise return a color within the range between them.
+        (r1, g1, b1), (r2, g2, b2) = colors[i], colors[i+1]
+        return int(r1 + f*(r2-r1)), int(g1 + f*(g2-g1)), int(b1 + f*(b2-b1))
+
+func = np.vectorize(convert_to_rgb_all)
 
 
 class Stream:
@@ -505,6 +534,8 @@ class Stream:
 
         cv2.destroyAllWindows()
 
+        add_lineout_horizontal = None
+        sub_lineout_horizontal = None
 
         close_in = input("Step 6 - Close in on ROI: Proceed? (y/n): ")
 
@@ -520,124 +551,209 @@ class Stream:
             x_a, y_a = self.static_center_a
             x_b, y_b = self.static_center_b
 
+            n_sigma = 3
+
             self.roi_a = self.current_frame_a[
-                         y_a - 4 * self.static_sigmas_y: y_a + 4 * self.static_sigmas_y + 1,
-                         x_a - 4*self.static_sigmas_x: x_a + 4*self.static_sigmas_x + 1
+                         y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + 1,
+                         x_a - n_sigma*self.static_sigmas_x: x_a + n_sigma*self.static_sigmas_x + 1
                          ]
 
             self.roi_b = self.current_frame_b[
-                         y_b - 4 * self.static_sigmas_y: y_b + 4 * self.static_sigmas_y + 1,
-                         x_b - 4*self.static_sigmas_x: x_b + 4*self.static_sigmas_x + 1
+                         y_b - n_sigma * self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + 1,
+                         x_b - n_sigma*self.static_sigmas_x: x_b + n_sigma*self.static_sigmas_x + 1
                          ]
 
 
             roi_a_16bit = bdc.to_16_bit(self.roi_a)
+            roi_b_16bit = bdc.to_16_bit(self.roi_b)
+
             cv2.imshow("ROI A", roi_a_16bit)
 
-            roi_b_16bit = bdc.to_16_bit(self.roi_b)
             cv2.imshow("ROI B", roi_b_16bit)
             continue_stream = self.keep_streaming()
 
-
-        """
-        if close_in.lower() == "y":
-
-
-            continue_stream = True
-            print("\nClosing in on ROI.")
-            print("Stream A:")
-            print("\tCenter: {}".format(self.static_center_a))
-            x_a, y_a = self.static_center_a
-            print("\tX will go from {} to {}".format(x_a - 4*self.static_sigmas_x, x_a + 4*self.static_sigmas_x))
-            print("\tY will go from {} to {}".format(y_a - 4*self.static_sigmas_x, y_a + 4*self.static_sigmas_x))
-
-
-            print("Stream B Prime:")
-            print("\tCenter: {}".format(self.static_center_b))
-            x_b, y_b = self.static_center_b
-            print("\tX will go from {} to {}".format(x_b - 4 * self.static_sigmas_x, x_b + 4 * self.static_sigmas_x))
-            print("\tY will go from {} to {}".format(y_b - 4 * self.static_sigmas_y, y_b + 4 * self.static_sigmas_y))
-
-            print("Most Recent Frame")
-            self.roi_a = self.current_frame_a[
-                         y_a - 4 * self.static_sigmas_y: y_a + 4 * self.static_sigmas_y + 1,
-                         x_a - 4*self.static_sigmas_x: x_a + 4*self.static_sigmas_x + 1
-                         ]
-
-            self.roi_b = self.current_frame_b[
-                         y_b - 4 * self.static_sigmas_y: y_b + 4 * self.static_sigmas_y + 1,
-                         x_b - 4*self.static_sigmas_x: x_b + 4*self.static_sigmas_x + 1
-                         ]
-
-
-            print("MOMENT OF TRUTH")
-            print("Shape of ROI A : {}".format(self.roi_a.shape))
-            print("Shape of ROI B': {}".format(self.roi_b.shape))
-
-                        #self.current_frame_a[
-                         #x_a - 4*self.static_sigmas_x: x_a + 4*self.static_sigmas_x + 1,
-                         #y_a - 4 * self.static_sigmas_x, y_a + 4 * self.static_sigmas_x
-                         #]
-
-            roi_a_16bit = bdc.to_16_bit(self.roi_a)
-            cv2.imshow("ROI A", roi_a_16bit)
-            cv2.waitKey(10000)
-
-            roi_b_16bit = bdc.to_16_bit(self.roi_b)
-            cv2.imshow("ROI B", roi_b_16bit)
-            cv2.waitKey(10000)
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-            self.frame_count += 1
-            self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=warp_)
-
-            x_a, y_a = self.static_center_a
-
-
-
-            x_b, y_b = self.static_center_b
-
-            self.roi_a = self.current_frame_a[
-                         y_a - 4 * self.static_sigmas_y: y_a + 4 * self.static_sigmas_y + 1,
-                         x_a - 4*self.static_sigmas_x: x_a + 4*self.static_sigmas_x + 1
-                         ]
-
-            self.roi_b = self.current_frame_b[
-                         y_b - 4 * self.static_sigmas_y: y_b + 4 * self.static_sigmas_y + 1,
-                         x_b - 4*self.static_sigmas_x: x_b + 4*self.static_sigmas_x + 1
-                         ]
-
-
-            roi_a_16bit = bdc.to_16_bit(self.roi_a)
-            cv2.imshow("ROI A", roi_a_16bit)
-            #cv2.waitKey(10000)
-
-            roi_b_16bit = bdc.to_16_bit(self.roi_b)
-            cv2.imshow("ROI B", roi_b_16bit)
-            #cv2.waitKey(10000)
-
-
-        """
-
+        #roi_a_16_lineout = np.asarray(self.roi_a[int(self.roi_a.shape[0] * 0.5), :] * (1 / 16), dtype='int16')
+        #roi_b_16_lineout = np.asarray(self.roi_b[int(self.roi_b.shape[0] * 0.5), :] * (1 / 16), dtype='int16')
+        #print("Plus")
+        #print(roi_a_16_lineout + roi_b_16_lineout)
+        #print("Minus")
+        #print(roi_a_16_lineout - roi_b_16_lineout)
 
 
         cv2.destroyAllWindows()
 
+        #self.all_cams.StopGrabbing()
+        #sys.exit()
 
+        start_algebra = input("Step 7 - Commence Image Algebra: Proceed? (y/n): ")
+
+        fig, ax = plt.subplots(figsize=(12, 12))
+        add_lineout_horizontal = None
+        sub_lineout_horizontal = None
+        if start_algebra.lower() == "y":
+            continue_stream = True
+            #plt.figure()
+
+            #npplus = bdc.to_16_bit(np.add(self.roi_a, self.roi_b))
+
+            #ax.imshow(npplus)
+            #plt.ion()  # Turn the interactive mode on.
+            #plt.show()
+
+
+        elif start_algebra.lower() == "n":
+            continue_stream = False
+
+        while continue_stream:
+
+            self.frame_count += 1
+            self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=warp_)
+
+            x_a, y_a = self.static_center_a
+            x_b, y_b = self.static_center_b
+
+            n_sigma = 3
+
+            self.roi_a = self.current_frame_a[
+                         y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + 1,
+                         x_a - n_sigma*self.static_sigmas_x: x_a + n_sigma*self.static_sigmas_x + 1
+                         ]
+
+            self.roi_b = self.current_frame_b[
+                         y_b - n_sigma* self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + 1,
+                         x_b - n_sigma*self.static_sigmas_x: x_b + n_sigma*self.static_sigmas_x + 1
+                         ]
+
+
+
+
+            #print("In Image A: Range of pixel intensity is {} to {}".format(np.min(self.roi_a), np.max(self.roi_a)))
+            #print("In Image B': Range of pixel intensity is {} to {}".format(np.min(self.roi_b),
+                                                                             #np.max(self.roi_b)))
+
+            #npplus = bdc.to_16_bit(np.add(self.roi_a, self.roi_b))
+            #cv2plus = cv2.add(bdc.to_16_bit(self.roi_a), bdc.to_16_bit(self.roi_b))
+            #print("Max np_plus: {}".format(np.max(npplus.flatten())))
+            #print("Max cv2_plus: {}".format(np.max(cv2plus.flatten())))
+            #minus = np.add(bdc.to_16_bit(self.roi_a), bdc.to_16_bit(self.roi_b) * (-1))
+            roi_a_16bit = bdc.to_16_bit(self.roi_a)
+            roi_b_16bit = bdc.to_16_bit(self.roi_b)
+            plus = cv2.add(self.roi_a, self.roi_b)
+            minus = cv2.subtract(self.roi_a, self.roi_b)
+
+            #print("First 50 values of bottom row\n")
+            #print(minus[-1, 0:50])
+            #print("Last 50 values of bottom row\n")
+            #print(minus[-1, -50:])
+
+            plus = plus*16
+            minus = minus*16
+
+
+            cv2.imshow("Add", plus)
+            cv2.imshow("Subtract", minus)
+            #continue_stream = self.keep_streaming()
+
+            #print(plus.shape)
+            #print(minus.shape)
+            #add_lineout_horizontal = np.asarray(plus[int(plus.shape[0]*0.5), :] * (1/16), dtype='int16')
+
+            #sub_lineout_horizontal = np.asarray(minus[int(minus.shape[0]*0.5), :] * (1/16), dtype='int16')
+
+            continue_stream = self.keep_streaming()
+
+            #continue_stream = False
+
+
+
+
+            #cv2.imshow("CV2_Plus", cv2plus)
+
+            #shape = npplus.shape
+            #height = shape[0]
+            #width = shape[1]
+
+            #data = np.random.random((size, size))
+            #ax.imshow(npplus)
+
+
+            #fig.canvas.draw()
+
+
+
+            """
+            
+                        img_a = np.asarray(self.roi_a, dtype='uint16')
+            img_b_prime = np.asarray(self.roi_b, dtype='uint16')
+
+            print("In Image A: Range of pixel intensity is {} to {}".format(np.min(img_a) / 16, np.max(img_a) / 16))
+            print("In Image B': Range of pixel intensity is {} to {}".format(np.min(img_b_prime) / 16,
+                                                                             np.max(img_b_prime) / 16))
+
+            added = ia.add_imgs(img_a / 16, img_b_prime / 16)
+            subtracted = np.add(img_a / 16, (-1) * (img_b_prime * (1 / 16)))
+
+            print("In A + B': Range of pixel intensity is {} to {}".format(np.min(added), np.max(added)))
+            print("In A - B': Range of pixel intensity is {} to {}".format(np.min(subtracted), np.max(subtracted)))
+
+            # print("In Image B': Range of pixel intensity is {} to {}".format(np.min(img_b_prime)/16, np.max(img_b_prime)/16))
+
+            # added = ia.add_imgs(img_a, img_b_prime)
+            # subtracted = ia.subtract_imgs(img_a, img_b_prime)
+
+            zeroes = np.zeros((added.shape[0], added.shape[1], 3), 'uint16')
+
+            # cv2.imshow("temp", temp)
+            # cv2.waitKey(10000)
+
+            # print(temp)
+
+            added_bgr_array = np.add(zeroes.copy(), sixteen_bit_max).copy()
+            added_bgr_array[:, :, 2] = func(added)[2]
+            added_bgr_array[:, :, 1] = func(added)[1]
+            added_bgr_array[:, :, 0] = func(added)[0]
+
+            subtracted_bgr_array = np.add(zeroes.copy(), sixteen_bit_max).copy()
+            subtracted_bgr_array[:, :, 2] = func(subtracted)[2]
+            subtracted_bgr_array[:, :, 1] = func(subtracted)[1]
+            subtracted_bgr_array[:, :, 0] = func(subtracted)[0]
+
+            # print(bgr_array)
+            # print(np.max(temp))
+
+            cv2.imshow("added", added_bgr_array)
+            cv2.waitKey(10000)
+
+            cv2.imshow("subtracted", subtracted_bgr_array)
+            cv2.waitKey(10000)            
+            """
+
+
+
+            #plt.ion()
+
+
+
+
+            #plt.draw()
+            #print("Showing again")
+            #plt.show()
+
+            #roi_a_16bit = bdc.to_16_bit(self.roi_a)
+            #cv2.imshow("ROI A", roi_a_16bit)
+
+            #roi_b_16bit = bdc.to_16_bit(self.roi_b)
+            #cv2.imshow("ROI B", roi_b_16bit)
+            #continue_stream = self.keep_streaming()
+
+
+        #cv2.destroyAllWindows()
+        plt.close('all')
+        #print("Linelouts")
+        #print("plus: len of ", len(add_lineout_horizontal))
+        #print(add_lineout_horizontal)
+        #print("minus: len of ", len(sub_lineout_horizontal))
+        #print(sub_lineout_horizontal)
 
         self.all_cams.StopGrabbing()
 
