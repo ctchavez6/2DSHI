@@ -499,7 +499,6 @@ def stream_cam_to_histograms(cams_dict, figures, histograms_dict, lines, frame_b
 
     if save_imgs or save_vids:
         camera_a_frames_directory, camera_b_frames_directory, cams_by_hists_direc, videos_directory = clear_prev_run()
-
         if save_imgs:
             for a, b in zip(raw_cam_a_frames, raw_cam_b_frames):
                 camera_a_frames_as_16bit.append(convert_to_16_bit(a, original_bit_depth=12))

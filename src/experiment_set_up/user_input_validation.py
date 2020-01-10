@@ -1,6 +1,5 @@
 import sys
 
-from . import request_experiment_parameters
 from . import write_experimental_params_to_file
 from . import get_command_line_parameters
 from . import find_previous_run

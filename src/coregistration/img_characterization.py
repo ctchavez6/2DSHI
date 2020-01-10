@@ -12,7 +12,27 @@ def characterize_img(img, orb_detector, mask=None):
 def draw_keypoints(img, keypoints, color=(0, 255, 0)):
     return cv2.drawKeypoints(img, keypoints, color=color, flags=0, outImage=np.array([]))
 
-def find_matches(img1, img2, matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True), threshold=90):
+def get_euclidean_transform_matrix(gray1, gray2):
+    n_iters = 1000
+    e_thresh = 1e-6
+    criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, n_iters, e_thresh)
+
+    #gray1 = cv2.cvtColor(gray1, cv2.COLOR_BGR2GRAY)
+    #gray2 = cv2.cvtColor(gray2, cv2.COLOR_BGR2GRAY)
+
+    # Define the motion model: can be TRANSLATION OR AFFINE OR HOMOGRAPHY
+    warp_mode = cv2.MOTION_EUCLIDEAN
+
+    init_warp = np.array([[1, 0, 0], [0, 1, 0]], dtype=np.float32)
+    cc, warp = cv2.findTransformECC(gray1, gray2, init_warp, warp_mode, criteria, inputMask=None, gaussFiltSize=3)
+
+    return warp
+
+
+
+
+
+def find_matches(img1, img2, matcher=cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True), threshold=90):
     orb_ = initialize_orb_detector()
 
     kp1, d1 = characterize_img(img1, orb_)
@@ -94,7 +114,7 @@ def derive_homography(img_a_8bit, img_b_8bit, supress_shear=False):
 
     # Find the homography matrix.
     homography, mask = cv2.findHomography(p1, p2, cv2.RANSAC)
-
+    transform_matrix, mask = cv2.findTransformECC()
     homography_components = get_homography_components(homography)
     translation = homography_components[0]
     angle = homography_components[1]

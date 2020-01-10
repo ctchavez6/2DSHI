@@ -30,7 +30,7 @@ def gaussian_distribution(x, mu, sigma, coefficient):
 # Create a function which returns a Gaussian (normal) distribution.
 def gauss(x, *p):
     a, b, c, d = p
-    y = a*np.exp(-np.power((x - b), 2.)/(2. * c**2.)) + d
+    y = a*np.exp(-np.power((x - b), 2.)/(2. * c**2.)) # + d
     return y
 
 def read_image_from_file(image_path, file_bit_depth=16, original_bit_depth=12):
@@ -135,7 +135,7 @@ def plot_horizonal_lineout_intensity(image, coordinates):
     Returns:
         (np.ndarray, np.ndarray): A tuple equal to (indices, intensity values). Both components as a np.ndarray
     """
-    print("Inside Function plot_horizonal_lineout_intensity(image, coordinates)")
+    #print("Inside Function plot_horizonal_lineout_intensity(image, coordinates)")
 
     fig = plt.figure()
     y_max, x_max = coordinates
@@ -250,9 +250,9 @@ def get_noise_boundaries(image, coordinates_of_maxima, upper_limit_noise=10):
     ax.axhline(first_j_above_uln, color='y', linestyle='dashed', linewidth=1)
     ax.axhline(last_j_above_uln, color='y', linestyle='dashed', linewidth=1)
 
-    ax.imshow(image)
-    fig_a.savefig("Image With NoiseSubtracted ROI Boxed.png")
-    plt.close('all')
+    #ax.imshow(image)
+    #fig_a.savefig("Image With NoiseSubtracted ROI Boxed.png")
+    #plt.close('all')
     return first_i_above_uln, last_i_above_uln, first_j_above_uln, last_j_above_uln
 
 
@@ -260,22 +260,107 @@ def get_gaus_boundaries_x(image, coords_of_max):
     #fig = plt.figure()
     #xm, ym = coords_of_max
     ym, xm = coords_of_max
-    lineout = np.array(np.asarray(image[xm:xm+1, :])[0])
+    #print("Inside get_gaus_boundaries_x(image, coords_of_max):")
+    #print("coords_of_max = {}".format(coords_of_max))
+    lineout = np.array(np.asarray(image[int(xm):int(xm)+1, :])[0])
     indices = np.arange(0, len(lineout))
     #print("Maximum has a value of image[xm, ym], which is: ", image[xm, ym])
 
-    p_initial = [image[xm, ym]*1.0, 960.00, 5.0, 0.0]
+    p_initial = [image[int(xm), int(ym)]*1.0, 960.00, 5.0, 0.0]
 
     popt, pcov = curve_fit(gauss, indices, lineout, p0=p_initial)
 
     amp, mu, sigma = popt[0], popt[1], popt[2]
     offset = popt[3]
+
+
+    """
     #print("mu: ", mu)
     #print("sigma: ", sigma)
     #print("amp: ", amp)
     #print("offset: ", offset)
 
     #print("xs: ", xs)
+
+    y_fit = gauss(indices, *popt)
+
+    # Create a plot of our work, showing both the data and the fit.
+    #fig, ax = plt.subplots()
+
+    # ax.errorbar(x, y, e)
+    #ax.plot(indices, lineout, label='data')
+    #ax.plot(indices, y_fit, color='red', label='fit')
+    ax.axvline(x=mu)
+    ax.axvline(x=mu - sigma)
+    ax.axvline(x=mu + sigma)
+
+    ax.axvline(x=mu - 4 * sigma, c='g')
+    ax.axvline(x=mu + 4 * sigma, c='g')
+
+    ax.axhline(y=amp + offset)
+
+    # print(popt)
+    ax.legend()
+    ax.set_xlabel(r'$x$')
+    ax.set_ylabel(r'$f(x)$')
+    ax.set_title('Horizontal')
+
+    plt.show()
+    plt.close('all')
+
+    print("Lineout max - ", np.max(lineout))
+    # print("ys: ", ys)
+    print("indices:\n\t", indices)
+    print("ys:\n\t", lineout)
+    # for a in ys:
+    # print(a)
+    m = modeling.models.Gaussian1D(amplitude=10, mean=30, stddev=5)
+
+    # popt, pcov = curve_fit(gaussian_distribution, indices, lineout)
+
+    # mu, sigma, amp = popt[0], popt[1], popt[2]
+    plt.axvline(mu + (1 * sigma), color='b', linestyle='dashed', linewidth=1, label="1sigma")
+    plt.axvline(mu - (1 * sigma), color='b', linestyle='dashed', linewidth=1)
+    plt.axvline(mu + (2 * sigma), color='r', linestyle='dashed', linewidth=1, label="2sigma")
+    plt.axvline(mu - (2 * sigma), color='r', linestyle='dashed', linewidth=1)
+    plt.axvline(mu + (3 * sigma), color='g', linestyle='dashed', linewidth=1, label="3sigma")
+    plt.axvline(mu - (3 * sigma), color='g', linestyle='dashed', linewidth=1)
+    plt.axvline(mu + (4 * sigma), color='gray', linestyle='dashed', linewidth=1, label="4sigma")
+    plt.axvline(mu - (4 * sigma), color='gray', linestyle='dashed', linewidth=1)
+
+    # y_model_output = gaussian_distribution(indices, *popt)
+    # y_model_output = gaussian_distribution(indices, *popt)
+    y_model_output = indices
+
+    plt.plot(indices, lineout, label='Data')
+    plt.plot(indices, y_fit, label='Model')
+    plt.title("Scipy Optimize Fit")
+    plt.legend()
+    plt.show()
+    """
+
+    return int(mu), int(sigma), int(amp)
+
+
+
+def get_gaus_boundaries_y(image, coords_of_max):
+
+    image = np.array(image)
+
+    ym, xm = coords_of_max
+
+    p_initial = [image[xm, ym]*1.0, 600.00, 5.0, 0.0]
+
+    ys = np.array(image[:, ym:ym+1].flatten())  # Vertical Line Out
+
+    lineout = ys
+
+    indices = np.arange(0, len(lineout)) # 0 to 1199
+
+    popt, pcov = curve_fit(gauss, indices, lineout, p0=p_initial)
+
+    amp, mu, sigma, offset = popt[0], popt[1], popt[2], popt[3]
+
 
 
 
@@ -297,112 +382,17 @@ def get_gaus_boundaries_x(image, coords_of_max):
 
     ax.axhline(y=amp + offset)
 
-    #print(popt)
+    print(popt)
     ax.legend()
     ax.set_xlabel(r'$x$')
     ax.set_ylabel(r'$f(x)$')
-    ax.set_title('Horizontal')
+    ax.set_title('Vertical')
 
     plt.show()
-    plt.close('all')    
-
-    print("Lineout max - ", np.max(lineout))
-    #print("ys: ", ys)
-    print("indices:\n\t", indices)
-    print("ys:\n\t", lineout)
-    #for a in ys:
-        #print(a)
-    m = modeling.models.Gaussian1D(amplitude=10, mean=30, stddev=5)
-
-    #popt, pcov = curve_fit(gaussian_distribution, indices, lineout)
-
-    #mu, sigma, amp = popt[0], popt[1], popt[2]
-    plt.axvline(mu + (1 * sigma), color='b', linestyle='dashed', linewidth=1, label="1sigma")
-    plt.axvline(mu - (1 * sigma), color='b', linestyle='dashed', linewidth=1)
-    plt.axvline(mu + (2 * sigma), color='r', linestyle='dashed', linewidth=1, label="2sigma")
-    plt.axvline(mu - (2 * sigma), color='r', linestyle='dashed', linewidth=1)
-    plt.axvline(mu + (3 * sigma), color='g', linestyle='dashed', linewidth=1, label="3sigma")
-    plt.axvline(mu - (3 * sigma), color='g', linestyle='dashed', linewidth=1)
-    plt.axvline(mu + (4 * sigma), color='gray', linestyle='dashed', linewidth=1, label="4sigma")
-    plt.axvline(mu - (4 * sigma), color='gray', linestyle='dashed', linewidth=1)
-
-    #y_model_output = gaussian_distribution(indices, *popt)
-    #y_model_output = gaussian_distribution(indices, *popt)
-    y_model_output = indices
-
-    plt.plot(indices, lineout, label='Data')
-    plt.plot(indices, indices, label='Model')
-    plt.title("Scipy Optimize Fit")
-    plt.legend()
-    plt.show()
-        
-    """
-#fig.savefig("ScipyOptimizeCurveFit_X-coregistration-cam_b_frame_186.png")
-
-    #plt.close('all')
-    return mu, sigma, amp
-
-
-
-def get_gaus_boundaries_y(image, coords_of_max):
-
-
-    image = np.array(image)
-    xs = np.arange(0, image.shape[1])
-
-
-
-    #print("coords of max")
-    #print(coords_of_max)
-    ym, xm = coords_of_max
-    p_initial = [image[xm, ym]*1.0, 600.00, 5.0, 0.0]
-
-    ys = np.array(image[:, ym:ym+1].flatten())  # Vertical Line Out
-    lineout = ys
-    indices = np.arange(0, len(lineout))
-
-    #print("indices len ", len(indices))
-    #print("Lineout len ", len(lineout))
-    popt, pcov = curve_fit(gauss, indices, lineout, p0=p_initial)
-
-    amp, mu, sigma = popt[0], popt[1], popt[2]
-    offset = popt[3]
-    #print("mu: ", mu)
-    #print("sigma: ", sigma)
-    #print("amp: ", amp)
-    #print("offset: ", offset)
-
-    #print("xs: ", xs)
-
-    #y_fit = gauss(indices, *popt)
-
-    # Create a plot of our work, showing both the data and the fit.
-    #fig, ax = plt.subplots()
-
-    #ax.errorbar(x, y, e)
-    #ax.plot(indices, lineout, label='data')
-    #ax.plot(indices, y_fit, color='red', label='fit')
-    #ax.axvline(x=mu)
-    #ax.axvline(x=mu - sigma)
-    #ax.axvline(x=mu + sigma)
-
-    #ax.axvline(x=mu - 4*sigma, c='g')
-    #ax.axvline(x=mu + 4*sigma, c='g')
-
-    #ax.axhline(y=amp + offset)
-
-    #print(popt)
-    #ax.legend()
-    #ax.set_xlabel(r'$x$')
-    #ax.set_ylabel(r'$f(x)$')
-    #ax.set_title('Vertical')
-
-    #plt.show()
-    #plt.close('all')
-
-
-    """
+    plt.close('all')
     
+    
+        
     #print(ys)
     #print("ys: ", ys)
 

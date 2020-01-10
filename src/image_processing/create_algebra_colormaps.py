@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import path_management.directory_management as dirs
-import path_management.image_management as img_tools
+import src.path_management.directory_management as dirs
+import src.path_management.image_management as img_tools
 import cv2
 import os
 
-
+"""
 run = "2019_12_14__13_08"
 
 img_a_path = dirs.get_latest_run()
@@ -25,6 +25,13 @@ subtracted = np.subtract(img_a_12_bit, img_b_prime_12_bit)
 added = np.add(img_a_12_bit, img_b_prime_12_bit)
 
 
+create_colormap("A_Minus_B_Prime_Colormap.png", algebra_directory, subtracted)
+create_colormap("A_Plus_B_Prime_Colormap.png", algebra_directory, added)
+
+"""
+
+
+
 def create_colormap(file_name, save_directory, array):
     save_path = os.path.join(save_directory, file_name)
     fig = plt.figure()
@@ -39,6 +46,17 @@ def create_colormap(file_name, save_directory, array):
     fig.savefig(save_path)
 
 
+def create_colormap2(array):
+    #save_path = os.path.join(save_directory, file_name)
+    fig = plt.figure()
+    imgplot = plt.imshow(array)
+    imgplot.set_cmap('bwr')
 
-create_colormap("A_Minus_B_Prime_Colormap.png", algebra_directory, subtracted)
-create_colormap("A_Plus_B_Prime_Colormap.png", algebra_directory, added)
+    for im in plt.gca().get_images():
+        im.set_clim(-4095 * 2, 4095 * 2)
+
+    plt.colorbar()
+    plt.show()
+    #fig.savefig(save_path)
+
+
