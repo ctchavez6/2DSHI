@@ -8,6 +8,7 @@ from coregistration import find_gaussian_profile as fgp
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import numba
 from image_processing import img_algebra as ia
 
 EPSILON = sys.float_info.epsilon  # Smallest possible difference
@@ -15,6 +16,14 @@ sixteen_bit_max = (2 ** 16) - 1
 
 #plt.ion()  # Turn the interactive mode on.
 
+
+@numba.njit
+def hist1d(v, b, r):
+    return np.histogram(v, b, r)[0]
+
+@numba.njit
+def hist1d_test(v, b, r):
+    return np.histogram(v, b, r)
 
 def set_xvalues(polygon, x0, x1):
     """
@@ -185,7 +194,6 @@ def initialize_histograms_algebra(line_width=3):
 
     for camera_identifier in ["plus", "minus"]:
         #camera_identifier = chr(97 + i)
-        stream_subplots[camera_identifier].set_title('Camera ' + camera_identifier.capitalize())
         stream_subplots[camera_identifier].set_xlabel('Bin')
         stream_subplots[camera_identifier].set_ylabel('Frequency')
 
@@ -220,10 +228,20 @@ def initialize_histograms_algebra(line_width=3):
         lines["avg-sigma"][camera_identifier] = stream_subplots[camera_identifier] \
             .axvspan(-100, -100, alpha=0.5, color='#f5beba')
 
-        stream_subplots[camera_identifier].set_xlim(-100, bins - 1 + 100)
+        if camera_identifier is "plus":
+            stream_subplots[camera_identifier].set_title("A Plus B Prime")
+            stream_subplots["plus"].set_xlim(0, 4095 * 2 + 100)
+        elif camera_identifier is "minus":
+            stream_subplots[camera_identifier].set_title("A Minus B Prime")
+            stream_subplots["minus"].set_xlim(-100 - 4095, 4095 + 100)
+
+
         stream_subplots[camera_identifier].grid(True)
         stream_subplots[camera_identifier].set_autoscale_on(False)
         stream_subplots[camera_identifier].set_ylim(bottom=0, top=1)
+
+
+
 
     figs = dict()
     figs["plus"], figs["minus"] = fig_a, fig_b
@@ -232,7 +250,7 @@ def initialize_histograms_algebra(line_width=3):
 
 
 
-def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,threshold=1.2):
+def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,threshold=1.2, plus=False, minus=False):
     """
     Updates histograms for a given camera given the histogram of intensity values.
 
@@ -248,43 +266,128 @@ def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,
     Returns:
         TODO Add Description
     """
-    calculated_hist = cv2.calcHist([raw_2d_array], [0], None, [bins], [0, 4095]) / np.prod(raw_2d_array.shape[:2])
+    if not plus and not minus:
+        calculated_hist = cv2.calcHist([raw_2d_array], [0], None, [bins], [0, 4095]) / np.prod(raw_2d_array.shape[:2])
+        #print("cv2 Calc Hist\n", calculated_hist)
+        histogram_maximum = np.amax(calculated_hist)
+        greyscale_max = np.amax(raw_2d_array.flatten())
+        greyscale_avg = np.mean(raw_2d_array)
+        greyscale_stdev = np.std(raw_2d_array)
 
-    histogram_maximum = np.amax(calculated_hist)
-    greyscale_max = np.amax(raw_2d_array.flatten())
-    greyscale_avg = np.mean(raw_2d_array)
-    greyscale_stdev = np.std(raw_2d_array)
+        lines_dict["intensities"][identifier].set_ydata(calculated_hist)  # Intensities/Percent of Saturation
 
-    lines_dict["intensities"][identifier].set_ydata(calculated_hist)  # Intensities/Percent of Saturation
+        lines_dict["maxima"][identifier].set_ydata(greyscale_max)  # Maximums
+        lines_dict["averages"][identifier].set_ydata(greyscale_avg)  # Averages
+        lines_dict["stdevs"][identifier].set_ydata(greyscale_stdev)  # Standard Deviations
+        lines_dict["max_vert"][identifier].set_xdata(greyscale_max)  # Maximum Indicator as vertical line
+        lines_dict["grayscale_avg"][identifier].set_xdata(greyscale_avg)  # Maximum Indicator as vertical line
+        lines_dict["grayscale_avg+0.5sigma"][identifier].set_xdata(min([bins, greyscale_avg+(greyscale_stdev*0.5)]))  # Maximum Indicator as vertical line
+        lines_dict["grayscale_avg-0.5sigma"][identifier].set_xdata(max([greyscale_avg-(greyscale_stdev*0.5), 0]))  # Maximum Indicator as vertical line
 
-    lines_dict["maxima"][identifier].set_ydata(greyscale_max)  # Maximums
-    lines_dict["averages"][identifier].set_ydata(greyscale_avg)  # Averages
-    lines_dict["stdevs"][identifier].set_ydata(greyscale_stdev)  # Standard Deviations
-    lines_dict["max_vert"][identifier].set_xdata(greyscale_max)  # Maximum Indicator as vertical line
-    lines_dict["grayscale_avg"][identifier].set_xdata(greyscale_avg)  # Maximum Indicator as vertical line
-    lines_dict["grayscale_avg+0.5sigma"][identifier].set_xdata(min([bins, greyscale_avg+(greyscale_stdev*0.5)]))  # Maximum Indicator as vertical line
-    lines_dict["grayscale_avg-0.5sigma"][identifier].set_xdata(max([greyscale_avg-(greyscale_stdev*0.5), 0]))  # Maximum Indicator as vertical line
+        set_xvalues(lines_dict["avg+sigma"][identifier], greyscale_avg, min([bins, greyscale_avg+(greyscale_stdev*0.5)]))
+        set_xvalues(lines_dict["avg-sigma"][identifier], max([greyscale_avg-(greyscale_stdev*0.5), 0]), greyscale_avg)
 
-    set_xvalues(lines_dict["avg+sigma"][identifier], greyscale_avg, min([bins, greyscale_avg+(greyscale_stdev*0.5)]))
-    set_xvalues(lines_dict["avg-sigma"][identifier], max([greyscale_avg-(greyscale_stdev*0.5), 0]), greyscale_avg)
+        histogram_dict[identifier].legend(
+            labels=(
+                "intensity",
+                "maximum %.0f" % greyscale_max,
+                "average %.2f" % greyscale_avg,
+                "stdev %.4f" % greyscale_stdev,),
+            loc="upper right"
+        )
 
-    histogram_dict[identifier].legend(
-        labels=(
-            "intensity",
-            "maximum %.0f" % greyscale_max,
-            "average %.2f" % greyscale_avg,
-            "stdev %.4f" % greyscale_stdev,),
-        loc="upper right"
-    )
+        if histogram_maximum > 0.001:
+            histogram_dict[identifier].set_ylim(bottom=0.000000, top=histogram_maximum * threshold)
+        else:
+            histogram_dict[identifier].set_ylim(bottom=0.000000, top=0.001)
+    elif plus and not minus:
+        plus_bins_ = (0, 4095 * 2)
+        plus_bins_ = np.asarray(plus_bins_).astype(np.int64)
+        ranges = (0, 4095 * 2)
+        ranges = np.asarray(ranges).astype(np.float64)
+        hist_output = hist1d_test(raw_2d_array.flatten(), 4095 * 2, (ranges[0], ranges[1]-1))
+        h = hist_output[0]
+        x_vals = hist_output[1][:-1]
+        #print("Len h, len xvals")
+        #print(len(h), len(x_vals))
+        #print("numba histogram\n", hist1d_test(raw_2d_array.flatten(), 4095 * 2, (ranges[0], ranges[1])))
 
-    if histogram_maximum > 0.001:
-        histogram_dict[identifier].set_ylim(bottom=0.000000, top=histogram_maximum * threshold)
-    else:
-        histogram_dict[identifier].set_ylim(bottom=0.000000, top=0.001)
+        calculated_hist = h/ np.prod(raw_2d_array.shape[:2])
+        histogram_maximum = np.amax(calculated_hist)
+        greyscale_max = np.amax(raw_2d_array.flatten())
+        greyscale_avg = np.mean(raw_2d_array)
+        greyscale_stdev = np.std(raw_2d_array)
 
+        lines_dict["intensities"][identifier].set_data(x_vals ,calculated_hist)  # Intensities/Percent of Saturation
 
+        lines_dict["maxima"][identifier].set_ydata(greyscale_max)  # Maximums
+        lines_dict["averages"][identifier].set_ydata(greyscale_avg)  # Averages
+        lines_dict["stdevs"][identifier].set_ydata(greyscale_stdev)  # Standard Deviations
+        lines_dict["max_vert"][identifier].set_xdata(greyscale_max)  # Maximum Indicator as vertical line
+        lines_dict["grayscale_avg"][identifier].set_xdata(greyscale_avg)  # Maximum Indicator as vertical line
+        lines_dict["grayscale_avg+0.5sigma"][identifier].set_xdata(min([bins, greyscale_avg+(greyscale_stdev*0.5)]))  # Maximum Indicator as vertical line
+        lines_dict["grayscale_avg-0.5sigma"][identifier].set_xdata(max([greyscale_avg-(greyscale_stdev*0.5), 0]))  # Maximum Indicator as vertical line
 
+        set_xvalues(lines_dict["avg+sigma"][identifier], greyscale_avg, min([bins, greyscale_avg+(greyscale_stdev*0.5)]))
+        set_xvalues(lines_dict["avg-sigma"][identifier], max([greyscale_avg-(greyscale_stdev*0.5), 0]), greyscale_avg)
 
+        histogram_dict[identifier].legend(
+            labels=(
+                "intensity",
+                "maximum %.0f" % greyscale_max,
+                "average %.2f" % greyscale_avg,
+                "stdev %.4f" % greyscale_stdev,),
+            loc="upper right"
+        )
+
+        if histogram_maximum > 0.001:
+            histogram_dict[identifier].set_ylim(bottom=0.000000, top=histogram_maximum * threshold)
+        else:
+            histogram_dict[identifier].set_ylim(bottom=0.000000, top=0.001)
+    elif minus and not plus:
+        plus_bins_ = (0, 4095 * 2)
+        plus_bins_ = np.asarray(plus_bins_).astype(np.int64)
+        ranges = (-1*4095, 4095)
+        ranges = np.asarray(ranges).astype(np.float64)
+        hist_output = hist1d_test(raw_2d_array.flatten(), 4095 * 2, (ranges[0], ranges[1]-1))
+        h = hist_output[0]
+        x_vals = hist_output[1][:-1]
+        #print("Len h, len xvals")
+        #print(len(h), len(x_vals))
+        #print("numba histogram\n", hist1d_test(raw_2d_array.flatten(), 4095 * 2, (ranges[0], ranges[1])))
+
+        calculated_hist = h/ np.prod(raw_2d_array.shape[:2])
+        histogram_maximum = np.amax(calculated_hist)
+        greyscale_max = np.amax(raw_2d_array.flatten())
+        greyscale_avg = np.mean(raw_2d_array)
+        greyscale_stdev = np.std(raw_2d_array)
+
+        lines_dict["intensities"][identifier].set_data(x_vals ,calculated_hist)  # Intensities/Percent of Saturation
+
+        lines_dict["maxima"][identifier].set_ydata(greyscale_max)  # Maximums
+        lines_dict["averages"][identifier].set_ydata(greyscale_avg)  # Averages
+        lines_dict["stdevs"][identifier].set_ydata(greyscale_stdev)  # Standard Deviations
+        lines_dict["max_vert"][identifier].set_xdata(greyscale_max)  # Maximum Indicator as vertical line
+        lines_dict["grayscale_avg"][identifier].set_xdata(greyscale_avg)  # Maximum Indicator as vertical line
+        lines_dict["grayscale_avg+0.5sigma"][identifier].set_xdata(min([bins, greyscale_avg+(greyscale_stdev*0.5)]))  # Maximum Indicator as vertical line
+        lines_dict["grayscale_avg-0.5sigma"][identifier].set_xdata(max([greyscale_avg-(greyscale_stdev*0.5), 0]))  # Maximum Indicator as vertical line
+
+        set_xvalues(lines_dict["avg+sigma"][identifier], greyscale_avg, min([bins, greyscale_avg+(greyscale_stdev*0.5)]))
+        set_xvalues(lines_dict["avg-sigma"][identifier], max([greyscale_avg-(greyscale_stdev*0.5), 0]), greyscale_avg)
+
+        histogram_dict[identifier].legend(
+            labels=(
+                "intensity",
+                "maximum %.0f" % greyscale_max,
+                "average %.2f" % greyscale_avg,
+                "stdev %.4f" % greyscale_stdev,),
+            loc="upper right"
+        )
+
+        if histogram_maximum > 0.001:
+            histogram_dict[identifier].set_ylim(bottom=0.000000, top=histogram_maximum * threshold)
+        else:
+            histogram_dict[identifier].set_ylim(bottom=0.000000, top=0.001)
 
 
 
@@ -528,7 +631,7 @@ class Stream:
             b_8bit = bdc.to_8_bit(self.current_frame_b)
             warp_ = ic.get_euclidean_transform_matrix(a_8bit, b_8bit)
 
-            print("Warp Matrix Below:\n\n{}\n".format(warp_))
+            #print("Warp Matrix Below:\n\n{}\n".format(warp_))
             a = warp_[0][0]
             b = warp_[0][1]
             tx = warp_[0][2]
@@ -711,6 +814,10 @@ class Stream:
 
         cv2.destroyAllWindows()
 
+
+        plus_fig = None
+        minus_fig = None
+
         start_algebra = input("Step 7 - Commence Image Algebra: Proceed? (y/n): ")
         figs, histograms, lines = initialize_histograms_rois()
         figs_alg, histograms_alg, lines_alg = initialize_histograms_algebra()
@@ -758,8 +865,6 @@ class Stream:
             hist_img_a = bdc.to_16_bit(cv2.resize(hist_img_a, (w, h), interpolation=cv2.INTER_AREA), 8)
             hist_img_b = bdc.to_16_bit(cv2.resize(hist_img_b, (w, h), interpolation=cv2.INTER_AREA), 8)
 
-
-
             ROI_A_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR), cv2.cvtColor(self.roi_a * 16, cv2.COLOR_GRAY2BGR)), axis=1)
             ROI_B_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR), cv2.cvtColor(self.roi_b * 16, cv2.COLOR_GRAY2BGR)), axis=1)
 
@@ -771,58 +876,76 @@ class Stream:
             #cv2.imshow("ROI B Prime", ROI_B_WITH_HISTOGRAM)
 
 
-            plus = cv2.add(self.roi_a, self.roi_b)*16
-            minus = cv2.subtract(self.roi_a, self.roi_b)*16
+            plus_ = cv2.add(self.roi_a, self.roi_b)
+            minus_ = np.zeros(self.roi_a.shape, dtype='int16')
+            minus_ = np.add(minus_, self.roi_a)
+            minus_ = np.add(minus_, self.roi_b * (-1))
+            print("Lowest pixel in the minus spectrum: {}".format(np.min(minus_.flatten())))
 
-            update_histogram(histograms_alg, lines_alg, "plus", 4096, plus)
-            update_histogram(histograms_alg, lines_alg, "minus", 4096, minus)
+
+
+            update_histogram(histograms_alg, lines_alg, "plus", 4096, plus_, plus=True)
+            update_histogram(histograms_alg, lines_alg, "minus", 4096, minus_, minus=True)
+
+            #plus_ = plus_ * 16
+            #minus_ = minus_ * 16
+
+            displayable_plus = cv2.add(self.roi_a, self.roi_b) * 16
+            displayable_minus = cv2.subtract(self.roi_a, self.roi_b) * 16
 
             figs_alg["plus"].canvas.draw()  # Draw updates subplots in interactive mode
-            figs_alg["minus"].canvas.draw()  # Draw updates subplots in interactive mode
             hist_img_plus = np.fromstring(figs_alg["plus"].canvas.tostring_rgb(), dtype=np.uint8, sep='')
-            hist_img_minus = np.fromstring(figs_alg["minus"].canvas.tostring_rgb(), dtype=np.uint8, sep='')  # convert  to image
             hist_img_plus = hist_img_plus.reshape(figs_alg["plus"].canvas.get_width_height()[::-1] + (3,))
-            hist_img_minus = hist_img_minus.reshape(figs_alg["minus"].canvas.get_width_height()[::-1] + (3,))
             hist_img_plus = cv2.resize(hist_img_plus, (w, h), interpolation=cv2.INTER_AREA)
-            hist_img_minus = cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA)
             hist_img_plus = bdc.to_16_bit(cv2.resize(hist_img_plus, (w, h), interpolation=cv2.INTER_AREA), 8)
+            PLUS_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_plus, cv2.COLOR_RGB2BGR), cv2.cvtColor(displayable_plus, cv2.COLOR_GRAY2BGR)), axis=1)
+
+            figs_alg["minus"].canvas.draw()  # Draw updates subplots in interactive mode
+            hist_img_minus = np.fromstring(figs_alg["minus"].canvas.tostring_rgb(), dtype=np.uint8, sep='')  # convert  to image
+            hist_img_minus = hist_img_minus.reshape(figs_alg["minus"].canvas.get_width_height()[::-1] + (3,))
+            hist_img_minus = cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA)
             hist_img_minus = bdc.to_16_bit(cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA), 8)
-            PLUS_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_plus, cv2.COLOR_RGB2BGR), cv2.cvtColor(plus, cv2.COLOR_GRAY2BGR)), axis=1)
-            MINUS_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_minus, cv2.COLOR_RGB2BGR), cv2.cvtColor(minus, cv2.COLOR_GRAY2BGR)), axis=1)
+            MINUS_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_minus, cv2.COLOR_RGB2BGR), cv2.cvtColor(displayable_minus, cv2.COLOR_GRAY2BGR)), axis=1)
+
+
+
+            cv2.imshow("PLUS_WITH_HISTOGRAM", PLUS_WITH_HISTOGRAM)
+            cv2.imshow("MINUS_WITH_HISTOGRAM", MINUS_WITH_HISTOGRAM)
+
+
+            #print("max(plus_)", np.max(plus_.flatten()))
+
+            #print("Histogram below\n", h)
+            #print("max(h)", np.max(h))
+            #plus_fig = plt.figure()
+
+            #_, bins, patches = plt.hist(plus_.flatten(), color="r", bins=int((4095 * 2)/5))
+            #plt.xlim(0, 4095 * 2)
+            #plus_fig.canvas.draw()  # Draw updates subplots in interactive mode
+            #hist_img_plus = np.fromstring(plus_fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+            #hist_img_plus = hist_img_plus.reshape(plus_fig.canvas.get_width_height()[::-1] + (3,))
+            #hist_img_plus = cv2.resize(hist_img_plus, (w, h), interpolation=cv2.INTER_AREA)
+           # hist_img_plus = bdc.to_16_bit(cv2.resize(hist_img_plus, (w, h), interpolation=cv2.INTER_AREA), 8)
+            #cv2.imshow("Plus Hist", hist_img_plus)
+            #plt.close('all')
+            #minus_fig = None
+
 
             """
+
+            update_histogram(histograms_alg, lines_alg, "minus", 4096, minus_, minus=True)
+            figs_alg["minus"].canvas.draw()  # Draw updates subplots in interactive mode
+            hist_img_minus = np.fromstring(figs_alg["minus"].canvas.tostring_rgb(), dtype=np.uint8, sep='')  # convert  to image
+            hist_img_minus = hist_img_minus.reshape(figs_alg["minus"].canvas.get_width_height()[::-1] + (3,))
+            hist_img_minus = cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA)
+            hist_img_minus = bdc.to_16_bit(cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA), 8)
+            MINUS_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_minus, cv2.COLOR_RGB2BGR), cv2.cvtColor(minus_, cv2.COLOR_GRAY2BGR)), axis=1)
+
             """
 
-            ALGEBRA = np.concatenate((PLUS_WITH_HISTOGRAM, MINUS_WITH_HISTOGRAM), axis=0)
-            cv2.imshow("ALGEBRA", ALGEBRA)
+            #ALGEBRA = np.concatenate((PLUS_WITH_HISTOGRAM, MINUS_WITH_HISTOGRAM), axis=0)
+            #cv2.imshow("ALGEBRA", ALGEBRA)
 
-            #cv2.imshow("A PLUS B PRIME", PLUS_WITH_HISTOGRAM)
-            #cv2.imshow("A MINUS B PRIME", MINUS_WITH_HISTOGRAM)
-
-            #cv2.imshow("ROI B Prime", ROI_B_WITH_HISTOGRAM)
-
-            #cv2.imshow("Add", cv2.add(self.roi_a, self.roi_b)*16)
-            #cv2.imshow("Subtract", cv2.subtract(self.roi_a, self.roi_b)*16)
-
-            #print("Shape ROI A: {}".format(self.roi_a.shape))
-            #print("Shape ROI B': {}\n\n".format(self.roi_b.shape))
-
-
-            #print("Shape Hist Image A: {}".format(hist_img_a.shape))
-            #print("Shape Hist Image B: {}".format(hist_img_b.shape))
-
-
-            #hist_img_a = cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR)  # img is rgb, convert to opencv's default bgr
-            #hist_img_b = cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR)  # img is rgb, convert to opencv's default bgr
-
-
-
-            #cv2.imshow("Hist Cam A", hist_img_a)
-            #cv2.imshow("Hist Cam B", hist_img_b)
-
-            #print("hist_img_a\n", hist_img_a)
-
-            #print("hist_img_b\n", hist_img_b)
 
             continue_stream = self.keep_streaming()
 
