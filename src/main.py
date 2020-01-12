@@ -41,11 +41,13 @@ if __name__ == "__main__":
         uiv.display_dict_values(prev_run)
         args = uiv.update_previous_params(prev_run)
 
-
+    prev_conf = find_previous_run.get_previous_configuration()
+    print("IF THIS WORKS, PRINT AS DICTIONARY")
+    print(prev_conf)
 
     current_datetime = datetime.now().strftime("%Y_%m_%d__%H_%M")
 
-    run_directory = os.path.join("D:", "\\" +current_datetime)
+    run_directory = os.path.join("D:", "\\" + current_datetime)
 
     if not os.path.exists(run_directory):
         os.mkdir(run_directory)
@@ -53,8 +55,6 @@ if __name__ == "__main__":
         os.mkdir(os.path.join(run_directory, "cam_b_frames"))
 
     wptf.document_run(args, current_datetime)
-
-
 
     print("\nAll Experimental Data will be saved in the following directory:\n\tD:\\{}\n".format(current_datetime))
     print("\nStarting Run: {}\n".format(current_datetime))
@@ -65,6 +65,7 @@ if __name__ == "__main__":
     camera_configurations_folder = os.path.join(os.getcwd(), "camera_configuration_files")
     # Prepare Camera Configuration Files
     config_files_by_cam = cam_setup.assign_config_files(parameter_dictionary, args, camera_configurations_folder)
+
 
     stream = stream_tools.Stream(fb=args["FrameBreak"], save_imgs=args["SaveImages"])  # Create a Stream() Instance
     stream.get_cameras(config_files_by_cam)  # Get Basler Cameras, and load corresponding camera configuration files
@@ -87,3 +88,14 @@ if __name__ == "__main__":
         for j in range(len(b_frames)):
             b16 = bdc.to_16_bit(b_frames[j])
             im.save_img("b_{}.png".format(j + 1), b_frames_dir, b16)
+
+    print("Writing Stream Configurations to File")
+    wptf.document_configurations(
+        warp_matrix=stream.get_warp_matrix(),
+        sigmas=stream.get_static_sigmas(),
+        static_centers=stream.get_static_centers(),
+        current_datetime=current_datetime)
+
+
+
+

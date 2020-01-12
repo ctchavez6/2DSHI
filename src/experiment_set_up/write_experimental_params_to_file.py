@@ -11,7 +11,6 @@ def document_run(all_experimental_parameters, run):
     """
 
     current_working_directory = os.getcwd()
-
     run_directory = os.path.join("D:", run)
 
     if not os.path.exists(run_directory):
@@ -35,4 +34,101 @@ def document_run(all_experimental_parameters, run):
     params_file.close()
 
     os.chdir(current_working_directory)
-    return run_directory
+    return
+
+
+def document_configurations(warp_matrix, sigmas, static_centers , current_datetime):
+    """
+    Takes a dictionary and removes any keys not specified.
+
+    Args:
+        parameter_dictionary: Requested number of bins.
+    Returns:
+        reduced_dictionary: The input dictionary but reduced to the keys specified.
+    """
+    current_working_directory = os.getcwd()
+    os.chdir(os.path.join("D:"))
+
+    a = warp_matrix[0][0]
+    b = warp_matrix[0][1]
+    tx = warp_matrix[0][2]
+    c = warp_matrix[1][0]
+    d = warp_matrix[1][1]
+    ty = warp_matrix[1][2]
+
+    updated_file_as_string = ''
+
+    updated_file_as_string += "a"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(a)
+    updated_file_as_string += "\n"
+
+    updated_file_as_string += "b"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(b)
+    updated_file_as_string += "\n"
+
+    updated_file_as_string += "tx"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(tx)
+    updated_file_as_string += "\n"
+
+
+    updated_file_as_string += "c"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(c)
+    updated_file_as_string += "\n"
+
+    updated_file_as_string += "d"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(d)
+    updated_file_as_string += "\n"
+
+    updated_file_as_string += "ty"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(ty)
+    updated_file_as_string += "\n"
+
+    sigma_x, sigma_y = sigmas
+
+    updated_file_as_string += "sigma_x"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(sigma_x)
+    updated_file_as_string += "\n"
+
+    updated_file_as_string += "sigma_y"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(sigma_y)
+    updated_file_as_string += "\n"
+
+    static_center_a, static_center_b = static_centers
+    static_center_a_x, static_center_a_y = static_center_a
+    static_center_b_x, static_center_b_y = static_center_b
+
+    updated_file_as_string += "static_center_a_x"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(static_center_a_x)
+    updated_file_as_string += "\n"
+
+    updated_file_as_string += "static_center_a_y"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(static_center_a_y)
+    updated_file_as_string += "\n"
+
+    updated_file_as_string += "static_center_b_x"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(static_center_b_x)
+    updated_file_as_string += "\n"
+
+    updated_file_as_string += "static_center_b_y"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(static_center_b_y)
+    updated_file_as_string += "\n"
+
+
+    params_file = open('stream_configuration.txt', 'w+')
+    params_file.write(updated_file_as_string)
+    params_file.close()
+
+    os.chdir(current_working_directory)
+    return
