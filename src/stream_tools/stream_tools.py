@@ -268,7 +268,6 @@ def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,
     """
     if not plus and not minus:
         calculated_hist = cv2.calcHist([raw_2d_array], [0], None, [bins], [0, 4095]) / np.prod(raw_2d_array.shape[:2])
-        #print("cv2 Calc Hist\n", calculated_hist)
         histogram_maximum = np.amax(calculated_hist)
         greyscale_max = np.amax(raw_2d_array.flatten())
         greyscale_avg = np.mean(raw_2d_array)
@@ -308,9 +307,6 @@ def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,
         hist_output = hist1d_test(raw_2d_array.flatten(), 4095 * 2, (ranges[0], ranges[1]-1))
         h = hist_output[0]
         x_vals = hist_output[1][:-1]
-        #print("Len h, len xvals")
-        #print(len(h), len(x_vals))
-        #print("numba histogram\n", hist1d_test(raw_2d_array.flatten(), 4095 * 2, (ranges[0], ranges[1])))
 
         calculated_hist = h/ np.prod(raw_2d_array.shape[:2])
         histogram_maximum = np.amax(calculated_hist)
@@ -352,9 +348,6 @@ def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,
         hist_output = hist1d_test(raw_2d_array.flatten(), 4095 * 2, (ranges[0], ranges[1]-1))
         h = hist_output[0]
         x_vals = hist_output[1][:-1]
-        #print("Len h, len xvals")
-        #print(len(h), len(x_vals))
-        #print("numba histogram\n", hist1d_test(raw_2d_array.flatten(), 4095 * 2, (ranges[0], ranges[1])))
 
         calculated_hist = h/ np.prod(raw_2d_array.shape[:2])
         histogram_maximum = np.amax(calculated_hist)
@@ -362,7 +355,7 @@ def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,
         greyscale_avg = np.mean(raw_2d_array)
         greyscale_stdev = np.std(raw_2d_array)
 
-        lines_dict["intensities"][identifier].set_data(x_vals ,calculated_hist)  # Intensities/Percent of Saturation
+        lines_dict["intensities"][identifier].set_data(x_vals, calculated_hist)  # Intensities/Percent of Saturation
 
         lines_dict["maxima"][identifier].set_ydata(greyscale_max)  # Maximums
         lines_dict["averages"][identifier].set_ydata(greyscale_avg)  # Averages
@@ -423,6 +416,8 @@ class Stream:
         self.roi_a = None
         self.roi_b = None
 
+        self.warp_matrix = None
+
 
 
     def get_12bit_a_frames(self):
@@ -443,8 +438,14 @@ class Stream:
 
         return max_sigma_x, max_sigma_y
 
+    def get_static_sigmas(self):
+        return self.static_sigmas_x, self.static_sigmas_y
 
+    def get_static_centers(self):
+        return self.static_center_a, self.static_center_b
 
+    def get_warp_matrix(self):
+        return self.warp_matrix
 
     def get_cameras(self, config_files):
         """
@@ -630,6 +631,7 @@ class Stream:
             a_8bit = bdc.to_8_bit(self.current_frame_a)
             b_8bit = bdc.to_8_bit(self.current_frame_b)
             warp_ = ic.get_euclidean_transform_matrix(a_8bit, b_8bit)
+            self.warp_matrix = warp_
 
             #print("Warp Matrix Below:\n\n{}\n".format(warp_))
             a = warp_[0][0]
@@ -869,7 +871,6 @@ class Stream:
             ROI_B_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR), cv2.cvtColor(self.roi_b * 16, cv2.COLOR_GRAY2BGR)), axis=1)
 
             A_ON_B = np.concatenate((ROI_A_WITH_HISTOGRAM, ROI_B_WITH_HISTOGRAM), axis=0)
-            cv2.imshow("ROIs", A_ON_B)
 
 
             #cv2.imshow("ROI A", ROI_A_WITH_HISTOGRAM)
@@ -880,7 +881,7 @@ class Stream:
             minus_ = np.zeros(self.roi_a.shape, dtype='int16')
             minus_ = np.add(minus_, self.roi_a)
             minus_ = np.add(minus_, self.roi_b * (-1))
-            print("Lowest pixel in the minus spectrum: {}".format(np.min(minus_.flatten())))
+            #print("Lowest pixel in the minus spectrum: {}".format(np.min(minus_.flatten())))
 
 
 
@@ -909,43 +910,42 @@ class Stream:
 
 
 
-            cv2.imshow("PLUS_WITH_HISTOGRAM", PLUS_WITH_HISTOGRAM)
-            cv2.imshow("MINUS_WITH_HISTOGRAM", MINUS_WITH_HISTOGRAM)
+            ALGEBRA = np.concatenate((PLUS_WITH_HISTOGRAM, MINUS_WITH_HISTOGRAM), axis=0)
+            cv2.imshow("Dashboard", np.concatenate((A_ON_B, ALGEBRA), axis=1))
 
 
-            #print("max(plus_)", np.max(plus_.flatten()))
+            R_MATRIX = np.divide(minus_, plus_)
+            DISPLAYABLE_R_MATRIX = np.zeros((R_MATRIX.shape[0], R_MATRIX.shape[1], 3), dtype=np.uint8)
+            DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX < 0.00, abs(R_MATRIX*(2**8 - 1)), 0)
+            DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX < 0.00, abs(R_MATRIX*(2**8 - 1)), 0)
 
-            #print("Histogram below\n", h)
-            #print("max(h)", np.max(h))
-            #plus_fig = plt.figure()
-
-            #_, bins, patches = plt.hist(plus_.flatten(), color="r", bins=int((4095 * 2)/5))
-            #plt.xlim(0, 4095 * 2)
-            #plus_fig.canvas.draw()  # Draw updates subplots in interactive mode
-            #hist_img_plus = np.fromstring(plus_fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
-            #hist_img_plus = hist_img_plus.reshape(plus_fig.canvas.get_width_height()[::-1] + (3,))
-            #hist_img_plus = cv2.resize(hist_img_plus, (w, h), interpolation=cv2.INTER_AREA)
-           # hist_img_plus = bdc.to_16_bit(cv2.resize(hist_img_plus, (w, h), interpolation=cv2.INTER_AREA), 8)
-            #cv2.imshow("Plus Hist", hist_img_plus)
-            #plt.close('all')
-            #minus_fig = None
+            DISPLAYABLE_R_MATRIX[:, :, 0] = np.where(R_MATRIX > 0.00, abs(R_MATRIX*(2**8 - 1)), DISPLAYABLE_R_MATRIX[:, :, 0])
+            DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX > 0.00, abs(R_MATRIX*(2**8 - 1)), DISPLAYABLE_R_MATRIX[:, :, 1])
+            DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX > 0.00, abs(R_MATRIX*(2**8 - 1)), DISPLAYABLE_R_MATRIX[:, :, 2])
 
 
-            """
+            print("\n\n\nMiddle 4 Values - A:\n\t{}".format(
+                                                    self.roi_a[int(self.roi_a.shape[1]/2),
+                                                    int(self.roi_a.shape[0]/2)-2:int(self.roi_a.shape[0]/2)+2]))
 
-            update_histogram(histograms_alg, lines_alg, "minus", 4096, minus_, minus=True)
-            figs_alg["minus"].canvas.draw()  # Draw updates subplots in interactive mode
-            hist_img_minus = np.fromstring(figs_alg["minus"].canvas.tostring_rgb(), dtype=np.uint8, sep='')  # convert  to image
-            hist_img_minus = hist_img_minus.reshape(figs_alg["minus"].canvas.get_width_height()[::-1] + (3,))
-            hist_img_minus = cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA)
-            hist_img_minus = bdc.to_16_bit(cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA), 8)
-            MINUS_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_minus, cv2.COLOR_RGB2BGR), cv2.cvtColor(minus_, cv2.COLOR_GRAY2BGR)), axis=1)
+            print("Middle 4 Values - B Prime:\n\t{}".format(
+                                                    self.roi_b[int(self.roi_b.shape[1]/2),
+                                                    int(self.roi_b.shape[0]/2)-2:int(self.roi_b.shape[0]/2)+2]))
 
-            """
+            print("Middle 4 Values - Plus:\n\t{}".format(
+                                                    plus_[int(plus_.shape[1]/2),
+                                                    int(plus_.shape[0]/2)-2:int(plus_.shape[0]/2)+2]))
 
-            #ALGEBRA = np.concatenate((PLUS_WITH_HISTOGRAM, MINUS_WITH_HISTOGRAM), axis=0)
-            #cv2.imshow("ALGEBRA", ALGEBRA)
+            print("Middle 4 Values - Minus:\n\t{}".format(
+                                                    minus_[int(minus_.shape[1]/2),
+                                                    int(minus_.shape[0]/2)-2:int(minus_.shape[0]/2)+2]))
 
+            print("Middle 4 Values - R:\n\t{}".format(
+                                                    R_MATRIX[int(R_MATRIX.shape[1]/2),
+                                                    int(R_MATRIX.shape[0]/2)-2:int(R_MATRIX.shape[0]/2)+2]))
+
+            print("Average(R_MATRIX):\n\t{}\n\n\n".format(np.mean(R_MATRIX.flatten())))
+            cv2.imshow("R_MATRIX", DISPLAYABLE_R_MATRIX)
 
             continue_stream = self.keep_streaming()
 
