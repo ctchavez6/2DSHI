@@ -3,7 +3,7 @@
 import sys
 import argparse
 import os
-
+import numpy as np
 import stream_cameras_and_histograms as streams  # OLD CODE
 
 from experiment_set_up import update_camera_configuration as ucc
@@ -42,9 +42,10 @@ if __name__ == "__main__":
         args = uiv.update_previous_params(prev_run)
 
     prev_conf = find_previous_run.get_previous_configuration()
-    print("IF THIS WORKS, PRINT AS DICTIONARY")
-    print(prev_conf)
-
+    if prev_conf is None:
+        print("No Saved Previous Configuration Found")
+    else:
+        print(prev_conf)
     current_datetime = datetime.now().strftime("%Y_%m_%d__%H_%M")
 
     run_directory = os.path.join("D:", "\\" + current_datetime)
@@ -66,9 +67,28 @@ if __name__ == "__main__":
     # Prepare Camera Configuration Files
     config_files_by_cam = cam_setup.assign_config_files(parameter_dictionary, args, camera_configurations_folder)
 
-
     stream = stream_tools.Stream(fb=args["FrameBreak"], save_imgs=args["SaveImages"])  # Create a Stream() Instance
     stream.get_cameras(config_files_by_cam)  # Get Basler Cameras, and load corresponding camera configuration files
+    stream.set_current_run(current_datetime)
+    if prev_conf is not None:
+        warp_from_prev_run = np.zeros((2, 3), dtype='float32')
+        warp_from_prev_run[0][0] = float(prev_conf['a'])
+        warp_from_prev_run[0][1] = float(prev_conf['b'])
+        warp_from_prev_run[0][2] = float(prev_conf['tx'])
+        warp_from_prev_run[1][0] = float(prev_conf['c'])
+        warp_from_prev_run[1][1] = float(prev_conf['d'])
+        warp_from_prev_run[1][2] = float(prev_conf['ty'])
+        stream.set_warp_matrix(warp_from_prev_run)
+
+        static_a = prev_conf['static_center_a_x'], prev_conf['static_center_a_y']
+        static_b = prev_conf['static_center_b_x'], prev_conf['static_center_b_y']
+        stream.set_static_centers(static_a, static_b)
+
+        sigma_x, sigma_y = prev_conf['sigma_x'], prev_conf['sigma_y']
+        stream.set_static_sigmas(sigma_x, sigma_y)
+
+        stream.offer_to_jump()
+
     stream.start(histogram=args["DisplayHistocam"])  # Start steam (Display Histogram if user specified so in input)
 
     print("Stream has ended.")
