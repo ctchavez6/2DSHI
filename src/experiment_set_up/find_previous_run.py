@@ -43,7 +43,6 @@ def get_latest_run():
                         "CompensatorAngle"]
 
 
-
     for line in last_run_params_file:
         split_by_tabs = line.split('\t')
         parameter = split_by_tabs[0]

@@ -10,10 +10,42 @@ import matplotlib.pyplot as plt
 import sys
 import numba
 from image_processing import img_algebra as ia
-from PIL import Image, ImageDraw, ImageFont
 import csv as csv
 import os
+from PIL import Image, ImageDraw, ImageFont
+import tkinter as tk
+import threading
 
+
+class App(threading.Thread):
+
+   def __init__(self):
+      threading.Thread.__init__(self)
+      self.start()
+      self.foo = 1
+
+   def callback(self):
+      self.root.quit()
+
+   def scale_onChange(self, value):
+      self.foo = int(value)
+
+
+   def run(self):
+      self.root = tk.Tk()
+      self.root.protocol("WM_DELETE_WINDOW", self.callback)
+
+      label = tk.Label(self.root, text="Hello World")
+      label.pack()
+
+      scale = tk.Scale(from_=1, to=2, tickinterval=0.5, orient=tk.HORIZONTAL, command=self.scale_onChange)
+      scale.pack()
+
+      #self.foo = label
+      self.root.mainloop()
+
+
+app = App()
 
 EPSILON = sys.float_info.epsilon  # Smallest possible difference
 sixteen_bit_max = (2 ** 16) - 1
@@ -28,6 +60,10 @@ def hist1d(v, b, r):
 @numba.njit
 def hist1d_test(v, b, r):
     return np.histogram(v, b, r)
+
+
+
+
 
 def set_xvalues(polygon, x0, x1):
     """
@@ -866,14 +902,38 @@ class Stream:
         #WHITE_BACKGROUND = WHITE_BACKGROUND + 255
 
         step = 7
+
         if self.jump_level == step:
             continue_stream = True
+
         else:
             start_algebra = input("Step 7 - Commence Image Algebra (Free Stream): Proceed? (y/n): ")
             if start_algebra.lower() == "y":
                 continue_stream = True
 
+        #root.mainloop()
+
         while continue_stream:
+            """
+                        def sel():
+                selection = "Value = " + str(var.get())
+                label.config(text=selection)
+
+            root = Tk()
+            var = DoubleVar()
+            scale = Scale(root, variable=var)
+            scale.pack(anchor=CENTER)
+
+            button = Button(root, text="Get Scale Value", command=sel)
+            button.pack(anchor=CENTER)
+
+            label = Label(root)
+            label.pack()
+
+            """
+
+
+
             self.frame_count += 1
             self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
 
@@ -882,6 +942,8 @@ class Stream:
             x_b, y_b = self.static_center_b
 
             n_sigma = 1
+            old_n_sigma = n_sigma + 0
+            n_sigma = app.foo
 
             self.roi_a = self.current_frame_a[
                          y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + 1,
@@ -1030,7 +1092,7 @@ class Stream:
 
             continue_stream = self.keep_streaming()
 
-
+        app.callback()
 
         cv2.destroyAllWindows()
 
@@ -1038,6 +1100,8 @@ class Stream:
         current_r_frame = 0
         run_folder = os.path.join("D:", "\\" + self.current_run)
         record_r_matrices = input("Step 8 - Image Algebra (Record): Proceed? (y/n): ")
+        stats = list()
+        stats.append(["Frame", "Avg_R", "Sigma_R"])
         #r_matrix_limit = int(input("R Matrix Frame Break: "))
         if record_r_matrices.lower() == "y":
             continue_stream = True
@@ -1128,6 +1192,8 @@ class Stream:
                 self.r_frames.append(R_MATRIX)
                 nan_mean = np.nanmean(R_MATRIX.flatten())
                 nan_st_dev = np.nanstd(R_MATRIX.flatten())
+                stats.append([len(self.r_frames), nan_mean, nan_st_dev])
+
                 # print("nan mean: ", nan_mean)
                 # print("nan std dev: ", nan_st_dev)
 
@@ -1201,6 +1267,8 @@ class Stream:
                 cv2.imshow("R_MATRIX", np.concatenate((R_VALUES, DISPLAYABLE_R_MATRIX), axis=1))
                 continue_stream = self.keep_streaming()
 
+            cv2.destroyAllWindows()
+
         step = 9
         write_to_csv = input("Step 9 - Write Recorded R Frame(s) to File(s)? : Proceed? (y/n)")
 
@@ -1217,7 +1285,11 @@ class Stream:
                     csvWriter = csv.writer(my_csv, delimiter=',')
                     csvWriter.writerows(r_matrix.tolist())
 
+            stats_csv_path = os.path.join(run_folder, "r_matrices_stats.csv")
+            with open(stats_csv_path, "w+", newline='') as stats_csv:
+                stats_csvWriter = csv.writer(stats_csv, delimiter=',')
+                for i in range(len(r_matrices)):
 
-
+                    stats_csvWriter.writerow(stats[i])
 
         self.all_cams.StopGrabbing()
