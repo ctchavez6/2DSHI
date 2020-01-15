@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/scratch.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/scratch2.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/scratch3.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/experiment_set_up/find_previous_run.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/find_previous_run.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -335,14 +334,11 @@
       <workItem from="1578859177544" duration="381000" />
       <workItem from="1578862095949" duration="5220000" />
       <workItem from="1578867721931" duration="12751000" />
-      <workItem from="1578967583076" duration="8862000" />
-    </task>
-    <task id="LOCAL-00021" summary="saving images at 16 bit">
-      <created>1573707354072</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1573707354072</updated>
+      <workItem from="1578967583076" duration="8895000" />
+      <workItem from="1578976639544" duration="614000" />
+      <workItem from="1579028692358" duration="1845000" />
+      <workItem from="1579048460296" duration="599000" />
+      <workItem from="1579055613181" duration="9510000" />
     </task>
     <task id="LOCAL-00022" summary="saving images at 16 bit">
       <created>1573788119142</created>
@@ -680,7 +676,14 @@
       <option name="project" value="LOCAL" />
       <updated>1578884786094</updated>
     </task>
-    <option name="localTasksCounter" value="70" />
+    <task id="LOCAL-00070" summary="sigma slider and stats writer">
+      <created>1578976582314</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1578976582314</updated>
+    </task>
+    <option name="localTasksCounter" value="71" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -704,7 +707,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="code cleanup" />
     <MESSAGE value="Dynamic documentation of individual runs" />
     <MESSAGE value="Now allowing user to use previous runs parameters." />
     <MESSAGE value="Started 2 more modules: path_management and coregistration" />
@@ -729,35 +731,36 @@
     <MESSAGE value="algebra" />
     <MESSAGE value="visualizing R matrix" />
     <MESSAGE value="visualizing R matrix and saving data" />
-    <option name="LAST_COMMIT_MESSAGE" value="visualizing R matrix and saving data" />
+    <MESSAGE value="sigma slider and stats writer" />
+    <option name="LAST_COMMIT_MESSAGE" value="sigma slider and stats writer" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1578884785300">
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1578976581444">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
     <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1578884785300" />
-    <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578275054515" />
+    <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578976581444" />
     <state x="420" y="539" key="FileChooserDialogImpl" timestamp="1578865801470">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="420" y="539" key="FileChooserDialogImpl/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578865801470" />
-    <state x="1042" y="526" key="SettingsEditor" timestamp="1578967788108">
+    <state x="179" y="354" key="SettingsEditor" timestamp="1579028734909">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1049" y="436" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1578708348219" />
     <state x="1042" y="526" key="SettingsEditor/0.0.2560.1560@0.0.2560.1560" timestamp="1578716626937" />
-    <state x="1042" y="526" key="SettingsEditor/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578967788108" />
+    <state x="179" y="354" key="SettingsEditor/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579028734909" />
     <state width="498" height="446" key="SwitcherDM" timestamp="1578865799870">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state width="498" height="446" key="SwitcherDM/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578865799870" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1578884788779">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1578976589379">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
     <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1578884788779" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578275056585" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578976589379" />
     <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1578867722024">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
@@ -768,12 +771,12 @@
       <screen x="0" y="0" width="1440" height="860" />
     </state>
     <state x="518" y="90" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1440.860@0.0.1440.860" timestamp="1576983755808" />
-    <state x="1443" y="792" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1578865797995">
+    <state x="1443" y="792" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1578976653718">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1443" y="711" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1400@0.0.2560.1400" timestamp="1578699848585" />
     <state x="1443" y="792" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1560@0.0.2560.1560" timestamp="1578859053110" />
-    <state x="1443" y="792" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578865797995" />
+    <state x="1443" y="792" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578976653718" />
     <state x="943" y="355" width="840" height="678" key="search.everywhere.popup" timestamp="1578970281524">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>

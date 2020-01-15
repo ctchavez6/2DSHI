@@ -109,13 +109,19 @@ if __name__ == "__main__":
             b16 = bdc.to_16_bit(b_frames[j])
             im.save_img("b_{}.png".format(j + 1), b_frames_dir, b16)
 
-    print("Writing Stream Configurations to File")
-    wptf.document_configurations(
-        warp_matrix=stream.get_warp_matrix(),
-        sigmas=stream.get_static_sigmas(),
-        static_centers=stream.get_static_centers(),
-        current_datetime=current_datetime)
+    try:
+        print("Writing Stream Configurations to File")
+        wptf.document_configurations(
+            warp_matrix=stream.get_warp_matrix(),
+            sigmas=stream.get_static_sigmas(),
+            static_centers=stream.get_static_centers(),
+            current_datetime=current_datetime)
+    except TypeError as e:
+        print("TYPE ERROR")
+        raise e
+    print("Done")
 
+    print("You have completed and exited the script.")
 
 
 

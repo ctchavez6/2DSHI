@@ -17,12 +17,22 @@ import tkinter as tk
 import threading
 
 
+def progressBar(value, endvalue, bar_length=20):
+
+    percent = float(value) / endvalue
+    arrow = '-' * int(round(percent * bar_length)-1) + '>'
+    spaces = ' ' * (bar_length - len(arrow))
+
+    sys.stdout.write("\rPercent: [{0}] {1}%".format(arrow + spaces, int(round(percent * 100))))
+    sys.stdout.flush()
+
 class App(threading.Thread):
 
    def __init__(self):
       threading.Thread.__init__(self)
       self.start()
       self.foo = 1
+      self.at_front = False
 
    def callback(self):
       self.root.quit()
@@ -43,6 +53,10 @@ class App(threading.Thread):
 
       #self.foo = label
       self.root.mainloop()
+
+   def bring_to_front(self):
+       self.root.lift()
+       self.at_front = True
 
 
 app = App()
@@ -290,7 +304,95 @@ def initialize_histograms_algebra(line_width=3):
 
 
 
-def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,threshold=1.2, plus=False, minus=False):
+def initialize_histograms_r(line_width=3):
+    """
+    Initializes histogram matplotlib.pyplot figures/subplots.
+
+    Args:
+        num_cameras: An integer
+        line_width: An integer
+    Raises:
+        Exception: Any error/exception other than 'no such file or directory'.
+    Returns:
+        dict: A dictionary of histograms with ascending lowercase alphabetical letters (that match cameras) as keys
+    """
+    bins = 4096
+    stream_subplots = dict()
+    lines = {
+        "intensities": dict(),
+        "maxima": dict(),
+        "averages": dict(),
+        "stdevs": dict(),
+        "max_vert": dict(),
+        "avg+sigma": dict(),
+        "avg-sigma": dict(),
+        "grayscale_avg": dict(),
+        "grayscale_avg+0.5sigma": dict(),
+        "grayscale_avg-0.5sigma": dict()
+    }
+    fig_a = plt.figure(figsize=(5, 5))
+    stream_subplots["r"] = fig_a.add_subplot()
+
+
+
+
+    for camera_identifier in ["r"]:
+        #camera_identifier = chr(97 + i)
+        stream_subplots[camera_identifier].set_xlabel('Bin')
+        stream_subplots[camera_identifier].set_ylabel('Frequency')
+
+        lines["intensities"][camera_identifier], = stream_subplots[camera_identifier] \
+            .plot(np.arange(bins), np.zeros((bins, 1)), c='k', lw=line_width, label='intensity')
+
+        lines["maxima"][camera_identifier], = stream_subplots[camera_identifier] \
+            .plot(np.arange(bins), np.zeros((bins, 1)), c='g', lw=1, label='maximum')
+
+        lines["averages"][camera_identifier], = stream_subplots[camera_identifier] \
+            .plot(np.arange(bins), np.zeros((bins, 1)), c='b', linestyle='dashed', lw=1, label='average')
+
+        lines["stdevs"][camera_identifier], = stream_subplots[camera_identifier] \
+            .plot(np.arange(bins), np.zeros((bins, 1)), c='r', linestyle='dotted', lw=2, label='stdev')
+
+        lines["grayscale_avg"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='b', linestyle='dashed', linewidth=1)
+
+        lines["grayscale_avg+0.5sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='r', linestyle='dotted', linewidth=1)
+
+        lines["grayscale_avg-0.5sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='r', linestyle='dotted', linewidth=1)
+
+
+        lines["max_vert"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvline(-100, color='g', linestyle='solid', linewidth=1)
+
+        lines["avg+sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvspan(-100, -100, alpha=0.5, color='#f5beba')
+
+        lines["avg-sigma"][camera_identifier] = stream_subplots[camera_identifier] \
+            .axvspan(-100, -100, alpha=0.5, color='#f5beba')
+
+        stream_subplots[camera_identifier].set_title("R Matrix Histogram")
+        stream_subplots[camera_identifier].set_xlim(-1.2, 1.2)
+
+
+
+        stream_subplots[camera_identifier].grid(True)
+        stream_subplots[camera_identifier].set_autoscale_on(False)
+        stream_subplots[camera_identifier].set_ylim(bottom=0, top=1)
+
+
+
+
+    figs = dict()
+    figs["r"] = fig_a
+
+    return figs, stream_subplots, lines
+
+
+
+
+def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,threshold=1.2, plus=False, minus=False, r=False):
     """
     Updates histograms for a given camera given the histogram of intensity values.
 
@@ -306,7 +408,7 @@ def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,
     Returns:
         TODO Add Description
     """
-    if not plus and not minus:
+    if not plus and not minus and not r:
         calculated_hist = cv2.calcHist([raw_2d_array], [0], None, [bins], [0, 4095]) / np.prod(raw_2d_array.shape[:2])
         histogram_maximum = np.amax(calculated_hist)
         greyscale_max = np.amax(raw_2d_array.flatten())
@@ -421,6 +523,48 @@ def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,
             histogram_dict[identifier].set_ylim(bottom=0.000000, top=histogram_maximum * threshold)
         else:
             histogram_dict[identifier].set_ylim(bottom=0.000000, top=0.001)
+    if r and (not plus and not minus):
+        r_bins_ = (0, 1)
+        r_bins_ = np.asarray(r_bins_).astype(np.int64)
+        ranges = (float(-1), float(1))
+        ranges = np.asarray(ranges).astype(np.float64)
+        hist_output = hist1d_test(raw_2d_array.flatten(), 2000, (ranges[0], ranges[1]))
+        h = hist_output[0]
+        x_vals = hist_output[1][:-1]
+
+        calculated_hist = h/ np.prod(raw_2d_array.shape[:2])
+        histogram_maximum = np.amax(calculated_hist)
+        greyscale_max = np.amax(raw_2d_array.flatten())
+        greyscale_avg = np.mean(raw_2d_array)
+        greyscale_stdev = np.std(raw_2d_array)
+
+        lines_dict["intensities"][identifier].set_data(x_vals, calculated_hist)  # Intensities/Percent of Saturation
+
+        lines_dict["maxima"][identifier].set_ydata(greyscale_max)  # Maximums
+        lines_dict["averages"][identifier].set_ydata(greyscale_avg)  # Averages
+        lines_dict["stdevs"][identifier].set_ydata(greyscale_stdev)  # Standard Deviations
+        lines_dict["max_vert"][identifier].set_xdata(greyscale_max)  # Maximum Indicator as vertical line
+        lines_dict["grayscale_avg"][identifier].set_xdata(greyscale_avg)  # Maximum Indicator as vertical line
+        lines_dict["grayscale_avg+0.5sigma"][identifier].set_xdata(min([bins, greyscale_avg+(greyscale_stdev*0.5)]))  # Maximum Indicator as vertical line
+        lines_dict["grayscale_avg-0.5sigma"][identifier].set_xdata(max([greyscale_avg-(greyscale_stdev*0.5), 0]))  # Maximum Indicator as vertical line
+
+        set_xvalues(lines_dict["avg+sigma"][identifier], greyscale_avg, min([bins, greyscale_avg+(greyscale_stdev*0.5)]))
+        set_xvalues(lines_dict["avg-sigma"][identifier], max([greyscale_avg-(greyscale_stdev*0.5), 0]), greyscale_avg)
+
+        histogram_dict[identifier].legend(
+            labels=(
+                "intensity",
+                "maximum %.0f" % greyscale_max,
+                "average %.2f" % greyscale_avg,
+                "stdev %.4f" % greyscale_stdev,),
+            loc="upper right"
+        )
+
+        if histogram_maximum > 0.001:
+            histogram_dict[identifier].set_ylim(bottom=0.000000, top=histogram_maximum * threshold)
+        else:
+            histogram_dict[identifier].set_ylim(bottom=0.000000, top=0.001)
+
 
 
 
@@ -898,8 +1042,7 @@ class Stream:
 
         figs, histograms, lines = initialize_histograms_rois()
         figs_alg, histograms_alg, lines_alg = initialize_histograms_algebra()
-        #WHITE_BACKGROUND = np.zeros((450, 450, 3), dtype=np.uint8)
-        #WHITE_BACKGROUND = WHITE_BACKGROUND + 255
+        figs_r, histograms_r, lines_r = initialize_histograms_r()
 
         step = 7
 
@@ -914,26 +1057,6 @@ class Stream:
         #root.mainloop()
 
         while continue_stream:
-            """
-                        def sel():
-                selection = "Value = " + str(var.get())
-                label.config(text=selection)
-
-            root = Tk()
-            var = DoubleVar()
-            scale = Scale(root, variable=var)
-            scale.pack(anchor=CENTER)
-
-            button = Button(root, text="Get Scale Value", command=sel)
-            button.pack(anchor=CENTER)
-
-            label = Label(root)
-            label.pack()
-
-            """
-
-
-
             self.frame_count += 1
             self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
 
@@ -941,8 +1064,6 @@ class Stream:
             x_a, y_a = self.static_center_a
             x_b, y_b = self.static_center_b
 
-            n_sigma = 1
-            old_n_sigma = n_sigma + 0
             n_sigma = app.foo
 
             self.roi_a = self.current_frame_a[
@@ -1007,6 +1128,9 @@ class Stream:
 
 
 
+
+
+
             ALGEBRA = np.concatenate((PLUS_WITH_HISTOGRAM, MINUS_WITH_HISTOGRAM), axis=0)
             DASHBOARD = np.concatenate((A_ON_B, ALGEBRA), axis=1)
             dash_height, dash_width, dash_channels = DASHBOARD.shape
@@ -1019,8 +1143,6 @@ class Stream:
             R_MATRIX = np.divide(minus_, plus_)
             nan_mean = np.nanmean(R_MATRIX.flatten())
             nan_st_dev = np.nanstd(R_MATRIX.flatten())
-            #print("nan mean: ", nan_mean)
-            #print("nan std dev: ", nan_st_dev)
 
             DISPLAYABLE_R_MATRIX = np.zeros((R_MATRIX.shape[0], R_MATRIX.shape[1], 3), dtype=np.uint8)
             DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX < 0.00, abs(R_MATRIX*(2**8 - 1)), 0)
@@ -1030,48 +1152,29 @@ class Stream:
             #DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX > 0.00, abs(R_MATRIX*(2**8 - 1)), DISPLAYABLE_R_MATRIX[:, :, 1])
             DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX > 0.00, abs(R_MATRIX*(2**8 - 1)), DISPLAYABLE_R_MATRIX[:, :, 2])
 
+
+
+
+
             dr_height, dr_width, dr_channels = DISPLAYABLE_R_MATRIX.shape
-            scale_factor = 1
-            if dr_width > 450:
-                scale_factor = float(float(450)/float(dr_width))
-                DISPLAYABLE_R_MATRIX = cv2.resize(DISPLAYABLE_R_MATRIX, (int(dr_width*scale_factor), int(dr_height*scale_factor)))
-            dr_height, dr_width, dr_channels = DISPLAYABLE_R_MATRIX.shape
 
-            #WHITE_BACKGROUND = 255
 
-            """
-            print("\n\n\nMiddle 4 Values - A:\n\t{}".format(
-                                                    self.roi_a[int(self.roi_a.shape[1]/2),
-                                                    int(self.roi_a.shape[0]/2)-2:int(self.roi_a.shape[0]/2)+2]))
 
-            print("Middle 4 Values - B Prime:\n\t{}".format(
-                                                    self.roi_b[int(self.roi_b.shape[1]/2),
-                                                    int(self.roi_b.shape[0]/2)-2:int(self.roi_b.shape[0]/2)+2]))
+            update_histogram(histograms_r, lines_r, "r", 4096, R_MATRIX, r=True)
+            figs_r["r"].canvas.draw()  # Draw updates subplots in interactive mode
+            hist_img_r = np.fromstring(figs_r["r"].canvas.tostring_rgb(), dtype=np.uint8, sep='')  # convert  to image
+            hist_img_r = hist_img_r.reshape(figs_r["r"].canvas.get_width_height()[::-1] + (3,))
+            hist_img_r = cv2.resize(hist_img_r, (w, h), interpolation=cv2.INTER_AREA)
+            hist_img_r = bdc.to_16_bit(cv2.resize(hist_img_r, (w, h), interpolation=cv2.INTER_AREA), 8)
+            R_HIST = (cv2.cvtColor(hist_img_r, cv2.COLOR_RGB2BGR))
+            #cv2.imshow("R Histogram", R_WITH_HISTOGRAM)
 
-            print("Middle 4 Values - Plus:\n\t{}".format(
-                                                    plus_[int(plus_.shape[1]/2),
-                                                    int(plus_.shape[0]/2)-2:int(plus_.shape[0]/2)+2]))
 
-            print("Middle 4 Values - Minus:\n\t{}".format(
-                                                    minus_[int(minus_.shape[1]/2),
-                                                    int(minus_.shape[0]/2)-2:int(minus_.shape[0]/2)+2]))
 
-            print("Middle 4 Values - R:\n\t{}".format(
-                                                    R_MATRIX[int(R_MATRIX.shape[1]/2),
-                                                    int(R_MATRIX.shape[0]/2)-2:int(R_MATRIX.shape[0]/2)+2]))
 
-            print("Average(R_MATRIX):\n\t{}\n\n\n".format(np.mean(R_MATRIX.flatten())))
-            """
 
-            #draw = ImageDraw.Draw(image)
-
-            #cv2.imshow("R_MATRIX", DISPLAYABLE_R_MATRIX)
             R_VALUES = Image.new('RGB', (dr_width, dr_height), (255, 255, 255))
-            #if WHITE_BACKGROUND.shape != DISPLAYABLE_R_MATRIX.shape:
-                #WHITE_BACKGROUND = cv2.resize(WHITE_BACKGROUND, (int(dr_width*scale_factor), int(dr_height*scale_factor)))
 
-
-            #image = Image.open('background.png')
 
             # initialise the drawing context with
             # the image object as background
@@ -1087,190 +1190,207 @@ class Stream:
             color = 'rgb(0, 0, 0)'  # black color
             draw.text((x, y), message, fill=color, font=font)
             R_VALUES = np.array(R_VALUES)
+            VALUES_W_HIST = np.concatenate((R_VALUES*(2**8), np.array(R_HIST)), axis=1)
+            #R_HIST_W_DISPLAYABLE_R =
+            #print("R VALUES TYPE: {}".format(R_VALUES.dtype))
+            #print("R_HIST TYPE: {}".format(R_HIST.dtype))
 
-            cv2.imshow("R_MATRIX", np.concatenate((R_VALUES, DISPLAYABLE_R_MATRIX), axis=1))
+
+            cv2.imshow("R_MATRIX", np.concatenate((VALUES_W_HIST, np.array(DISPLAYABLE_R_MATRIX*(2**8), dtype='uint16')), axis=1))
+
+            #cv2.imshow("R_WITH_HISTOGRAM", R_WITH_HISTOGRAM)
+
 
             continue_stream = self.keep_streaming()
+            if not continue_stream:
+                app.callback()
+                cv2.destroyAllWindows()
 
-        app.callback()
+        satisfied_with_run = False
+
+
+        current_r_frame = 0
+        stats = list()
+
+        step = 8
+        run_folder = os.path.join("D:", "\\" + self.current_run)
+        while satisfied_with_run is False:
+            current_r_frame = 0
+            record_r_matrices = input("Step 8 - Image Algebra (Record): Proceed? (y/n): ")
+            stats = list()
+            self.r_frames = list()
+            stats.append(["Frame", "Avg_R", "Sigma_R"])
+            #r_matrix_limit = int(input("R Matrix Frame Break: "))
+            if record_r_matrices.lower() == "y":
+                continue_stream = True
+                while continue_stream:
+                    self.frame_count += 1
+                    current_r_frame += 1
+                    print("Current R Frame: {}".format(current_r_frame))
+                    self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
+
+                    x_a, y_a = self.static_center_a
+                    x_b, y_b = self.static_center_b
+
+                    n_sigma = 1
+
+                    self.roi_a = self.current_frame_a[
+                                 y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + 1,
+                                 x_a - n_sigma * self.static_sigmas_x: x_a + n_sigma * self.static_sigmas_x + 1
+                                 ]
+
+                    self.roi_b = self.current_frame_b[
+                                 y_b - n_sigma * self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + 1,
+                                 x_b - n_sigma * self.static_sigmas_x: x_b + n_sigma * self.static_sigmas_x + 1
+                                 ]
+
+                    h = self.roi_a.shape[0]
+                    w = self.roi_a.shape[1]
+
+                    update_histogram(histograms, lines, "a", 4096, self.roi_a)
+                    update_histogram(histograms, lines, "b", 4096, self.roi_b)
+                    figs["a"].canvas.draw()  # Draw updates subplots in interactive mode
+                    figs["b"].canvas.draw()  # Draw updates subplots in interactive mode
+                    hist_img_a = np.fromstring(figs["a"].canvas.tostring_rgb(), dtype=np.uint8, sep='')
+                    hist_img_b = np.fromstring(figs["b"].canvas.tostring_rgb(), dtype=np.uint8, sep='')  # convert  to image
+                    hist_img_a = hist_img_a.reshape(figs["a"].canvas.get_width_height()[::-1] + (3,))
+                    hist_img_b = hist_img_b.reshape(figs["b"].canvas.get_width_height()[::-1] + (3,))
+                    hist_img_a = cv2.resize(hist_img_a, (w, h), interpolation=cv2.INTER_AREA)
+                    hist_img_b = cv2.resize(hist_img_b, (w, h), interpolation=cv2.INTER_AREA)
+                    hist_img_a = bdc.to_16_bit(cv2.resize(hist_img_a, (w, h), interpolation=cv2.INTER_AREA), 8)
+                    hist_img_b = bdc.to_16_bit(cv2.resize(hist_img_b, (w, h), interpolation=cv2.INTER_AREA), 8)
+
+                    ROI_A_WITH_HISTOGRAM = np.concatenate(
+                        (cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR), cv2.cvtColor(self.roi_a * 16, cv2.COLOR_GRAY2BGR)),
+                        axis=1)
+                    ROI_B_WITH_HISTOGRAM = np.concatenate(
+                        (cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR), cv2.cvtColor(self.roi_b * 16, cv2.COLOR_GRAY2BGR)),
+                        axis=1)
+
+                    A_ON_B = np.concatenate((ROI_A_WITH_HISTOGRAM, ROI_B_WITH_HISTOGRAM), axis=0)
+
+                    plus_ = cv2.add(self.roi_a, self.roi_b)
+                    minus_ = np.zeros(self.roi_a.shape, dtype='int16')
+                    minus_ = np.add(minus_, self.roi_a)
+                    minus_ = np.add(minus_, self.roi_b * (-1))
+                    # print("Lowest pixel in the minus spectrum: {}".format(np.min(minus_.flatten())))
+
+                    update_histogram(histograms_alg, lines_alg, "plus", 4096, plus_, plus=True)
+                    update_histogram(histograms_alg, lines_alg, "minus", 4096, minus_, minus=True)
+
+                    displayable_plus = cv2.add(self.roi_a, self.roi_b) * 16
+                    displayable_minus = cv2.subtract(self.roi_a, self.roi_b) * 16
+
+                    figs_alg["plus"].canvas.draw()  # Draw updates subplots in interactive mode
+                    hist_img_plus = np.fromstring(figs_alg["plus"].canvas.tostring_rgb(), dtype=np.uint8, sep='')
+                    hist_img_plus = hist_img_plus.reshape(figs_alg["plus"].canvas.get_width_height()[::-1] + (3,))
+                    hist_img_plus = cv2.resize(hist_img_plus, (w, h), interpolation=cv2.INTER_AREA)
+                    hist_img_plus = bdc.to_16_bit(cv2.resize(hist_img_plus, (w, h), interpolation=cv2.INTER_AREA), 8)
+                    PLUS_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_plus, cv2.COLOR_RGB2BGR),
+                                                          cv2.cvtColor(displayable_plus, cv2.COLOR_GRAY2BGR)), axis=1)
+
+                    figs_alg["minus"].canvas.draw()  # Draw updates subplots in interactive mode
+                    hist_img_minus = np.fromstring(figs_alg["minus"].canvas.tostring_rgb(), dtype=np.uint8,
+                                                   sep='')  # convert  to image
+                    hist_img_minus = hist_img_minus.reshape(figs_alg["minus"].canvas.get_width_height()[::-1] + (3,))
+                    hist_img_minus = cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA)
+                    hist_img_minus = bdc.to_16_bit(cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA), 8)
+                    MINUS_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_minus, cv2.COLOR_RGB2BGR),
+                                                           cv2.cvtColor(displayable_minus, cv2.COLOR_GRAY2BGR)), axis=1)
+
+                    ALGEBRA = np.concatenate((PLUS_WITH_HISTOGRAM, MINUS_WITH_HISTOGRAM), axis=0)
+                    DASHBOARD = np.concatenate((A_ON_B, ALGEBRA), axis=1)
+                    dash_height, dash_width, dash_channels = DASHBOARD.shape
+
+                    if dash_width > 2000:
+                        scale_factor = float(float(2000) / float(dash_width))
+                        DASHBOARD = cv2.resize(DASHBOARD, (int(dash_width * scale_factor), int(dash_height * scale_factor)))
+
+                    cv2.imshow("Dashboard", DASHBOARD)
+
+                    R_MATRIX = np.divide(minus_, plus_)
+                    self.r_frames.append(R_MATRIX)
+                    nan_mean = np.nanmean(R_MATRIX.flatten())
+                    nan_st_dev = np.nanstd(R_MATRIX.flatten())
+                    stats.append([len(self.r_frames), nan_mean, nan_st_dev])
+
+
+
+                    DISPLAYABLE_R_MATRIX = np.zeros((R_MATRIX.shape[0], R_MATRIX.shape[1], 3), dtype=np.uint8)
+                    DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX < 0.00, abs(R_MATRIX * (2 ** 8 - 1)), 0)
+                    DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX < 0.00, abs(R_MATRIX * (2 ** 8 - 1)), 0)
+
+                    DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX > 0.00, abs(R_MATRIX * (2 ** 8 - 1)),
+                                                             DISPLAYABLE_R_MATRIX[:, :, 2])
+
+                    dr_height, dr_width, dr_channels = DISPLAYABLE_R_MATRIX.shape
+
+                    update_histogram(histograms_r, lines_r, "r", 4096, R_MATRIX, r=True)
+                    figs_r["r"].canvas.draw()  # Draw updates subplots in interactive mode
+                    hist_img_r = np.fromstring(figs_r["r"].canvas.tostring_rgb(), dtype=np.uint8,
+                                               sep='')  # convert  to image
+                    hist_img_r = hist_img_r.reshape(figs_r["r"].canvas.get_width_height()[::-1] + (3,))
+                    hist_img_r = cv2.resize(hist_img_r, (w, h), interpolation=cv2.INTER_AREA)
+                    hist_img_r = bdc.to_16_bit(cv2.resize(hist_img_r, (w, h), interpolation=cv2.INTER_AREA), 8)
+
+                    R_VALUES = Image.new('RGB', (dr_width, dr_height), (255, 255, 255))
+
+                    # initialise the drawing context with
+                    # the image object as background
+
+                    draw = ImageDraw.Draw(R_VALUES)
+                    font = ImageFont.truetype('arial.ttf', size=30)
+                    (x, y) = (50, 50)
+                    message = "R Matrix Values\n"
+                    message = message + "Average: {0:.4f}".format(nan_mean) + "\n"
+                    message = message + "Sigma: {0:.4f}".format(nan_st_dev)
+
+                    # Mean: {0:.4f}\n".format(nan_mean, 2.000*float(self.frame_count))
+                    color = 'rgb(0, 0, 0)'  # black color
+                    draw.text((x, y), message, fill=color, font=font)
+                    R_VALUES = np.array(R_VALUES)
+                    VALUES_W_HIST = np.concatenate((R_VALUES * (2 ** 8), np.array(R_HIST)), axis=1)
+                    # R_HIST_W_DISPLAYABLE_R =
+                    # print("R VALUES TYPE: {}".format(R_VALUES.dtype))
+                    # print("R_HIST TYPE: {}".format(R_HIST.dtype))
+
+                    cv2.imshow("R_MATRIX", np.concatenate(
+                        (VALUES_W_HIST, np.array(DISPLAYABLE_R_MATRIX * (2 ** 8), dtype='uint16')), axis=1))
+                    continue_stream = self.keep_streaming()
+                    if continue_stream is False:
+                        cv2.destroyAllWindows()
+                        fig_ = plt.figure()
+                        ax1 = fig_.add_subplot(111)
+                        frames = list()
+                        averages = list()
+                        sigmas = list()
+
+                        for i in range(1, len(stats)):
+                            frames.append(stats[i][0])
+                            averages.append(stats[i][1])
+                            sigmas.append(stats[i][2])
+
+                        ax1.errorbar(frames, averages,yerr=sigmas, c='b', capsize=5)
+                        ax1.set_xlabel('Frame')
+                        ax1.set_ylabel('R (Mean)')
+                        ax1.set_title('Mean R by Frame')
+                        save_path = os.path.join(run_folder, 'mean_r_by_frame.png')
+                        fig_.savefig(save_path)
+                        plot_img = cv2.imread(save_path, cv2.IMREAD_COLOR)
+                        cv2.imshow('R Mean Plot', plot_img)
+                        cv2.waitKey(60000)
+                        cv2.destroyAllWindows()
+                        satisfaction_input = input("Are you satisfied with this run? (y/n): ")
+                        if satisfaction_input.lower() == 'y':
+                            satisfied_with_run = True
+            if record_r_matrices.lower() == "n":
+                satisfied_with_run = True
+                continue_stream = False
 
         cv2.destroyAllWindows()
 
-        step = 8
-        current_r_frame = 0
-        run_folder = os.path.join("D:", "\\" + self.current_run)
-        record_r_matrices = input("Step 8 - Image Algebra (Record): Proceed? (y/n): ")
-        stats = list()
-        stats.append(["Frame", "Avg_R", "Sigma_R"])
-        #r_matrix_limit = int(input("R Matrix Frame Break: "))
-        if record_r_matrices.lower() == "y":
-            continue_stream = True
-            while continue_stream:
-                self.frame_count += 1
-                current_r_frame += 1
-                print("Current R Frame: {}".format(current_r_frame))
-                self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
-
-                x_a, y_a = self.static_center_a
-                x_b, y_b = self.static_center_b
-
-                n_sigma = 1
-
-                self.roi_a = self.current_frame_a[
-                             y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + 1,
-                             x_a - n_sigma * self.static_sigmas_x: x_a + n_sigma * self.static_sigmas_x + 1
-                             ]
-
-                self.roi_b = self.current_frame_b[
-                             y_b - n_sigma * self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + 1,
-                             x_b - n_sigma * self.static_sigmas_x: x_b + n_sigma * self.static_sigmas_x + 1
-                             ]
-
-                h = self.roi_a.shape[0]
-                w = self.roi_a.shape[1]
-
-                update_histogram(histograms, lines, "a", 4096, self.roi_a)
-                update_histogram(histograms, lines, "b", 4096, self.roi_b)
-                figs["a"].canvas.draw()  # Draw updates subplots in interactive mode
-                figs["b"].canvas.draw()  # Draw updates subplots in interactive mode
-                hist_img_a = np.fromstring(figs["a"].canvas.tostring_rgb(), dtype=np.uint8, sep='')
-                hist_img_b = np.fromstring(figs["b"].canvas.tostring_rgb(), dtype=np.uint8, sep='')  # convert  to image
-                hist_img_a = hist_img_a.reshape(figs["a"].canvas.get_width_height()[::-1] + (3,))
-                hist_img_b = hist_img_b.reshape(figs["b"].canvas.get_width_height()[::-1] + (3,))
-                hist_img_a = cv2.resize(hist_img_a, (w, h), interpolation=cv2.INTER_AREA)
-                hist_img_b = cv2.resize(hist_img_b, (w, h), interpolation=cv2.INTER_AREA)
-                hist_img_a = bdc.to_16_bit(cv2.resize(hist_img_a, (w, h), interpolation=cv2.INTER_AREA), 8)
-                hist_img_b = bdc.to_16_bit(cv2.resize(hist_img_b, (w, h), interpolation=cv2.INTER_AREA), 8)
-
-                ROI_A_WITH_HISTOGRAM = np.concatenate(
-                    (cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR), cv2.cvtColor(self.roi_a * 16, cv2.COLOR_GRAY2BGR)),
-                    axis=1)
-                ROI_B_WITH_HISTOGRAM = np.concatenate(
-                    (cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR), cv2.cvtColor(self.roi_b * 16, cv2.COLOR_GRAY2BGR)),
-                    axis=1)
-
-                A_ON_B = np.concatenate((ROI_A_WITH_HISTOGRAM, ROI_B_WITH_HISTOGRAM), axis=0)
-
-                plus_ = cv2.add(self.roi_a, self.roi_b)
-                minus_ = np.zeros(self.roi_a.shape, dtype='int16')
-                minus_ = np.add(minus_, self.roi_a)
-                minus_ = np.add(minus_, self.roi_b * (-1))
-                # print("Lowest pixel in the minus spectrum: {}".format(np.min(minus_.flatten())))
-
-                update_histogram(histograms_alg, lines_alg, "plus", 4096, plus_, plus=True)
-                update_histogram(histograms_alg, lines_alg, "minus", 4096, minus_, minus=True)
-
-                displayable_plus = cv2.add(self.roi_a, self.roi_b) * 16
-                displayable_minus = cv2.subtract(self.roi_a, self.roi_b) * 16
-
-                figs_alg["plus"].canvas.draw()  # Draw updates subplots in interactive mode
-                hist_img_plus = np.fromstring(figs_alg["plus"].canvas.tostring_rgb(), dtype=np.uint8, sep='')
-                hist_img_plus = hist_img_plus.reshape(figs_alg["plus"].canvas.get_width_height()[::-1] + (3,))
-                hist_img_plus = cv2.resize(hist_img_plus, (w, h), interpolation=cv2.INTER_AREA)
-                hist_img_plus = bdc.to_16_bit(cv2.resize(hist_img_plus, (w, h), interpolation=cv2.INTER_AREA), 8)
-                PLUS_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_plus, cv2.COLOR_RGB2BGR),
-                                                      cv2.cvtColor(displayable_plus, cv2.COLOR_GRAY2BGR)), axis=1)
-
-                figs_alg["minus"].canvas.draw()  # Draw updates subplots in interactive mode
-                hist_img_minus = np.fromstring(figs_alg["minus"].canvas.tostring_rgb(), dtype=np.uint8,
-                                               sep='')  # convert  to image
-                hist_img_minus = hist_img_minus.reshape(figs_alg["minus"].canvas.get_width_height()[::-1] + (3,))
-                hist_img_minus = cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA)
-                hist_img_minus = bdc.to_16_bit(cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA), 8)
-                MINUS_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_minus, cv2.COLOR_RGB2BGR),
-                                                       cv2.cvtColor(displayable_minus, cv2.COLOR_GRAY2BGR)), axis=1)
-
-                ALGEBRA = np.concatenate((PLUS_WITH_HISTOGRAM, MINUS_WITH_HISTOGRAM), axis=0)
-                DASHBOARD = np.concatenate((A_ON_B, ALGEBRA), axis=1)
-                dash_height, dash_width, dash_channels = DASHBOARD.shape
-                if dash_width > 2000:
-                    scale_factor = float(float(2000) / float(dash_width))
-                    DASHBOARD = cv2.resize(DASHBOARD, (int(dash_width * scale_factor), int(dash_height * scale_factor)))
-                cv2.imshow("Dashboard", DASHBOARD)
-
-                R_MATRIX = np.divide(minus_, plus_)
-                self.r_frames.append(R_MATRIX)
-                nan_mean = np.nanmean(R_MATRIX.flatten())
-                nan_st_dev = np.nanstd(R_MATRIX.flatten())
-                stats.append([len(self.r_frames), nan_mean, nan_st_dev])
-
-                # print("nan mean: ", nan_mean)
-                # print("nan std dev: ", nan_st_dev)
-
-                DISPLAYABLE_R_MATRIX = np.zeros((R_MATRIX.shape[0], R_MATRIX.shape[1], 3), dtype=np.uint8)
-                DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX < 0.00, abs(R_MATRIX * (2 ** 8 - 1)), 0)
-                DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX < 0.00, abs(R_MATRIX * (2 ** 8 - 1)), 0)
-
-                # DISPLAYABLE_R_MATRIX[:, :, 0] = np.where(R_MATRIX > 0.00, abs(R_MATRIX*(2**8 - 1)), DISPLAYABLE_R_MATRIX[:, :, 0])
-                # DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX > 0.00, abs(R_MATRIX*(2**8 - 1)), DISPLAYABLE_R_MATRIX[:, :, 1])#qqqqq
-                DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX > 0.00, abs(R_MATRIX * (2 ** 8 - 1)),
-                                                         DISPLAYABLE_R_MATRIX[:, :, 2])
-
-                dr_height, dr_width, dr_channels = DISPLAYABLE_R_MATRIX.shape
-                scale_factor = 1
-                if dr_width > 450:
-                    scale_factor = float(float(450) / float(dr_width))
-                    DISPLAYABLE_R_MATRIX = cv2.resize(DISPLAYABLE_R_MATRIX,
-                                                      (int(dr_width * scale_factor), int(dr_height * scale_factor)))
-                dr_height, dr_width, dr_channels = DISPLAYABLE_R_MATRIX.shape
-
-                # WHITE_BACKGROUND = 255
-
-                """
-                print("\n\n\nMiddle 4 Values - A:\n\t{}".format(
-                                                        self.roi_a[int(self.roi_a.shape[1]/2),
-                                                        int(self.roi_a.shape[0]/2)-2:int(self.roi_a.shape[0]/2)+2]))
-
-                print("Middle 4 Values - B Prime:\n\t{}".format(
-                                                        self.roi_b[int(self.roi_b.shape[1]/2),
-                                                        int(self.roi_b.shape[0]/2)-2:int(self.roi_b.shape[0]/2)+2]))
-
-                print("Middle 4 Values - Plus:\n\t{}".format(
-                                                        plus_[int(plus_.shape[1]/2),
-                                                        int(plus_.shape[0]/2)-2:int(plus_.shape[0]/2)+2]))
-
-                print("Middle 4 Values - Minus:\n\t{}".format(
-                                                        minus_[int(minus_.shape[1]/2),
-                                                        int(minus_.shape[0]/2)-2:int(minus_.shape[0]/2)+2]))
-
-                print("Middle 4 Values - R:\n\t{}".format(
-                                                        R_MATRIX[int(R_MATRIX.shape[1]/2),
-                                                        int(R_MATRIX.shape[0]/2)-2:int(R_MATRIX.shape[0]/2)+2]))
-
-                print("Average(R_MATRIX):\n\t{}\n\n\n".format(np.mean(R_MATRIX.flatten())))
-                """
-
-                # draw = ImageDraw.Draw(image)
-
-                # cv2.imshow("R_MATRIX", DISPLAYABLE_R_MATRIX)
-                R_VALUES = Image.new('RGB', (dr_width, dr_height), (255, 255, 255))
-                # if WHITE_BACKGROUND.shape != DISPLAYABLE_R_MATRIX.shape:
-                # WHITE_BACKGROUND = cv2.resize(WHITE_BACKGROUND, (int(dr_width*scale_factor), int(dr_height*scale_factor)))
-
-                # image = Image.open('background.png')
-
-                # initialise the drawing context with
-                # the image object as background
-
-                draw = ImageDraw.Draw(R_VALUES)
-                font = ImageFont.truetype('arial.ttf', size=30)
-                (x, y) = (50, 50)
-                message = "R Matrix Values\n"
-                message = message + "Average: {0:.4f}".format(nan_mean) + "\n"
-                message = message + "Standard Deviation: {0:.4f}".format(nan_st_dev)
-
-                # Mean: {0:.4f}\n".format(nan_mean, 2.000*float(self.frame_count))
-                color = 'rgb(0, 0, 0)'  # black color
-                draw.text((x, y), message, fill=color, font=font)
-                R_VALUES = np.array(R_VALUES)
-
-                cv2.imshow("R_MATRIX", np.concatenate((R_VALUES, DISPLAYABLE_R_MATRIX), axis=1))
-                continue_stream = self.keep_streaming()
-
-            cv2.destroyAllWindows()
-
         step = 9
-        write_to_csv = input("Step 9 - Write Recorded R Frame(s) to File(s)? : Proceed? (y/n)")
+        write_to_csv = input("Step 9 - Write Recorded R Frame(s) to File(s)? - Proceed? (y/n): ")
 
         if write_to_csv.lower() == 'y':
             print("During Step 8: You saved {} R Matrices".format(len(self.r_frames)))
@@ -1288,8 +1408,16 @@ class Stream:
             stats_csv_path = os.path.join(run_folder, "r_matrices_stats.csv")
             with open(stats_csv_path, "w+", newline='') as stats_csv:
                 stats_csvWriter = csv.writer(stats_csv, delimiter=',')
+                print("Writing R Matrix Stats to file:")
                 for i in range(len(r_matrices)):
-
                     stats_csvWriter.writerow(stats[i])
+                    #progressBar(i+1, len(r_matrices))
 
+            print("Matrices and Matrix Stats have finished writing to file.")
+        try:
+            if not app.at_front:
+                app.bring_to_front()
+        except Exception:
+            pass
+        app.callback()
         self.all_cams.StopGrabbing()
