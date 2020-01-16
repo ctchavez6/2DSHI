@@ -25,6 +25,7 @@ parser = argparse.ArgumentParser()
 if __name__ == "__main__":
     args = None
     run_mode = uiv.determine_run_mode(sys.argv[:])
+    current_directory = os.getcwd()
 
     if run_mode == 1:  # Apply the parameters for the previous run, exactly.
         prev_run = find_previous_run.get_latest_run()
@@ -109,6 +110,7 @@ if __name__ == "__main__":
             b16 = bdc.to_16_bit(b_frames[j])
             im.save_img("b_{}.png".format(j + 1), b_frames_dir, b16)
 
+    os.chdir(run_directory)
     try:
         print("Writing Stream Configurations to File")
         wptf.document_configurations(
@@ -118,9 +120,9 @@ if __name__ == "__main__":
             current_datetime=current_datetime)
     except TypeError as e:
         print("TYPE ERROR")
-        raise e
+        #raise e
     print("Done")
-
+    os.chdir(current_directory)
     print("You have completed and exited the script.")
 
 

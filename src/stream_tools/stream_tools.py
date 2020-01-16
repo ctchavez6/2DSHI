@@ -15,6 +15,7 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 import tkinter as tk
 import threading
+from path_management import image_management as im
 
 
 def progressBar(value, endvalue, bar_length=20):
@@ -864,6 +865,43 @@ class Stream:
                 print("\tPhi Y (rad):{}".format(phi))
                 print("\tPhi Y (deg):{}\n".format(np.degrees(phi)))
 
+                temp_a_8bit = np.array(self.current_frame_a, dtype='uint8')  # bdc.to_8_bit()
+                temp_b_prime_8bit = np.array(self.current_frame_b, dtype='uint8')
+                # temp_b_prime_8bit = bdc.to_8_bit(self.current_frame_b)
+                GOOD_MATCH_PERCENT = 0.10
+                orb = cv2.ORB_create(nfeatures=10000, scoreType=cv2.ORB_FAST_SCORE, nlevels=20)
+                keypoints1, descriptors1 = orb.detectAndCompute(temp_a_8bit, None)
+                keypoints2, descriptors2 = orb.detectAndCompute(temp_b_prime_8bit, None)
+
+                print("A has {} key points".format(len(keypoints1)))
+                print("B has {} key points".format(len(keypoints2)))
+                # cv2.drawMatchesKnn expects list of lists as matches.
+
+                matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
+                matches = matcher.match(descriptors1, descriptors2, None)
+                matches.sort(key=lambda x: x.distance, reverse=False)
+
+                # BFMatcher with default params
+                bf = cv2.BFMatcher()
+                knn_matches = bf.knnMatch(descriptors1, descriptors2, k=2)
+                lowe_ratio = 0.89
+
+                # Apply ratio test
+                good_knn = []
+
+                for m, n in knn_matches:
+                    if m.distance < lowe_ratio * n.distance:
+                        good_knn.append([m])
+
+                print("Percentage of Matches within Lowe Ratio of 0.89: {0:.4f}".format(
+                    100 * float(len(good_knn)) / float(len(knn_matches))))
+
+                imMatches = cv2.drawMatches(temp_a_8bit, keypoints1, temp_b_prime_8bit, keypoints2, matches[:25], None)
+                cv2.imshow("DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING",
+                           cv2.resize(imMatches, (int(imMatches.shape[1] * 0.5), int(imMatches.shape[0] * 0.5))))
+                cv2.waitKey(60000)
+                cv2.destroyAllWindows()
+
             while continue_stream:
                 self.frame_count += 1
                 self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
@@ -874,6 +912,8 @@ class Stream:
                 continue_stream = self.keep_streaming()
 
             cv2.destroyAllWindows()
+
+        cv2.destroyAllWindows()
 
 
 
@@ -1191,16 +1231,10 @@ class Stream:
             draw.text((x, y), message, fill=color, font=font)
             R_VALUES = np.array(R_VALUES)
             VALUES_W_HIST = np.concatenate((R_VALUES*(2**8), np.array(R_HIST)), axis=1)
-            #R_HIST_W_DISPLAYABLE_R =
-            #print("R VALUES TYPE: {}".format(R_VALUES.dtype))
-            #print("R_HIST TYPE: {}".format(R_HIST.dtype))
+
 
 
             cv2.imshow("R_MATRIX", np.concatenate((VALUES_W_HIST, np.array(DISPLAYABLE_R_MATRIX*(2**8), dtype='uint16')), axis=1))
-
-            #cv2.imshow("R_WITH_HISTOGRAM", R_WITH_HISTOGRAM)
-
-
             continue_stream = self.keep_streaming()
             if not continue_stream:
                 app.callback()
@@ -1211,6 +1245,8 @@ class Stream:
 
         current_r_frame = 0
         stats = list()
+        a_frames = list()
+        b_prime_frames = list()
 
         step = 8
         run_folder = os.path.join("D:", "\\" + self.current_run)
@@ -1219,6 +1255,9 @@ class Stream:
             record_r_matrices = input("Step 8 - Image Algebra (Record): Proceed? (y/n): ")
             stats = list()
             self.r_frames = list()
+            a_frames = list()
+            b_prime_frames = list()
+
             stats.append(["Frame", "Avg_R", "Sigma_R"])
             #r_matrix_limit = int(input("R Matrix Frame Break: "))
             if record_r_matrices.lower() == "y":
@@ -1233,6 +1272,9 @@ class Stream:
                     x_b, y_b = self.static_center_b
 
                     n_sigma = 1
+
+                    a_frames.append(self.current_frame_a)
+                    b_prime_frames.append(self.current_frame_b)
 
                     self.roi_a = self.current_frame_a[
                                  y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + 1,
@@ -1398,12 +1440,42 @@ class Stream:
 
             r_matrices = self.r_frames[:how_many_r]
             n_ = 0
+
             for r_matrix in r_matrices:
                 n_ += 1
                 csv_path = os.path.join(run_folder, "r_matrix_{}.csv".format(n_))
                 with open(csv_path, "w+", newline='') as my_csv:
                     csvWriter = csv.writer(my_csv, delimiter=',')
                     csvWriter.writerows(r_matrix.tolist())
+
+            n_ = 0
+            a_frames_dir = os.path.join(run_folder, "cam_a_frames")
+
+            for a_matrix in a_frames:
+                n_ += 1
+                csv_path = os.path.join(run_folder, "a_matrix_{}.csv".format(n_))
+                with open(csv_path, "w+", newline='') as my_csv:
+                    csvWriter = csv.writer(my_csv, delimiter=',')
+                    csvWriter.writerows(a_matrix.tolist())
+
+                a16 = bdc.to_16_bit(a_matrix)
+                im.save_img("a_{}.png".format(n_), a_frames_dir, a16)
+
+
+            b_frames_dir = os.path.join(run_folder, "cam_b_frames")
+
+            n_ = 0
+            for b_matrix in b_prime_frames:
+                n_ += 1
+                csv_path = os.path.join(run_folder, "b_matrix_{}.csv".format(n_))
+                with open(csv_path, "w+", newline='') as my_csv:
+                    csvWriter = csv.writer(my_csv, delimiter=',')
+                    csvWriter.writerows(b_matrix.tolist())
+
+                b16 = bdc.to_16_bit(b_matrix)
+                im.save_img("b_{}.png".format(n_), b_frames_dir, b16)
+
+
 
             stats_csv_path = os.path.join(run_folder, "r_matrices_stats.csv")
             with open(stats_csv_path, "w+", newline='') as stats_csv:
