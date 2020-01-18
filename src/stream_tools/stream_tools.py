@@ -607,6 +607,8 @@ class Stream:
 
 
         self.warp_matrix = None
+        self.warp_matrix_2 = None
+
         self.jump_level = 0
 
 
@@ -656,7 +658,7 @@ class Stream:
             print("Step 2 - Co-Register with Euclidean Transform")
             print("Step 3 - Find Brightest Pixel Locations")
             print("Step 4 - Set Gaussian-Based Static Centers")
-            print("Step 5 - Find Regions of Interest")
+            print("Step 5 - Define Regions of Interest & Re-Coregister")
             print("Step 6 - Close in on ROI")
             print("Step 7 - Commence Image Algebra (Free Stream)")
             jump_level_input = int(input("Which level would you like to jump to?  "))
@@ -715,7 +717,7 @@ class Stream:
         return (x_a, y_a), (x_b, y_b)
 
 
-    def grab_frames(self, warp_matrix=None):
+    def grab_frames(self, warp_matrix=None, warp_matrix2=None):
         try:
             grab_result_a = self.cam_a.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
             grab_result_b = self.cam_b.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
@@ -734,6 +736,13 @@ class Stream:
                     return a, b_prime
         except Exception as e:
             raise e
+
+    def grab_frames2(self, roi_a, roi_b, warp_matrix_2):
+        roi_shape = roi_b.shape[1], roi_b.shape[0]
+        roi_b_double_prime = cv2.warpAffine(roi_b, warp_matrix_2, roi_shape, flags=cv2.WARP_INVERSE_MAP)
+        return roi_a, roi_b_double_prime
+
+
 
     def show_16bit_representations(self, a_as_12bit, b_as_12bit, b_prime=False, show_centers=False):
         a_as_16bit = bdc.to_16_bit(a_as_12bit)
@@ -989,7 +998,7 @@ class Stream:
         step = 5
         if self.jump_level < step:
 
-            find_rois_ = input("Step 5 - Find Regions of Interest: Proceed? (y/n): ")
+            find_rois_ = input("Step 5 - Define Regions of Interest: Proceed? (y/n): ")
 
             if find_rois_.lower() == "y":
                 continue_stream = True
@@ -1022,6 +1031,7 @@ class Stream:
 
                         if self.frame_count % 10 == 0:
                             print("\tA  - Sigma X, Sigma Y - {}".format((int(sigma_x_a), int(sigma_y_a))))
+                            print("\tB  - Sigma X, Sigma Y - {}".format((int(sigma_x_b), int(sigma_y_b))))
 
 
                     for img_12bit in [self.current_frame_b]:
@@ -1036,8 +1046,8 @@ class Stream:
                         img_12bit[int(center_[1]) + int(sigma_y_b * n_sigma), :] = 4095
                         img_12bit[int(center_[1]) - int(sigma_y_b * n_sigma), :] = 4095
 
-                        a_as_16bit = bdc.to_16_bit(self.current_frame_a)
-                        b_as_16bit = bdc.to_16_bit(self.current_frame_b)
+                    a_as_16bit = bdc.to_16_bit(self.current_frame_a)
+                    b_as_16bit = bdc.to_16_bit(self.current_frame_b)
 
 
                     cv2.imshow("A", a_as_16bit)
@@ -1045,7 +1055,6 @@ class Stream:
 
                 except Exception:
                     print("Exception Occurred")
-                    pass
 
                 continue_stream = self.keep_streaming()
 
@@ -1055,10 +1064,12 @@ class Stream:
 
             cv2.destroyAllWindows()
 
+
+
         step = 6
         if self.jump_level < step:
 
-            close_in = input("Step 6 - Close in on ROI: Proceed? (y/n): ")
+            close_in = input("Step 6A - Close in on ROI: Proceed? (y/n): ")
 
             if close_in.lower() == "y":
                 continue_stream = True
@@ -1088,9 +1099,205 @@ class Stream:
 
             cv2.destroyAllWindows()
 
+
+
+        step = 6
+        if self.jump_level < step:
+
+            find_rois_ = input("Step 6B - Re-Coregister: Proceed? (y/n): ")
+
+            if find_rois_.lower() == "y":
+                continue_stream = True
+
+            while continue_stream:
+
+                self.frame_count += 1
+                self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
+
+                x_a, y_a = self.static_center_a
+                x_b, y_b = self.static_center_b
+
+                n_sigma = app.foo
+
+                self.roi_a = self.current_frame_a[
+                             y_a - n_sigma * self.static_sigmas_y : y_a + n_sigma * self.static_sigmas_y + 1,
+                             x_a - n_sigma * self.static_sigmas_x : x_a + n_sigma * self.static_sigmas_x + 1
+                             ]
+
+                self.roi_b = self.current_frame_b[
+                             y_b - n_sigma * self.static_sigmas_y : y_b + n_sigma * self.static_sigmas_y + 1,
+                             x_b - n_sigma * self.static_sigmas_x : x_b + n_sigma * self.static_sigmas_x + 1
+                             ]
+
+                roi_a_8bit = bdc.to_8_bit(self.roi_a)
+                roi_b_8bit = bdc.to_8_bit(self.roi_b)
+                warp_2_ = ic.get_euclidean_transform_matrix(roi_a_8bit, roi_b_8bit)
+                self.warp_matrix_2 = warp_2_
+
+
+                a, b, tx = warp_2_[0][0], warp_2_[0][1], warp_2_[0][2]
+                c, d, ty = warp_2_[1][0], warp_2_[1][1], warp_2_[1][2]
+
+                print("\tTranslation X:{}".format(tx))
+                print("\tTranslation Y:{}\n".format(ty))
+
+                scale_x = np.sign(a) * (np.sqrt(a ** 2 + b ** 2))
+                scale_y = np.sign(d) * (np.sqrt(c ** 2 + d ** 2))
+
+                print("\tScale X:{}".format(scale_x))
+                print("\tScale Y:{}\n".format(scale_y))
+
+                phi = np.arctan2(-1.0 * b, a)
+                print("\tPhi Y (rad):{}".format(phi))
+                print("\tPhi Y (deg):{}\n".format(np.degrees(phi)))
+                continue_stream = False
+
+            cv2.destroyAllWindows()
+
+            display_new = input("Step 6C - Display Re-Coregistered Images: Proceed? (y/n): ")
+
+            if display_new.lower() == "y":
+                continue_stream = True
+
+
+            cv2.destroyAllWindows()
+
+            while continue_stream:
+                self.frame_count += 1
+                self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
+
+                x_a, y_a = self.static_center_a
+                x_b, y_b = self.static_center_b
+
+                n_sigma = 2
+
+                self.roi_a = self.current_frame_a[
+                             y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + 1,
+                             x_a - n_sigma*self.static_sigmas_x: x_a + n_sigma*self.static_sigmas_x + 1
+                             ]
+
+                self.roi_b = self.current_frame_b[
+                             y_b - n_sigma * self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + 1,
+                             x_b - n_sigma*self.static_sigmas_x: x_b + n_sigma*self.static_sigmas_x + 1
+                             ]
+
+                cv2.imshow("ROI A", bdc.to_16_bit(self.roi_a))
+                cv2.imshow("ROI B Prime", bdc.to_16_bit(self.roi_b))
+
+
+                roi_a, b_double_prime = self.grab_frames2(self.roi_a.copy(), self.roi_b.copy(), self.warp_matrix_2.copy())
+                cv2.imshow("ROI B DOUBLE PRIME", bdc.to_16_bit(b_double_prime))
+
+
+                continue_stream = self.keep_streaming()
+
+
+
+
+
+
+
+
+
+                """
+                self.frame_count += 1
+                self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
+
+                x_a, y_a = self.static_center_a
+                x_b, y_b = self.static_center_b
+
+                n_sigma = app.foo
+
+                self.roi_a = self.current_frame_a[
+                             y_a - n_sigma * self.static_sigmas_y : y_a + n_sigma * self.static_sigmas_y + 1,
+                             x_a - n_sigma * self.static_sigmas_x : x_a + n_sigma * self.static_sigmas_x + 1
+                             ]
+
+                self.roi_b = self.current_frame_b[
+                             y_b - n_sigma * self.static_sigmas_y : y_b + n_sigma * self.static_sigmas_y + 1,
+                             x_b - n_sigma * self.static_sigmas_x : x_b + n_sigma * self.static_sigmas_x + 1
+                             ]
+
+                roi_a, b_double_prime = self.grab_frames2(self.roi_a, self.roi_b, self.warp_matrix_2)
+                cv2.imshow("ROI A", bdc.to_16_bit(roi_a))
+                cv2.imshow("ROI B Double Prime", bdc.to_16_bit(b_double_prime))
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                temp_a_8bit = np.array(self.current_frame_a, dtype='uint8')  # bdc.to_8_bit()
+                temp_b_double_prime_8bit = np.array(self.current_frame_b, dtype='uint8')
+                # temp_b_prime_8bit = bdc.to_8_bit(self.current_frame_b)
+                GOOD_MATCH_PERCENT = 0.10
+                orb = cv2.ORB_create(nfeatures=10000, scoreType=cv2.ORB_FAST_SCORE, nlevels=20)
+                keypoints1, descriptors1 = orb.detectAndCompute(temp_a_8bit, None)
+                keypoints2, descriptors2 = orb.detectAndCompute(temp_b_prime_8bit, None)
+
+                print("A has {} key points".format(len(keypoints1)))
+                print("B has {} key points".format(len(keypoints2)))
+                # cv2.drawMatchesKnn expects list of lists as matches.
+
+                matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
+                matches = matcher.match(descriptors1, descriptors2, None)
+                matches.sort(key=lambda x: x.distance, reverse=False)
+
+                # BFMatcher with default params
+                bf = cv2.BFMatcher()
+                knn_matches = bf.knnMatch(descriptors1, descriptors2, k=2)
+                lowe_ratio = 0.89
+
+                # Apply ratio test
+                good_knn = []
+
+                for m, n in knn_matches:
+                    if m.distance < lowe_ratio * n.distance:
+                        good_knn.append([m])
+
+                print("Percentage of Matches within Lowe Ratio of 0.89: {0:.4f}".format(
+                    100 * float(len(good_knn)) / float(len(knn_matches))))
+
+                imMatches = cv2.drawMatches(temp_a_8bit, keypoints1, temp_b_prime_8bit, keypoints2, matches[:25], None)
+                cv2.imshow("DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING",
+                           cv2.resize(imMatches, (int(imMatches.shape[1] * 0.5), int(imMatches.shape[0] * 0.5))))
+                cv2.waitKey(60000)
+                cv2.destroyAllWindows()
+                                    
+                """
+
+
+
+
+
+
+
+        cv2.destroyAllWindows()
+
+
+
+
+
+
         figs, histograms, lines = initialize_histograms_rois()
         figs_alg, histograms_alg, lines_alg = initialize_histograms_algebra()
         figs_r, histograms_r, lines_r = initialize_histograms_r()
+
+
+
 
         step = 7
 
@@ -1126,6 +1333,15 @@ class Stream:
 
             h = self.roi_a.shape[0]
             w = self.roi_a.shape[1]
+
+            #cv2.imshow("ROI A", bdc.to_16_bit(self.roi_a))
+
+            #cv2.imshow("ROI B Prime", bdc.to_16_bit(self.roi_b))
+
+            roi_a, b_double_prime = self.grab_frames2(self.roi_a.copy(), self.roi_b.copy(), self.warp_matrix_2.copy())
+            #cv2.imshow("ROI B DOUBLE PRIME", bdc.to_16_bit(b_double_prime))
+
+            self.roi_b = b_double_prime
 
             update_histogram(histograms, lines, "a", 4096, self.roi_a)
             update_histogram(histograms, lines, "b", 4096, self.roi_b)
@@ -1501,3 +1717,4 @@ class Stream:
             pass
         app.callback()
         self.all_cams.StopGrabbing()
+        print("This is B double prime")
