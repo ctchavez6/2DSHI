@@ -654,13 +654,13 @@ class Stream:
     def offer_to_jump(self):
         offer = input("Would you like ot use the previous parameters to a specific step? (y/n): ")
         if offer.lower() == 'y':
-            print("Step 1 - Stream Raw Camera Feed")
-            print("Step 2 - Co-Register with Euclidean Transform")
-            print("Step 3 - Find Brightest Pixel Locations")
-            print("Step 4 - Set Gaussian-Based Static Centers")
-            print("Step 5 - Define Regions of Interest & Re-Coregister")
-            print("Step 6 - Close in on ROI")
-            print("Step 7 - Commence Image Algebra (Free Stream)")
+            print("Step 1       : Stream Raw Camera Feed")
+            print("Step 2       : Co-Register with Euclidean Transform")
+            print("Step 3       : Find Brightest Pixel Locations")
+            print("Step 4       : Set Gaussian-Based Static Centers")
+            print("Step 5       : Define Regions of Interest ")
+            print("Step 6A - 6C : Close in on ROI & Re-Co Register")
+            print("Step 7       : Commence Image Algebra (Free Stream)")
             jump_level_input = int(input("Which level would you like to jump to?  "))
             self.jump_level = jump_level_input
 
