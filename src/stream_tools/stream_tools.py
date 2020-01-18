@@ -43,18 +43,18 @@ class App(threading.Thread):
       self.root.quit()
 
    def scale_onChange(self, value):
-      self.foo = int(value)
+      self.foo = float(value)
 
 
    def run(self):
       self.root = tk.Tk()
       self.root.protocol("WM_DELETE_WINDOW", self.callback)
 
-      label = tk.Label(self.root, text="Hello World")
+      label = tk.Label(self.root, text="Sigma")
       label.pack()
 
-      scale = tk.Scale(from_=1, to=2, tickinterval=0.5, orient=tk.HORIZONTAL, command=self.scale_onChange)
-      scale.pack()
+      scale = tk.Scale(from_=1.00, to=2.50, tickinterval=0.0001, resolution = 0.25, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange).pack()
+      #scale.pack()
 
       #self.foo = label
       self.root.mainloop()
@@ -977,9 +977,12 @@ class Stream:
                 print("Setting Centers\n")
                 print("Calculated Gaussian Centers")
                 self.static_center_a = (int(mu_a_x), int(mu_a_y))
-                self.static_center_b = (int(mu_b_x), int(mu_b_y))  # Original
-                print("\t\tA      : {}".format(self.static_center_a))
-                print("\t\tB Prime: {}".format(self.static_center_b))
+                #self.static_center_b = (int(mu_b_x), int(mu_b_y))  # Original
+                self.static_center_b = (int(mu_a_x), int(mu_a_y))  # Picking A
+
+                print("\t\tA                         : {}".format(self.static_center_a))
+                print("\t\tB Prime (Calculated)      : {}".format((int(mu_b_x), int(mu_b_y))))
+                print("\t\tB Prime (Overwritten to A): {}".format(self.static_center_b))
 
 
 
@@ -1035,7 +1038,6 @@ class Stream:
 
                         if self.frame_count % 10 == 0:
                             print("\tA  - Sigma X, Sigma Y - {}".format((int(sigma_x_a), int(sigma_y_a))))
-                            print("\tB  - Sigma X, Sigma Y - {}".format((int(sigma_x_b), int(sigma_y_b))))
 
 
                     for img_12bit in [self.current_frame_b]:
@@ -1049,6 +1051,9 @@ class Stream:
 
                         img_12bit[int(center_[1]) + int(sigma_y_b * n_sigma), :] = 4095
                         img_12bit[int(center_[1]) - int(sigma_y_b * n_sigma), :] = 4095
+
+                        if self.frame_count % 10 == 0:
+                            print("\tB  - Sigma X, Sigma Y - {}".format((int(sigma_x_a), int(sigma_y_a))))
 
                     a_as_16bit = bdc.to_16_bit(self.current_frame_a)
                     b_as_16bit = bdc.to_16_bit(self.current_frame_b)
@@ -1173,118 +1178,26 @@ class Stream:
                 x_a, y_a = self.static_center_a
                 x_b, y_b = self.static_center_b
 
-                n_sigma = 2
+                n_sigma = 3.0
 
                 self.roi_a = self.current_frame_a[
-                             y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + 1,
-                             x_a - n_sigma*self.static_sigmas_x: x_a + n_sigma*self.static_sigmas_x + 1
-                             ]
+                             int(y_a - n_sigma * self.static_sigmas_y): int(y_a + n_sigma * self.static_sigmas_y) + 1,
+                             int(x_a - n_sigma * self.static_sigmas_x): int(x_a + n_sigma*self.static_sigmas_x) + 1]
 
                 self.roi_b = self.current_frame_b[
-                             y_b - n_sigma * self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + 1,
-                             x_b - n_sigma*self.static_sigmas_x: x_b + n_sigma*self.static_sigmas_x + 1
-                             ]
+                             int(y_b - n_sigma * self.static_sigmas_y): int(y_b + n_sigma * self.static_sigmas_y) + 1,
+                             int(x_b - n_sigma*self.static_sigmas_x): int(x_b + n_sigma*self.static_sigmas_x) + 1]
 
                 cv2.imshow("ROI A", bdc.to_16_bit(self.roi_a))
                 cv2.imshow("ROI B Prime", bdc.to_16_bit(self.roi_b))
 
 
                 roi_a, b_double_prime = self.grab_frames2(self.roi_a.copy(), self.roi_b.copy(), self.warp_matrix_2.copy())
+
                 cv2.imshow("ROI B DOUBLE PRIME", bdc.to_16_bit(b_double_prime))
 
 
                 continue_stream = self.keep_streaming()
-
-
-
-
-
-
-
-
-
-                """
-                self.frame_count += 1
-                self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
-
-                x_a, y_a = self.static_center_a
-                x_b, y_b = self.static_center_b
-
-                n_sigma = app.foo
-
-                self.roi_a = self.current_frame_a[
-                             y_a - n_sigma * self.static_sigmas_y : y_a + n_sigma * self.static_sigmas_y + 1,
-                             x_a - n_sigma * self.static_sigmas_x : x_a + n_sigma * self.static_sigmas_x + 1
-                             ]
-
-                self.roi_b = self.current_frame_b[
-                             y_b - n_sigma * self.static_sigmas_y : y_b + n_sigma * self.static_sigmas_y + 1,
-                             x_b - n_sigma * self.static_sigmas_x : x_b + n_sigma * self.static_sigmas_x + 1
-                             ]
-
-                roi_a, b_double_prime = self.grab_frames2(self.roi_a, self.roi_b, self.warp_matrix_2)
-                cv2.imshow("ROI A", bdc.to_16_bit(roi_a))
-                cv2.imshow("ROI B Double Prime", bdc.to_16_bit(b_double_prime))
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                temp_a_8bit = np.array(self.current_frame_a, dtype='uint8')  # bdc.to_8_bit()
-                temp_b_double_prime_8bit = np.array(self.current_frame_b, dtype='uint8')
-                # temp_b_prime_8bit = bdc.to_8_bit(self.current_frame_b)
-                GOOD_MATCH_PERCENT = 0.10
-                orb = cv2.ORB_create(nfeatures=10000, scoreType=cv2.ORB_FAST_SCORE, nlevels=20)
-                keypoints1, descriptors1 = orb.detectAndCompute(temp_a_8bit, None)
-                keypoints2, descriptors2 = orb.detectAndCompute(temp_b_prime_8bit, None)
-
-                print("A has {} key points".format(len(keypoints1)))
-                print("B has {} key points".format(len(keypoints2)))
-                # cv2.drawMatchesKnn expects list of lists as matches.
-
-                matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
-                matches = matcher.match(descriptors1, descriptors2, None)
-                matches.sort(key=lambda x: x.distance, reverse=False)
-
-                # BFMatcher with default params
-                bf = cv2.BFMatcher()
-                knn_matches = bf.knnMatch(descriptors1, descriptors2, k=2)
-                lowe_ratio = 0.89
-
-                # Apply ratio test
-                good_knn = []
-
-                for m, n in knn_matches:
-                    if m.distance < lowe_ratio * n.distance:
-                        good_knn.append([m])
-
-                print("Percentage of Matches within Lowe Ratio of 0.89: {0:.4f}".format(
-                    100 * float(len(good_knn)) / float(len(knn_matches))))
-
-                imMatches = cv2.drawMatches(temp_a_8bit, keypoints1, temp_b_prime_8bit, keypoints2, matches[:25], None)
-                cv2.imshow("DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING",
-                           cv2.resize(imMatches, (int(imMatches.shape[1] * 0.5), int(imMatches.shape[0] * 0.5))))
-                cv2.waitKey(60000)
-                cv2.destroyAllWindows()
-                                    
-                """
-
-
-
 
 
 
@@ -1319,33 +1232,59 @@ class Stream:
             self.frame_count += 1
             self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
 
+            """
+            INITIAL BEFORE WE SHRINK DOWN
+            """
 
             x_a, y_a = self.static_center_a
             x_b, y_b = self.static_center_b
 
-            n_sigma = app.foo
+            n_sigma = 3
+
 
             self.roi_a = self.current_frame_a[
-                         y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + 1,
-                         x_a - n_sigma*self.static_sigmas_x: x_a + n_sigma*self.static_sigmas_x + 1
+                         y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + n_sigma,
+                         x_a - n_sigma*self.static_sigmas_x: x_a + n_sigma*self.static_sigmas_x + n_sigma
                          ]
 
             self.roi_b = self.current_frame_b[
-                         y_b - n_sigma * self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + 1,
-                         x_b - n_sigma * self.static_sigmas_x: x_b + n_sigma*self.static_sigmas_x + 1
+                         y_b - n_sigma * self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + n_sigma,
+                         x_b - n_sigma * self.static_sigmas_x: x_b + n_sigma*self.static_sigmas_x + n_sigma
                          ]
 
-            h = self.roi_a.shape[0]
-            w = self.roi_a.shape[1]
 
-            #cv2.imshow("ROI A", bdc.to_16_bit(self.roi_a))
-
-            #cv2.imshow("ROI B Prime", bdc.to_16_bit(self.roi_b))
 
             roi_a, b_double_prime = self.grab_frames2(self.roi_a.copy(), self.roi_b.copy(), self.warp_matrix_2.copy())
-            #cv2.imshow("ROI B DOUBLE PRIME", bdc.to_16_bit(b_double_prime))
+
+
+            CENTER_B_DP = int(b_double_prime.shape[1]*0.5), int(b_double_prime.shape[0]*0.5)
+
+
+            x_a, y_a = CENTER_B_DP
+            x_b, y_b = CENTER_B_DP
+            n_sigma = app.foo
+            #print("n_sigma = {}".format(n_sigma))
+
+
+
+            self.roi_a = self.roi_a[
+                         int(y_a - n_sigma * self.static_sigmas_y): int(y_a + n_sigma * self.static_sigmas_y + 1),
+                         int(x_a - n_sigma * self.static_sigmas_x): int(x_a + n_sigma * self.static_sigmas_x + 1)
+                         ]
+
+            b_double_prime = b_double_prime[
+                         int(y_b - n_sigma * self.static_sigmas_y): int(y_b + n_sigma * self.static_sigmas_y + 1),
+                         int(x_b - n_sigma * self.static_sigmas_x): int(x_b + n_sigma * self.static_sigmas_x + 1)
+                         ]
 
             self.roi_b = b_double_prime
+            h = b_double_prime.shape[0]
+            w = b_double_prime.shape[1]
+
+
+
+            print("roi a Shape: {}".format(self.roi_a.shape))
+            print("roi B'' Shape: {}".format(self.roi_b.shape))
 
             update_histogram(histograms, lines, "a", 4096, self.roi_a)
             update_histogram(histograms, lines, "b", 4096, self.roi_b)
@@ -1362,6 +1301,9 @@ class Stream:
 
             ROI_A_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR), cv2.cvtColor(self.roi_a * 16, cv2.COLOR_GRAY2BGR)), axis=1)
             ROI_B_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR), cv2.cvtColor(self.roi_b * 16, cv2.COLOR_GRAY2BGR)), axis=1)
+
+            print("ROI_A_WITH_HISTOGRAM Shape: {}".format(ROI_A_WITH_HISTOGRAM.shape))
+            print("ROI_B_WITH_HISTOGRAM Shape: {}".format(ROI_B_WITH_HISTOGRAM.shape))
 
             A_ON_B = np.concatenate((ROI_A_WITH_HISTOGRAM, ROI_B_WITH_HISTOGRAM), axis=0)
 
@@ -1492,30 +1434,57 @@ class Stream:
                 continue_stream = True
                 while continue_stream:
                     self.frame_count += 1
-                    current_r_frame += 1
-                    print("Current R Frame: {}".format(current_r_frame))
                     self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
+
+                    """
+                    INITIAL BEFORE WE SHRINK DOWN
+                    """
 
                     x_a, y_a = self.static_center_a
                     x_b, y_b = self.static_center_b
 
-                    n_sigma = 1
-
-                    a_frames.append(self.current_frame_a)
-                    b_prime_frames.append(self.current_frame_b)
+                    n_sigma = 3
 
                     self.roi_a = self.current_frame_a[
-                                 y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + 1,
-                                 x_a - n_sigma * self.static_sigmas_x: x_a + n_sigma * self.static_sigmas_x + 1
+                                 y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + n_sigma,
+                                 x_a - n_sigma * self.static_sigmas_x: x_a + n_sigma * self.static_sigmas_x + n_sigma
                                  ]
 
                     self.roi_b = self.current_frame_b[
-                                 y_b - n_sigma * self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + 1,
-                                 x_b - n_sigma * self.static_sigmas_x: x_b + n_sigma * self.static_sigmas_x + 1
+                                 y_b - n_sigma * self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + n_sigma,
+                                 x_b - n_sigma * self.static_sigmas_x: x_b + n_sigma * self.static_sigmas_x + n_sigma
                                  ]
 
-                    h = self.roi_a.shape[0]
-                    w = self.roi_a.shape[1]
+                    roi_a, b_double_prime = self.grab_frames2(self.roi_a.copy(), self.roi_b.copy(),
+                                                              self.warp_matrix_2.copy())
+
+                    CENTER_B_DP = int(b_double_prime.shape[1] * 0.5), int(b_double_prime.shape[0] * 0.5)
+
+                    x_a, y_a = CENTER_B_DP
+                    x_b, y_b = CENTER_B_DP
+                    n_sigma = app.foo
+                    # print("n_sigma = {}".format(n_sigma))
+
+                    self.roi_a = self.roi_a[
+                                 int(y_a - n_sigma * self.static_sigmas_y): int(
+                                     y_a + n_sigma * self.static_sigmas_y + 1),
+                                 int(x_a - n_sigma * self.static_sigmas_x): int(
+                                     x_a + n_sigma * self.static_sigmas_x + 1)
+                                 ]
+
+                    b_double_prime = b_double_prime[
+                                     int(y_b - n_sigma * self.static_sigmas_y): int(
+                                         y_b + n_sigma * self.static_sigmas_y + 1),
+                                     int(x_b - n_sigma * self.static_sigmas_x): int(
+                                         x_b + n_sigma * self.static_sigmas_x + 1)
+                                     ]
+
+                    self.roi_b = b_double_prime
+                    h = b_double_prime.shape[0]
+                    w = b_double_prime.shape[1]
+
+                    print("roi a Shape: {}".format(self.roi_a.shape))
+                    print("roi B'' Shape: {}".format(self.roi_b.shape))
 
                     update_histogram(histograms, lines, "a", 4096, self.roi_a)
                     update_histogram(histograms, lines, "b", 4096, self.roi_b)
@@ -1543,7 +1512,6 @@ class Stream:
                     minus_ = np.zeros(self.roi_a.shape, dtype='int16')
                     minus_ = np.add(minus_, self.roi_a)
                     minus_ = np.add(minus_, self.roi_b * (-1))
-                    # print("Lowest pixel in the minus spectrum: {}".format(np.min(minus_.flatten())))
 
                     update_histogram(histograms_alg, lines_alg, "plus", 4096, plus_, plus=True)
                     update_histogram(histograms_alg, lines_alg, "minus", 4096, minus_, minus=True)
@@ -1711,7 +1679,6 @@ class Stream:
                 print("Writing R Matrix Stats to file:")
                 for i in range(len(r_matrices)):
                     stats_csvWriter.writerow(stats[i])
-                    #progressBar(i+1, len(r_matrices))
 
             print("Matrices and Matrix Stats have finished writing to file.")
         try:
