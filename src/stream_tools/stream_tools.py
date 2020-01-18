@@ -17,6 +17,10 @@ import tkinter as tk
 import threading
 from path_management import image_management as im
 
+"""
+THIS IS NOT THE MAIN BRANCH MASTER: WE ARE TRYING TO RE-COREGISTER THE IMAGES IN THE BRANCH
+"""
+
 
 def progressBar(value, endvalue, bar_length=20):
 

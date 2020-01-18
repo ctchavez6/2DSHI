@@ -351,13 +351,6 @@
       <workItem from="1579233267039" duration="3000" />
       <workItem from="1579288003965" duration="7849000" />
     </task>
-    <task id="LOCAL-00026" summary="roi stuff">
-      <created>1575768825256</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1575768825256</updated>
-    </task>
     <task id="LOCAL-00027" summary="got it to rotate the roi">
       <created>1575848791504</created>
       <option name="number" value="00027" />
@@ -694,7 +687,14 @@
       <option name="project" value="LOCAL" />
       <updated>1579317801769</updated>
     </task>
-    <option name="localTasksCounter" value="75" />
+    <task id="LOCAL-00075" summary="Made it obvious this is a different branch">
+      <created>1579324027616</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1579324027616</updated>
+    </task>
+    <option name="localTasksCounter" value="76" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -718,7 +718,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="Started histocam module, need to think about structure of stream_tools module" />
     <MESSAGE value="latest bug - run params not actually updated by user input" />
     <MESSAGE value="a little bit of work on user input validation" />
     <MESSAGE value="updates on histocam streaming capabilities" />
@@ -743,14 +742,15 @@
     <MESSAGE value="r histogram" />
     <MESSAGE value="show keypoints at step 2, write a b and r" />
     <MESSAGE value="we are going to go for extra accuracy with b double prime" />
-    <option name="LAST_COMMIT_MESSAGE" value="we are going to go for extra accuracy with b double prime" />
+    <MESSAGE value="Made it obvious this is a different branch" />
+    <option name="LAST_COMMIT_MESSAGE" value="Made it obvious this is a different branch" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1579317800725">
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1579324025236">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1579317800725" />
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1579324025236" />
     <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579065164590" />
     <state x="420" y="539" key="FileChooserDialogImpl" timestamp="1578865801470">
       <screen x="0" y="0" width="2560" height="1560" />
@@ -770,11 +770,11 @@
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state width="498" height="446" key="SwitcherDM/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578865799870" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1579317892351">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1579324032226">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1579317892351" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1579324032226" />
     <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579065168816" />
     <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1579138638925">
       <screen x="0" y="0" width="2560" height="1560" />
