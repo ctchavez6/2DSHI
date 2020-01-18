@@ -961,8 +961,16 @@ class Stream:
                 mu_b_x, sigma_b_x, amp_b_x = fgp.get_gaus_boundaries_x(self.current_frame_b, max_pixel_b)
                 mu_b_y, sigma_b_y, amp_b_y = fgp.get_gaus_boundaries_y(self.current_frame_b, max_pixel_b)
 
+                print("Setting Centers\n")
+                print("Calculated Gaussian Centers")
                 self.static_center_a = (int(mu_a_x), int(mu_a_y))
-                self.static_center_b = (int(mu_b_x), int(mu_b_y))
+                self.static_center_b = (int(mu_b_x), int(mu_b_y))  # Original
+                print("\t\tA      : {}".format(self.static_center_a))
+                print("\t\tB Prime: {}".format(self.static_center_b))
+
+
+
+
 
             while continue_stream:
                 self.frame_count += 1
