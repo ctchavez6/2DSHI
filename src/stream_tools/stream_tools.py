@@ -33,35 +33,35 @@ def progressBar(value, endvalue, bar_length=20):
 
 class App(threading.Thread):
 
-   def __init__(self):
-      threading.Thread.__init__(self)
-      self.start()
-      self.foo = 1
-      self.at_front = False
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.start()
+        self.foo = 1
+        self.at_front = False
 
-   def callback(self):
-      self.root.quit()
+    def callback(self):
+        self.root.quit()
 
-   def scale_onChange(self, value):
-      self.foo = float(value)
+    def scale_onChange(self, value):
+        self.foo = float(value)
 
 
-   def run(self):
-      self.root = tk.Tk()
-      self.root.protocol("WM_DELETE_WINDOW", self.callback)
+    def run(self):
+        self.root = tk.Tk()
+        self.root.protocol("WM_DELETE_WINDOW", self.callback)
 
-      label = tk.Label(self.root, text="Sigma")
-      label.pack()
+        label = tk.Label(self.root, text="Sigma")
+        label.pack()
 
-      scale = tk.Scale(from_=1.00, to=2.50, tickinterval=0.0001, resolution = 0.25, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange).pack()
-      #scale.pack()
+        scale = tk.Scale(from_=1.00, to=2.50, tickinterval=0.0001, resolution = 0.25, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange).pack()
+        #scale.pack()
 
-      #self.foo = label
-      self.root.mainloop()
+        #self.foo = label
+        self.root.mainloop()
 
-   def bring_to_front(self):
-       self.root.lift()
-       self.at_front = True
+    def bring_to_front(self):
+        self.root.lift()
+        self.at_front = True
 
 
 app = App()
@@ -643,6 +643,9 @@ class Stream:
     def get_warp_matrix(self):
         return self.warp_matrix
 
+    def get_warp_matrix2(self):
+        return self.warp_matrix_2
+
     def set_current_run(self, datetime_string):
         self.current_run = datetime_string
 
@@ -654,6 +657,13 @@ class Stream:
 
     def set_warp_matrix(self, w):
         self.warp_matrix = w
+
+    def set_warp_matrix2(self, w):
+        self.warp_matrix_2 = w
+
+    def set_warp_matrix2(self, w):
+        self.warp_matrix_2 = w
+
 
     def offer_to_jump(self):
         offer = input("Would you like ot use the previous parameters to a specific step? (y/n): ")
@@ -723,8 +733,8 @@ class Stream:
 
     def grab_frames(self, warp_matrix=None, warp_matrix2=None):
         try:
-            grab_result_a = self.cam_a.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
-            grab_result_b = self.cam_b.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
+            grab_result_a = self.cam_a.RetrieveResult(600000, pylon.TimeoutHandling_ThrowException)
+            grab_result_b = self.cam_b.RetrieveResult(600000, pylon.TimeoutHandling_ThrowException)
             if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
                 a, b = grab_result_a.GetArray(), grab_result_b.GetArray()
                 if self.save_imgs:
@@ -1270,7 +1280,6 @@ class Stream:
             x_a, y_a = CENTER_B_DP
             x_b, y_b = CENTER_B_DP
             n_sigma = app.foo
-            #print("n_sigma = {}".format(n_sigma))
 
 
 
@@ -1290,9 +1299,6 @@ class Stream:
 
 
 
-            print("roi a Shape: {}".format(self.roi_a.shape))
-            print("roi B'' Shape: {}".format(self.roi_b.shape))
-
             update_histogram(histograms, lines, "a", 4096, self.roi_a)
             update_histogram(histograms, lines, "b", 4096, self.roi_b)
             figs["a"].canvas.draw()  # Draw updates subplots in interactive mode
@@ -1309,8 +1315,6 @@ class Stream:
             ROI_A_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR), cv2.cvtColor(self.roi_a * 16, cv2.COLOR_GRAY2BGR)), axis=1)
             ROI_B_WITH_HISTOGRAM = np.concatenate((cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR), cv2.cvtColor(self.roi_b * 16, cv2.COLOR_GRAY2BGR)), axis=1)
 
-            print("ROI_A_WITH_HISTOGRAM Shape: {}".format(ROI_A_WITH_HISTOGRAM.shape))
-            print("ROI_B_WITH_HISTOGRAM Shape: {}".format(ROI_B_WITH_HISTOGRAM.shape))
 
             A_ON_B = np.concatenate((ROI_A_WITH_HISTOGRAM, ROI_B_WITH_HISTOGRAM), axis=0)
 
@@ -1365,8 +1369,6 @@ class Stream:
             DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX < 0.00, abs(R_MATRIX*(2**8 - 1)), 0)
             DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX < 0.00, abs(R_MATRIX*(2**8 - 1)), 0)
 
-            #DISPLAYABLE_R_MATRIX[:, :, 0] = np.where(R_MATRIX > 0.00, abs(R_MATRIX*(2**8 - 1)), DISPLAYABLE_R_MATRIX[:, :, 0])
-            #DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX > 0.00, abs(R_MATRIX*(2**8 - 1)), DISPLAYABLE_R_MATRIX[:, :, 1])
             DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX > 0.00, abs(R_MATRIX*(2**8 - 1)), DISPLAYABLE_R_MATRIX[:, :, 2])
 
 
@@ -1393,8 +1395,6 @@ class Stream:
             R_VALUES = Image.new('RGB', (dr_width, dr_height), (255, 255, 255))
 
 
-            # initialise the drawing context with
-            # the image object as background
 
             draw = ImageDraw.Draw(R_VALUES)
             font = ImageFont.truetype('arial.ttf', size=30)
@@ -1425,15 +1425,22 @@ class Stream:
         a_frames = list()
         b_prime_frames = list()
 
+        a_images = list()
+        b_prime_images = list()
+
         step = 8
         run_folder = os.path.join("D:", "\\" + self.current_run)
         while satisfied_with_run is False:
+
             current_r_frame = 0
             record_r_matrices = input("Step 8 - Image Algebra (Record): Proceed? (y/n): ")
             stats = list()
             self.r_frames = list()
             a_frames = list()
             b_prime_frames = list()
+
+            a_images = list()
+            b_prime_images = list()
 
             stats.append(["Frame", "Avg_R", "Sigma_R"])
             #r_matrix_limit = int(input("R Matrix Frame Break: "))
@@ -1443,9 +1450,7 @@ class Stream:
                     self.frame_count += 1
                     self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
 
-                    """
-                    INITIAL BEFORE WE SHRINK DOWN
-                    """
+                    print("Current R Frame: {}".format(current_r_frame))
 
                     x_a, y_a = self.static_center_a
                     x_b, y_b = self.static_center_b
@@ -1454,13 +1459,11 @@ class Stream:
 
                     self.roi_a = self.current_frame_a[
                                  y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + n_sigma,
-                                 x_a - n_sigma * self.static_sigmas_x: x_a + n_sigma * self.static_sigmas_x + n_sigma
-                                 ]
+                                 x_a - n_sigma * self.static_sigmas_x: x_a + n_sigma * self.static_sigmas_x + n_sigma]
 
                     self.roi_b = self.current_frame_b[
                                  y_b - n_sigma * self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + n_sigma,
-                                 x_b - n_sigma * self.static_sigmas_x: x_b + n_sigma * self.static_sigmas_x + n_sigma
-                                 ]
+                                 x_b - n_sigma * self.static_sigmas_x: x_b + n_sigma * self.static_sigmas_x + n_sigma]
 
                     roi_a, b_double_prime = self.grab_frames2(self.roi_a.copy(), self.roi_b.copy(),
                                                               self.warp_matrix_2.copy())
@@ -1470,6 +1473,11 @@ class Stream:
                     x_a, y_a = CENTER_B_DP
                     x_b, y_b = CENTER_B_DP
                     n_sigma = app.foo
+
+                    a_frames.append(roi_a)
+                    b_prime_frames.append(b_double_prime)
+                    a_images.append(roi_a)
+                    b_prime_images.append(b_double_prime)
 
                     self.roi_a = self.roi_a[
                                  int(y_a - n_sigma * self.static_sigmas_y): int(
@@ -1485,12 +1493,11 @@ class Stream:
                                          x_b + n_sigma * self.static_sigmas_x + 1)
                                      ]
 
+
                     self.roi_b = b_double_prime
                     h = b_double_prime.shape[0]
                     w = b_double_prime.shape[1]
 
-                    print("roi a Shape: {}".format(self.roi_a.shape))
-                    print("roi B'' Shape: {}".format(self.roi_b.shape))
 
                     update_histogram(histograms, lines, "a", 4096, self.roi_a)
                     update_histogram(histograms, lines, "b", 4096, self.roi_b)
@@ -1642,7 +1649,7 @@ class Stream:
 
             r_matrices = self.r_frames[:how_many_r]
             n_ = 0
-
+            print("Writing R Matrices")
             for r_matrix in r_matrices:
                 n_ += 1
                 csv_path = os.path.join(run_folder, "r_matrix_{}.csv".format(n_))
@@ -1652,7 +1659,7 @@ class Stream:
 
             n_ = 0
             a_frames_dir = os.path.join(run_folder, "cam_a_frames")
-
+            print("Writing A Matrices")
             for a_matrix in a_frames:
                 n_ += 1
                 csv_path = os.path.join(run_folder, "a_matrix_{}.csv".format(n_))
@@ -1660,13 +1667,21 @@ class Stream:
                     csvWriter = csv.writer(my_csv, delimiter=',')
                     csvWriter.writerows(a_matrix.tolist())
 
-                a16 = bdc.to_16_bit(a_matrix)
+                #a16 = bdc.to_16_bit(a_matrix)
+                #im.save_img("a_{}.png".format(n_), a_frames_dir, a16)
+
+            print("Writing A Images")
+            n_ = 0
+            for img_a in a_images:
+                n_ += 1
+                a16 = bdc.to_16_bit(img_a)
                 im.save_img("a_{}.png".format(n_), a_frames_dir, a16)
 
 
             b_frames_dir = os.path.join(run_folder, "cam_b_frames")
 
             n_ = 0
+            print("Writing B Matrices")
             for b_matrix in b_prime_frames:
                 n_ += 1
                 csv_path = os.path.join(run_folder, "b_matrix_{}.csv".format(n_))
@@ -1674,15 +1689,20 @@ class Stream:
                     csvWriter = csv.writer(my_csv, delimiter=',')
                     csvWriter.writerows(b_matrix.tolist())
 
-                b16 = bdc.to_16_bit(b_matrix)
+                #b16 = bdc.to_16_bit(b_matrix)
+                #im.save_img("b_{}.png".format(n_), b_frames_dir, b16)
+
+            print("Writing B Images")
+            n_ = 0
+            for img_b in b_prime_images:
+                n_ += 1
+                b16 = bdc.to_16_bit(img_b)
                 im.save_img("b_{}.png".format(n_), b_frames_dir, b16)
 
-
-
+            print("Writing R Matrix Stats to file:")
             stats_csv_path = os.path.join(run_folder, "r_matrices_stats.csv")
             with open(stats_csv_path, "w+", newline='') as stats_csv:
                 stats_csvWriter = csv.writer(stats_csv, delimiter=',')
-                print("Writing R Matrix Stats to file:")
                 for i in range(len(r_matrices)):
                     stats_csvWriter.writerow(stats[i])
 
@@ -1694,4 +1714,3 @@ class Stream:
             pass
         app.callback()
         self.all_cams.StopGrabbing()
-        print("This is B double prime")

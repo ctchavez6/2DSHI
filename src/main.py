@@ -81,12 +81,24 @@ if __name__ == "__main__":
         warp_from_prev_run[1][2] = float(prev_conf['ty'])
         stream.set_warp_matrix(warp_from_prev_run)
 
+
         static_a = prev_conf['static_center_a_x'], prev_conf['static_center_a_y']
         static_b = prev_conf['static_center_b_x'], prev_conf['static_center_b_y']
         stream.set_static_centers(static_a, static_b)
 
         sigma_x, sigma_y = prev_conf['sigma_x'], prev_conf['sigma_y']
         stream.set_static_sigmas(sigma_x, sigma_y)
+
+
+        warp_from_prev_run2 = np.zeros((2, 3), dtype='float32')
+        warp_from_prev_run2[0][0] = float(prev_conf['a'])
+        warp_from_prev_run2[0][1] = float(prev_conf['b'])
+        warp_from_prev_run2[0][2] = float(prev_conf['tx'])
+        warp_from_prev_run2[1][0] = float(prev_conf['c'])
+        warp_from_prev_run2[1][1] = float(prev_conf['d'])
+        warp_from_prev_run2[1][2] = float(prev_conf['ty'])
+        stream.set_warp_matrix2(warp_from_prev_run2)
+
 
         stream.offer_to_jump()
 
@@ -117,10 +129,10 @@ if __name__ == "__main__":
             warp_matrix=stream.get_warp_matrix(),
             sigmas=stream.get_static_sigmas(),
             static_centers=stream.get_static_centers(),
-            current_datetime=current_datetime)
+            warp_matrix_2=stream.get_warp_matrix2())
     except TypeError as e:
         print("TYPE ERROR")
-        #raise e
+        raise e
     print("Done")
     os.chdir(current_directory)
     print("You have completed and exited the script.")

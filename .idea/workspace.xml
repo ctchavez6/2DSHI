@@ -3,6 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/coregistration/img_characterization.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/img_characterization.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/experiment_set_up/write_experimental_params_to_file.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/write_experimental_params_to_file.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -351,6 +354,7 @@
       <workItem from="1579233267039" duration="3000" />
       <workItem from="1579288003965" duration="7849000" />
       <workItem from="1579381586875" duration="11227000" />
+      <workItem from="1579466939659" duration="4448000" />
     </task>
     <task id="LOCAL-00028" summary="default config file">
       <created>1576116866310</created>
@@ -747,12 +751,12 @@
     <option name="LAST_COMMIT_MESSAGE" value="progress" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1579391122669">
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1579395884757">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
     <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1579324025236" />
-    <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579391122669" />
+    <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579395884757" />
     <state x="420" y="539" key="FileChooserDialogImpl" timestamp="1578865801470">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
@@ -771,12 +775,12 @@
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state width="498" height="446" key="SwitcherDM/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578865799870" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1579391127233">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1579395888331">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
     <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1579324032226" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579391127233" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579395888331" />
     <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1579138638925">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>

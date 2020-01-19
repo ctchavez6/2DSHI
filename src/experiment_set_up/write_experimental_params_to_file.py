@@ -37,7 +37,7 @@ def document_run(all_experimental_parameters, run):
     return
 
 
-def document_configurations(warp_matrix, sigmas, static_centers , current_datetime):
+def document_configurations(warp_matrix, sigmas, static_centers, warp_matrix_2):
     """
     Takes a dictionary and removes any keys not specified.
 
@@ -125,6 +125,45 @@ def document_configurations(warp_matrix, sigmas, static_centers , current_dateti
     updated_file_as_string += str(static_center_b_y)
     updated_file_as_string += "\n"
 
+
+    a2 = warp_matrix_2[0][0]
+    b2 = warp_matrix_2[0][1]
+    tx2 = warp_matrix_2[0][2]
+    c2 = warp_matrix_2[1][0]
+    d2 = warp_matrix_2[1][1]
+    ty2 = warp_matrix_2[1][2]
+
+
+    updated_file_as_string += "a2"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(a2)
+    updated_file_as_string += "\n"
+
+    updated_file_as_string += "b2"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(b2)
+    updated_file_as_string += "\n"
+
+    updated_file_as_string += "tx2"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(tx2)
+    updated_file_as_string += "\n"
+
+
+    updated_file_as_string += "c2"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(c2)
+    updated_file_as_string += "\n"
+
+    updated_file_as_string += "d2"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(d2)
+    updated_file_as_string += "\n"
+
+    updated_file_as_string += "ty2"
+    updated_file_as_string += "\t"
+    updated_file_as_string += str(ty2)
+    updated_file_as_string += "\n"
 
     params_file = open('stream_configuration.txt', 'w+')
     params_file.write(updated_file_as_string)
