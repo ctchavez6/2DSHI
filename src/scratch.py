@@ -1,74 +1,75 @@
+#This program outputs 3D plots for Rmax, Rmin, and Rmax - Rmin.
+
+import plotly.graph_objects as go
+import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.widgets import Slider, Button, RadioButtons
-from datetime import datetime
-import time
-import threading
+import os
+
+#https://plot.ly/python/3d-surface-plots/
+#from pandas import DataFrame
+# Read data from a csv
+
+current_directory = os.getcwd()
+tests_directory = os.path.join(current_directory, "tests")
+run_directory = os.path.join(tests_directory, "2020_01_16__11_59")
+
+#Rmax = '../2020_01_16_11_59/r_matrix_30.csv'
+Rmax = os.path.join(run_directory, 'r_matrix_30.csv')
+Rmax_data = pd.read_csv(Rmax)
+R_max = Rmax_data.values
+
+#Rmin = '../2020_01_16_11_59/r_matrix_60.csv'
+Rmin = os.path.join(run_directory, 'r_matrix_60.csv')
+print("Does R Max path exist: {}".format(os.path.exists(Rmin)))
+
+Rmin_data = pd.read_csv(Rmin)
+R_min = Rmin_data.values
+
+sh_1, sh_2 = Rmax_data.shape
+x1, y1 = np.linspace(0, 1, sh_1), np.linspace(0, 1, sh_1)
+
+fig = go.Figure(data=[go.Surface(z=R_max, x=x1, y=y1)])
+fig.update_layout(title=(Rmax), autosize=False,
+                   width=1000, height=1000,
+                   margin=dict(l=100, r=50, b=50, t=90))
+
+fig0 = go.Figure(data=[go.Surface(z=R_min, x=x1, y=y1)])
+fig0.update_layout(title=(Rmin), autosize=False,
+                   width=1000, height=1000,
+                   margin=dict(l=100, r=50, b=50, t=90))
+
+Rmax_Rmin = np.subtract(Rmax_data, Rmin_data)
+RmaxRmin = np.multiply(Rmax_data, Rmin_data)
+numerator = np.subtract(1, RmaxRmin)
+k = np.divide(numerator, Rmax_Rmin)
+
+ksquared = np.square(k)
+ksquaredMinus1 = np.subtract(ksquared,1)
+V = np.subtract(k, ksquaredMinus1)
+
+VminusR = np.subtract(V, R_max)
+Denominator = np.multiply(V, R_max)
+alpha = np.divide(VminusR, Denominator)
 
 
-now = datetime.now()
-later = datetime.now()
-difference = later-now
-difference =  difference.seconds
+fig1 = go.Figure(data=[go.Surface(z=k, x=x1, y=y1)])
+fig1.update_layout(title=('k'), autosize=False,
+                   width=1000, height=1000,
+                   margin=dict(l=100, r=50, b=50, t=90))
 
-plt.ion()
-fig, ax = plt.subplots()
-plt.subplots_adjust(left=0.25, bottom=0.25)
-t = np.arange(0.0, 1.0, 0.001)
-a0 = 5
-f0 = 3
-delta_f = 5.0
-s = a0 * np.sin(2 * np.pi * f0 * t)
-l, = plt.plot(t, s, lw=2)
-ax.margins(x=0)
+fig2 = go.Figure(data=[go.Surface(z=V, x=x1, y=y1)])
+fig2.update_layout(title = ('V'), autosize=False,
+                  width=1000, height=1000,
+                  margin=dict(l=100, r=50, b=50, t=90))
 
-axcolor = 'lightgoldenrodyellow'
-axfreq = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor=axcolor)
-axamp = plt.axes([0.25, 0.15, 0.65, 0.03], facecolor=axcolor)
+fig3 = go.Figure(data=[go.Surface(z=alpha, x=x1, y=y1)])
+fig3.update_layout(title = ('alpha'), autosize=False,
+                  width=1000, height=1000,
+                  margin=dict(l=100, r=50, b=50, t=90))
+fig.show()
+fig0.show()
+fig1.show()
+fig2.show()
+fig3.show()
 
-sfreq = Slider(axfreq, 'Freq', 0.1, 30.0, valinit=f0, valstep=delta_f)
-samp = Slider(axamp, 'Amp', 0.1, 10.0, valinit=a0)
-
-def update(val):
-    amp = samp.val
-    freq = sfreq.val
-    l.set_ydata(amp*np.sin(2*np.pi*freq*t))
-    fig.canvas.draw_idle()
-
-def reset(event):
-    sfreq.reset()
-    samp.reset()
-
-sfreq.on_changed(update)
-samp.on_changed(update)
-
-resetax = plt.axes([0.8, 0.025, 0.1, 0.04])
-button = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
-rax = plt.axes([0.025, 0.5, 0.15, 0.15], facecolor=axcolor)
-radio = RadioButtons(rax, ('red', 'blue', 'green'), active=0)
-
-
-
-def colorfunc(label):
-    l.set_color(label)
-    fig.canvas.draw_idle()
-
-
-
-plt.show()
-
-
-
-while int(difference) < 30:
-    later = datetime.now()
-    difference = later - now
-
-
-    difference = difference.seconds
-    print("Difference: {}".format(difference))
-    radio.on_clicked(colorfunc)
-    button.on_clicked(reset)
-
-    time.sleep(1)
-
-
+# export_csv = df.to_csv('r_matrix_difference.csv', index=None, header=True)

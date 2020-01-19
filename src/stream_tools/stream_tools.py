@@ -666,7 +666,7 @@ class Stream:
 
 
     def offer_to_jump(self):
-        offer = input("Would you like ot use the previous parameters to a specific step? (y/n): ")
+        offer = input("Would you like to use the previous parameters to JUMP to a specific step? (y/n): ")
         if offer.lower() == 'y':
             print("Step 1       : Stream Raw Camera Feed")
             print("Step 2       : Co-Register with Euclidean Transform")
@@ -1449,7 +1449,7 @@ class Stream:
                 while continue_stream:
                     self.frame_count += 1
                     self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
-
+                    current_r_frame += 1
                     print("Current R Frame: {}".format(current_r_frame))
 
                     x_a, y_a = self.static_center_a
@@ -1714,3 +1714,15 @@ class Stream:
             pass
         app.callback()
         self.all_cams.StopGrabbing()
+
+
+
+        step = 10
+        notes = input("Step 10 - Write some notes to a file? - Proceed? (y/n): ")
+
+        if notes.lower() == 'y':
+            notes = input("Write notes below:\n\n")
+            notes_file = open(os.path.join(run_folder, 'notes.txt'), 'w+')
+            notes_file.write(notes)
+            notes_file.close()
+

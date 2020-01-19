@@ -3,9 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/coregistration/img_characterization.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coregistration/img_characterization.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/experiment_set_up/write_experimental_params_to_file.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/write_experimental_params_to_file.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/scratch2.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/scratch3.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/scratch4.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -65,7 +66,7 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -354,14 +355,7 @@
       <workItem from="1579233267039" duration="3000" />
       <workItem from="1579288003965" duration="7849000" />
       <workItem from="1579381586875" duration="11227000" />
-      <workItem from="1579466939659" duration="4448000" />
-    </task>
-    <task id="LOCAL-00028" summary="default config file">
-      <created>1576116866310</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1576116866310</updated>
+      <workItem from="1579466939659" duration="6972000" />
     </task>
     <task id="LOCAL-00029" summary="default config file">
       <created>1576116956969</created>
@@ -699,7 +693,14 @@
       <option name="project" value="LOCAL" />
       <updated>1579391124924</updated>
     </task>
-    <option name="localTasksCounter" value="77" />
+    <task id="LOCAL-00077" summary="frames in sync, jump re implemented">
+      <created>1579472144492</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1579472144494</updated>
+    </task>
+    <option name="localTasksCounter" value="78" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -723,7 +724,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="a little bit of work on user input validation" />
     <MESSAGE value="updates on histocam streaming capabilities" />
     <MESSAGE value="images for later tests" />
     <MESSAGE value="close to streaming b prime" />
@@ -748,14 +748,15 @@
     <MESSAGE value="we are going to go for extra accuracy with b double prime" />
     <MESSAGE value="Made it obvious this is a different branch" />
     <MESSAGE value="progress" />
-    <option name="LAST_COMMIT_MESSAGE" value="progress" />
+    <MESSAGE value="frames in sync, jump re implemented" />
+    <option name="LAST_COMMIT_MESSAGE" value="frames in sync, jump re implemented" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1579395884757">
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1579472143582">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1579324025236" />
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1579472143582" />
     <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579395884757" />
     <state x="420" y="539" key="FileChooserDialogImpl" timestamp="1578865801470">
       <screen x="0" y="0" width="2560" height="1560" />
@@ -765,21 +766,21 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1044" y="356" key="RollbackChangesDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1579201239673" />
-    <state x="179" y="354" key="SettingsEditor" timestamp="1579028734909">
+    <state x="1042" y="526" key="SettingsEditor" timestamp="1579472479617">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1049" y="436" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1578708348219" />
-    <state x="1042" y="526" key="SettingsEditor/0.0.2560.1560@0.0.2560.1560" timestamp="1578716626937" />
+    <state x="1042" y="526" key="SettingsEditor/0.0.2560.1560@0.0.2560.1560" timestamp="1579472479617" />
     <state x="179" y="354" key="SettingsEditor/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579028734909" />
     <state width="498" height="446" key="SwitcherDM" timestamp="1578865799870">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state width="498" height="446" key="SwitcherDM/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578865799870" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1579395888331">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1579472146976">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1579324032226" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1579472146976" />
     <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579395888331" />
     <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1579138638925">
       <screen x="0" y="0" width="2560" height="1560" />
