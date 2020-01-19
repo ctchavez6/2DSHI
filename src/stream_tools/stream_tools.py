@@ -982,8 +982,15 @@ class Stream:
 
                 print("\t\tA                         : {}".format(self.static_center_a))
                 print("\t\tB Prime (Calculated)      : {}".format((int(mu_b_x), int(mu_b_y))))
-                print("\t\tB Prime (Overwritten to A): {}".format(self.static_center_b))
+                print("\t\tB Prime (Overwritten to A): {}".format(self.static_center_a))
 
+                option = int(input("Would you like to use the calculated gaussian center (1)"
+                               "or the overwritten gaussian center (2):  "))
+
+                if option == 1:
+                    self.static_center_b = (int(mu_b_x), int(mu_b_y))  # Picking A
+                elif option == 2:
+                    self.static_center_b = self.static_center_a
 
 
 
@@ -1463,7 +1470,6 @@ class Stream:
                     x_a, y_a = CENTER_B_DP
                     x_b, y_b = CENTER_B_DP
                     n_sigma = app.foo
-                    # print("n_sigma = {}".format(n_sigma))
 
                     self.roi_a = self.roi_a[
                                  int(y_a - n_sigma * self.static_sigmas_y): int(
