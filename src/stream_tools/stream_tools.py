@@ -1412,7 +1412,43 @@ class Stream:
 
 
             cv2.imshow("R_MATRIX", np.concatenate((VALUES_W_HIST, np.array(DISPLAYABLE_R_MATRIX*(2**8), dtype='uint16')), axis=1))
+
+            """
+            R_VALUES_other = Image.new('RGB', (dr_width * 2, dr_height), (255, 255, 255))
+            draw_other = ImageDraw.Draw(R_VALUES)
+            font_other = ImageFont.truetype('arial.ttf', size=30)
+            (x_other, y_other) = (50, 50)
+            message_other = "R Matrix Values\n"
+            message_other = message_other + "Average: {0:.4f}".format(nan_mean) + "\n"
+            message_other = message_other + "Sigma: {0:.4f}".format(nan_st_dev)
+
+            # Mean: {0:.4f}\n".format(nan_mean, 2.000*float(self.frame_count))
+            color_other = 'rgb(0, 0, 0)'  # black color
+            draw_other.text((x, y), message, fill=color, font=font)
+            R_VALUES = np.array(R_VALUES)
+            VALUES_W_HIST = np.concatenate((R_VALUES_other * (2 ** 8), np.array(R_HIST)), axis=1)
+
+            cv2.imshow("R_MATRIX_other", np.concatenate(
+                (VALUES_W_HIST, np.array(DISPLAYABLE_R_MATRIX * (2 ** 8), dtype='uint16')), axis=1))            
+            """
+
+
+
+
+
+
+
+
+
+
+
             continue_stream = self.keep_streaming()
+
+
+
+
+
+
             if not continue_stream:
                 app.callback()
                 cv2.destroyAllWindows()
@@ -1427,6 +1463,9 @@ class Stream:
 
         a_images = list()
         b_prime_images = list()
+
+        start_writing_at = 0
+        end_writing_at = 0
 
         step = 8
         run_folder = os.path.join("D:", "\\" + self.current_run)
@@ -1483,15 +1522,13 @@ class Stream:
                                  int(y_a - n_sigma * self.static_sigmas_y): int(
                                      y_a + n_sigma * self.static_sigmas_y + 1),
                                  int(x_a - n_sigma * self.static_sigmas_x): int(
-                                     x_a + n_sigma * self.static_sigmas_x + 1)
-                                 ]
+                                     x_a + n_sigma * self.static_sigmas_x + 1)]
 
                     b_double_prime = b_double_prime[
                                      int(y_b - n_sigma * self.static_sigmas_y): int(
                                          y_b + n_sigma * self.static_sigmas_y + 1),
                                      int(x_b - n_sigma * self.static_sigmas_x): int(
-                                         x_b + n_sigma * self.static_sigmas_x + 1)
-                                     ]
+                                         x_b + n_sigma * self.static_sigmas_x + 1)]
 
 
                     self.roi_b = b_double_prime
@@ -1601,36 +1638,50 @@ class Stream:
                     draw.text((x, y), message, fill=color, font=font)
                     R_VALUES = np.array(R_VALUES)
                     VALUES_W_HIST = np.concatenate((R_VALUES * (2 ** 8), np.array(R_HIST)), axis=1)
-                    # R_HIST_W_DISPLAYABLE_R =
-                    # print("R VALUES TYPE: {}".format(R_VALUES.dtype))
-                    # print("R_HIST TYPE: {}".format(R_HIST.dtype))
 
                     cv2.imshow("R_MATRIX", np.concatenate(
                         (VALUES_W_HIST, np.array(DISPLAYABLE_R_MATRIX * (2 ** 8), dtype='uint16')), axis=1))
+
+
+
+
+
+
                     continue_stream = self.keep_streaming()
                     if continue_stream is False:
-                        cv2.destroyAllWindows()
-                        fig_ = plt.figure()
-                        ax1 = fig_.add_subplot(111)
-                        frames = list()
-                        averages = list()
-                        sigmas = list()
+                        satisfied_with_range = False
+                        while satisfied_with_range is False:
+                            cv2.destroyAllWindows()
+                            fig_ = plt.figure()
+                            ax1 = fig_.add_subplot(111)
+                            frames = list()
+                            averages = list()
+                            sigmas = list()
 
-                        for i in range(1, len(stats)):
-                            frames.append(stats[i][0])
-                            averages.append(stats[i][1])
-                            sigmas.append(stats[i][2])
+                            starting_frame = int(input("Start at frame: "))
+                            end_frame = int(input("End at frame: "))
 
-                        ax1.errorbar(frames, averages,yerr=sigmas, c='b', capsize=5)
-                        ax1.set_xlabel('Frame')
-                        ax1.set_ylabel('R (Mean)')
-                        ax1.set_title('Mean R by Frame')
-                        save_path = os.path.join(run_folder, 'mean_r_by_frame.png')
-                        fig_.savefig(save_path)
-                        plot_img = cv2.imread(save_path, cv2.IMREAD_COLOR)
-                        cv2.imshow('R Mean Plot', plot_img)
-                        cv2.waitKey(60000)
-                        cv2.destroyAllWindows()
+                            #for i in range(1, len(stats)):
+                            for i in range(starting_frame, end_frame + 1):
+                                frames.append(stats[i][0])
+                                averages.append(stats[i][1])
+                                sigmas.append(stats[i][2])
+
+                            ax1.errorbar(frames, averages,yerr=sigmas, c='b', capsize=5)
+                            ax1.set_xlabel('Frame')
+                            ax1.set_ylabel('R (Mean)')
+                            ax1.set_title('Mean R by Frame')
+                            save_path = os.path.join(run_folder, 'mean_r_by_frame.png')
+                            fig_.savefig(save_path)
+                            plot_img = cv2.imread(save_path, cv2.IMREAD_COLOR)
+                            cv2.imshow('R Mean Plot', plot_img)
+                            cv2.waitKey(60000)
+                            cv2.destroyAllWindows()
+                            range_satisfaction_input = input("Are you satisfied with this range? (y/n): ")
+                            if range_satisfaction_input.lower() == "y":
+                                satisfied_with_range = True
+                                start_writing_at = starting_frame
+                                end_writing_at = end_frame
                         satisfaction_input = input("Are you satisfied with this run? (y/n): ")
                         if satisfaction_input.lower() == 'y':
                             satisfied_with_run = True
@@ -1644,14 +1695,13 @@ class Stream:
         write_to_csv = input("Step 9 - Write Recorded R Frame(s) to File(s)? - Proceed? (y/n): ")
 
         if write_to_csv.lower() == 'y':
-            print("During Step 8: You saved {} R Matrices".format(len(self.r_frames)))
-            how_many_r = int(input("How many R Matrix Frames would you like to write to file?: "))
 
-            r_matrices = self.r_frames[:how_many_r]
+            r_matrices = self.r_frames
             n_ = 0
             print("Writing R Matrices")
-            for r_matrix in r_matrices:
+            for i in range(start_writing_at, end_writing_at + 1):
                 n_ += 1
+                r_matrix = r_matrices[i - 1]
                 csv_path = os.path.join(run_folder, "r_matrix_{}.csv".format(n_))
                 with open(csv_path, "w+", newline='') as my_csv:
                     csvWriter = csv.writer(my_csv, delimiter=',')
@@ -1660,8 +1710,10 @@ class Stream:
             n_ = 0
             a_frames_dir = os.path.join(run_folder, "cam_a_frames")
             print("Writing A Matrices")
-            for a_matrix in a_frames:
+            for i in range(start_writing_at, end_writing_at + 1):
+            #for a_matrix in a_frames:
                 n_ += 1
+                a_matrix = a_frames[i - 1]
                 csv_path = os.path.join(run_folder, "a_matrix_{}.csv".format(n_))
                 with open(csv_path, "w+", newline='') as my_csv:
                     csvWriter = csv.writer(my_csv, delimiter=',')
@@ -1672,8 +1724,10 @@ class Stream:
 
             print("Writing A Images")
             n_ = 0
-            for img_a in a_images:
+            for i in range(start_writing_at, end_writing_at + 1):
+            #for img_a in a_images:
                 n_ += 1
+                img_a = a_images[i-1]
                 a16 = bdc.to_16_bit(img_a)
                 im.save_img("a_{}.png".format(n_), a_frames_dir, a16)
 
@@ -1682,8 +1736,10 @@ class Stream:
 
             n_ = 0
             print("Writing B Matrices")
-            for b_matrix in b_prime_frames:
+            for i in range(start_writing_at, end_writing_at + 1):
+            #for b_matrix in b_prime_frames:
                 n_ += 1
+                b_matrix = b_prime_frames[i-1]
                 csv_path = os.path.join(run_folder, "b_matrix_{}.csv".format(n_))
                 with open(csv_path, "w+", newline='') as my_csv:
                     csvWriter = csv.writer(my_csv, delimiter=',')
@@ -1694,8 +1750,10 @@ class Stream:
 
             print("Writing B Images")
             n_ = 0
-            for img_b in b_prime_images:
+            for i in range(start_writing_at, end_writing_at + 1):
+            #for img_b in b_prime_images:
                 n_ += 1
+                img_b = b_prime_images[i-1]
                 b16 = bdc.to_16_bit(img_b)
                 im.save_img("b_{}.png".format(n_), b_frames_dir, b16)
 
@@ -1703,8 +1761,11 @@ class Stream:
             stats_csv_path = os.path.join(run_folder, "r_matrices_stats.csv")
             with open(stats_csv_path, "w+", newline='') as stats_csv:
                 stats_csvWriter = csv.writer(stats_csv, delimiter=',')
-                for i in range(len(r_matrices)):
-                    stats_csvWriter.writerow(stats[i])
+                stats_csvWriter.writerow(stats[0])
+                count = 0
+                for i in range(start_writing_at, end_writing_at + 1):
+                    count += 1
+                    stats_csvWriter.writerow([count, stats[i][1], stats[i][2]])
 
             print("Matrices and Matrix Stats have finished writing to file.")
         try:
