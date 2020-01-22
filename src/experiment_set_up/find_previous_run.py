@@ -111,6 +111,13 @@ def get_previous_configuration():
                         "d",
                         "ty"]
 
+    float_parameters += ["a2",
+                        "b2",
+                        "tx2",
+                        "c2",
+                        "d2",
+                        "ty2"]
+
 
     for line in last_run_params_file:
         split_by_tabs = line.split('\t')

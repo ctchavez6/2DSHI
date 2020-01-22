@@ -91,12 +91,12 @@ if __name__ == "__main__":
 
 
         warp_from_prev_run2 = np.zeros((2, 3), dtype='float32')
-        warp_from_prev_run2[0][0] = float(prev_conf['a'])
-        warp_from_prev_run2[0][1] = float(prev_conf['b'])
-        warp_from_prev_run2[0][2] = float(prev_conf['tx'])
-        warp_from_prev_run2[1][0] = float(prev_conf['c'])
-        warp_from_prev_run2[1][1] = float(prev_conf['d'])
-        warp_from_prev_run2[1][2] = float(prev_conf['ty'])
+        warp_from_prev_run2[0][0] = float(prev_conf['a2'])
+        warp_from_prev_run2[0][1] = float(prev_conf['b2'])
+        warp_from_prev_run2[0][2] = float(prev_conf['tx2'])
+        warp_from_prev_run2[1][0] = float(prev_conf['c2'])
+        warp_from_prev_run2[1][1] = float(prev_conf['d2'])
+        warp_from_prev_run2[1][2] = float(prev_conf['ty2'])
         stream.set_warp_matrix2(warp_from_prev_run2)
 
 
