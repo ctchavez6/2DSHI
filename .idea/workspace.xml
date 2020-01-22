@@ -3,9 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/experiment_set_up/find_previous_run.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/experiment_set_up/find_previous_run.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -355,14 +352,7 @@
       <workItem from="1579381586875" duration="11227000" />
       <workItem from="1579466939659" duration="18366000" />
       <workItem from="1579566837456" duration="40000" />
-      <workItem from="1579659375902" duration="2759000" />
-    </task>
-    <task id="LOCAL-00031" summary="deleting files no longer needed">
-      <created>1576356141833</created>
-      <option name="number" value="00031" />
-      <option name="presentableId" value="LOCAL-00031" />
-      <option name="project" value="LOCAL" />
-      <updated>1576356141833</updated>
+      <workItem from="1579659375902" duration="5165000" />
     </task>
     <task id="LOCAL-00032" summary="progress on image algebra">
       <created>1576370336373</created>
@@ -700,7 +690,14 @@
       <option name="project" value="LOCAL" />
       <updated>1579489606555</updated>
     </task>
-    <option name="localTasksCounter" value="80" />
+    <task id="LOCAL-00080" summary="jump fix">
+      <created>1579665482445</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1579665482445</updated>
+    </task>
+    <option name="localTasksCounter" value="81" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -724,7 +721,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="close to streaming b prime" />
     <MESSAGE value="now streaming b prime" />
     <MESSAGE value="just found out about shear" />
     <MESSAGE value="priority realighment, focus on ROI" />
@@ -749,15 +745,16 @@
     <MESSAGE value="frames in sync, jump re implemented" />
     <MESSAGE value="run level 10 done" />
     <MESSAGE value="range selector for captured frames" />
-    <option name="LAST_COMMIT_MESSAGE" value="range selector for captured frames" />
+    <MESSAGE value="jump fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="jump fix" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1579489604521">
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1579665481535">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
     <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1579474618068" />
-    <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579489604521" />
+    <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579665481535" />
     <state x="420" y="539" key="FileChooserDialogImpl" timestamp="1578865801470">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
@@ -776,12 +773,12 @@
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state width="498" height="446" key="SwitcherDM/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578865799870" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1579489611939">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1579665484607">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
     <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1579474620226" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579489611939" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579665484607" />
     <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1579138638925">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
