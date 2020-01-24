@@ -168,6 +168,5 @@ def document_configurations(warp_matrix, sigmas, static_centers, warp_matrix_2):
     params_file = open('stream_configuration.txt', 'w+')
     params_file.write(updated_file_as_string)
     params_file.close()
-
     os.chdir(current_working_directory)
     return

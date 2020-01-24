@@ -1,6 +1,6 @@
 from tkinter import Tk
 from tkinter import filedialog as fd
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, askdirectory
 import matplotlib.pyplot as plt
 from scipy import ndimage, misc
 import os
@@ -30,13 +30,20 @@ filename_R_Max = askopenfilename(title='Pick an R_Max') # show an "Open" dialog 
 filename_sh_R_Max = filename_R_Max.split("/")[-1][:-4]
 
 
+
+
 run_directory = os.path.abspath(os.path.join(filename_R_Min, os.pardir))
 
 
 print("R_Min: {}".format(filename_R_Min))
-print("R_Max: {}".format(filename_R_Min))
+print("R_Max: {}".format(filename_R_Max))
 
-cal_phase_dir = os.path.join(run_directory, "calibration_and_phase")
+
+user_input_2 = input("Are your R_Min and R_Max values in the same directory? (y/n)")
+if user_input_2.lower() == "y":
+    cal_phase_dir = os.path.join(run_directory, "calibration_and_phase")
+else:
+    cal_phase_dir = askdirectory(title='Pick a directory to save your calibration_and_phase files')
 
 print("Run Directory: {}".format(run_directory))
 if not os.path.exists(cal_phase_dir):
@@ -62,9 +69,35 @@ alpha_numerator = np.subtract(V, values_r_max)
 alpha_denom = np.multiply(V, values_r_max) - 1.00
 alpha = np.divide(alpha_numerator, alpha_denom, where=alpha_denom!=0)
 
-constants = dict()
-constants["alpha"] =
+#compute the phase angle, using above calibration parameters, first computing the bracketed quantity, from the formula
+denom = np.multiply(V, np.subtract(np.multiply(alpha, values_r_max), 1))
+bracket = np.divide(1-values_r_max, denom, where=denom!=0.0)
+Phi = np.arcsin(bracket)
 
+constants = dict()
+constants["k"] = k
+constants["V"] = V
+constants["alpha"] = alpha
+constants["phi"] = Phi
+
+
+for constant in constants:
+    csv_path = os.path.join(cal_phase_dir, "{}.csv".format(constant))
+    print("Averaged Array will be saved to: {}".format(csv_path))
+    with open(csv_path, "w+", newline='') as my_csv:
+        csvWriter = csv.writer(my_csv, delimiter=',')
+        csvWriter.writerows(constants[constant].tolist())
+
+    os.chdir(start_dir)
+
+updated_file_as_string = ""
+updated_file_as_string += "R_Min: {}\n".format(filename_R_Min)
+updated_file_as_string += "R_Max: {}\n".format(filename_R_Max)
+calibration_matrices = open(os.path.join(cal_phase_dir, 'info.txt'), 'w+')
+calibration_matrices.write(updated_file_as_string)
+calibration_matrices.close()
+
+os.chdir(start_dir)
 
 """
 print("R_Min:\n\t{}\n\t{}\n".format(type(values_r_min), values_r_min.shape))
