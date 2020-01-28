@@ -42,7 +42,7 @@ csv_file = pandas.read_csv(filename,header=None)
 values = csv_file.values
 values = np.array(values, dtype='float32')
 
-result = ndimage.uniform_filter(values, size=size_of_avg, mode='constant')
+result = ndimage.uniform_filter(values, size=size_of_avg, mode='reflect')
 
 os.chdir(start_dir)
 

@@ -28,7 +28,8 @@ filename_R_Min = askopenfilename(title='Pick an R_Min') # show an "Open" dialog 
 filename_sh_R_Min = filename_R_Min.split("/")[-1][:-4]
 filename_R_Max = askopenfilename(title='Pick an R_Max') # show an "Open" dialog box and return the path to the selected file
 filename_sh_R_Max = filename_R_Max.split("/")[-1][:-4]
-
+filename_R_sample = askopenfilename(title='Pick an R_Sample') # show an "Open" dialog box and return the path to the selected file
+filename_sh_R_sample = filename_R_Max.split("/")[-1][:-4]
 
 
 
@@ -58,6 +59,12 @@ values_r_min = r_min_csv_file.values
 r_max_csv_file = pandas.read_csv(filename_R_Max, header=None)
 values_r_max = r_max_csv_file.values
 
+
+
+r_sample_csv_file = pandas.read_csv(filename_R_sample, header=None)
+values_r_sample = r_max_csv_file.values
+
+
 max_times_min = np.multiply(values_r_min, values_r_max)
 max_minus_min = np.subtract(values_r_max, values_r_min)
 
@@ -69,9 +76,11 @@ alpha_numerator = np.subtract(V, values_r_max)
 alpha_denom = np.multiply(V, values_r_max) - 1.00
 alpha = np.divide(alpha_numerator, alpha_denom, where=alpha_denom!=0)
 
+
+
 #compute the phase angle, using above calibration parameters, first computing the bracketed quantity, from the formula
-denom = np.multiply(V, np.subtract(np.multiply(alpha, values_r_max), 1))
-bracket = np.divide(1-values_r_max, denom, where=denom!=0.0)
+denom = np.multiply(V, np.subtract(np.multiply(alpha, values_r_sample), 1))
+bracket = np.divide(1-values_r_sample, denom, where=denom!=0.0)
 Phi = np.arcsin(bracket)
 
 constants = dict()
@@ -93,6 +102,8 @@ for constant in constants:
 updated_file_as_string = ""
 updated_file_as_string += "R_Min: {}\n".format(filename_R_Min)
 updated_file_as_string += "R_Max: {}\n".format(filename_R_Max)
+updated_file_as_string += "R_Sample: {}\n".format(filename_R_sample)
+
 calibration_matrices = open(os.path.join(cal_phase_dir, 'info.txt'), 'w+')
 calibration_matrices.write(updated_file_as_string)
 calibration_matrices.close()
