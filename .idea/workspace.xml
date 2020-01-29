@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/create_r_from_csv.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/create_k_v_a_matrices.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/create_k_v_a_matrices.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/moving_average.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/moving_average.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -360,14 +360,8 @@
       <workItem from="1579891877406" duration="51000" />
       <workItem from="1579910822219" duration="487000" />
       <workItem from="1580166806200" duration="20000" />
-      <workItem from="1580166864263" duration="8459000" />
-    </task>
-    <task id="LOCAL-00038" summary="Now allowing user to use previous runs parameters.">
-      <created>1576644940620</created>
-      <option name="number" value="00038" />
-      <option name="presentableId" value="LOCAL-00038" />
-      <option name="project" value="LOCAL" />
-      <updated>1576644940620</updated>
+      <workItem from="1580166864263" duration="8956000" />
+      <workItem from="1580262866106" duration="7915000" />
     </task>
     <task id="LOCAL-00039" summary="Started 2 more modules: path_management and coregistration">
       <created>1576726170136</created>
@@ -705,7 +699,14 @@
       <option name="project" value="LOCAL" />
       <updated>1580182877524</updated>
     </task>
-    <option name="localTasksCounter" value="87" />
+    <task id="LOCAL-00087" summary="next: image">
+      <created>1580184183889</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1580184183889</updated>
+    </task>
+    <option name="localTasksCounter" value="88" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -729,7 +730,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="static tests" />
     <MESSAGE value="progress on ROI" />
     <MESSAGE value="more progress on ROI, but static mu center having issues because of laser pulsation (no data equals no gaussian equals python barfs at us)" />
     <MESSAGE value="finally getting correct rotation angle and good looking b prime" />
@@ -754,38 +754,44 @@
     <MESSAGE value="commit to be save" />
     <MESSAGE value="in progress" />
     <MESSAGE value="avg multiple frames" />
-    <option name="LAST_COMMIT_MESSAGE" value="avg multiple frames" />
+    <MESSAGE value="next: image" />
+    <option name="LAST_COMMIT_MESSAGE" value="next: image" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1580182876586">
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1580184183049">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1580182876586" />
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1580184183049" />
     <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579841668323" />
     <state x="420" y="539" key="FileChooserDialogImpl" timestamp="1578865801470">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="420" y="539" key="FileChooserDialogImpl/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578865801470" />
-    <state x="1044" y="356" key="RollbackChangesDialog" timestamp="1579201239673">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state x="1044" y="397" key="RollbackChangesDialog" timestamp="1580262905164">
+      <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1044" y="356" key="RollbackChangesDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1579201239673" />
-    <state x="1042" y="526" key="SettingsEditor" timestamp="1579472479617">
+    <state x="1044" y="397" key="RollbackChangesDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1580262905164" />
+    <state x="1042" y="526" key="SettingsEditor" timestamp="1580264985272">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1049" y="436" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1578708348219" />
-    <state x="1042" y="526" key="SettingsEditor/0.0.2560.1560@0.0.2560.1560" timestamp="1579472479617" />
+    <state x="1042" y="526" key="SettingsEditor/0.0.2560.1560@0.0.2560.1560" timestamp="1580264985272" />
     <state x="179" y="354" key="SettingsEditor/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579028734909" />
     <state width="498" height="446" key="SwitcherDM" timestamp="1578865799870">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state width="498" height="446" key="SwitcherDM/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578865799870" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1580182880384">
+    <state x="1150" y="679" key="VCS.EditChangelistDialog" timestamp="1580262899574">
+      <screen x="0" y="0" width="2560" height="1560" />
+    </state>
+    <state x="1150" y="679" key="VCS.EditChangelistDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1580262899574" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1580184185535">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1580182880384" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1580184185535" />
     <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579841756028" />
     <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1579138638925">
       <screen x="0" y="0" width="2560" height="1560" />
@@ -803,10 +809,10 @@
     <state x="1443" y="711" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1400@0.0.2560.1400" timestamp="1579201085095" />
     <state x="1443" y="792" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1560@0.0.2560.1560" timestamp="1580179220292" />
     <state x="1443" y="792" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579221999979" />
-    <state x="943" y="355" width="672" height="678" key="search.everywhere.popup" timestamp="1579140081283">
+    <state x="943" y="355" width="840" height="678" key="search.everywhere.popup" timestamp="1580267641146">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
-    <state x="943" y="355" width="672" height="678" key="search.everywhere.popup/0.0.2560.1560@0.0.2560.1560" timestamp="1579140081283" />
+    <state x="943" y="355" width="840" height="678" key="search.everywhere.popup/0.0.2560.1560@0.0.2560.1560" timestamp="1580267641146" />
     <state x="943" y="355" width="840" height="678" key="search.everywhere.popup/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578970281524" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
