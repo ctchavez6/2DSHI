@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/create_r_from_csv.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/change_nans_to_zeros.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/create_k_v_a_matrices.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/create_k_v_a_matrices.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/create_r_from_csv.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/create_r_image_from_csv.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,15 +66,15 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\fwess\Documents\GitHub" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\image_processing" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\coregistration" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\image_algebra" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\experiment_set_up" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\fwess\Documents\GitHub" />
     </key>
   </component>
   <component name="RunManager" selected="Python.pixel_intensities">
