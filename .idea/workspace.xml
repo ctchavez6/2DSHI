@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/phi_100um_m=1_vpp.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/spiral_analysis.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/spiral_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/spiral_analysis.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -363,14 +362,8 @@
       <workItem from="1580166806200" duration="20000" />
       <workItem from="1580166864263" duration="8956000" />
       <workItem from="1580262866106" duration="7915000" />
-      <workItem from="1582682006230" duration="5187000" />
-    </task>
-    <task id="LOCAL-00040" summary="Started 2 more modules: path_management and coregistration">
-      <created>1576815355268</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1576815355268</updated>
+      <workItem from="1582682006230" duration="5316000" />
+      <workItem from="1582766731536" duration="5477000" />
     </task>
     <task id="LOCAL-00041" summary="Started histocam module, need to think about structure of stream_tools module">
       <created>1576985413828</created>
@@ -708,7 +701,14 @@
       <option name="project" value="LOCAL" />
       <updated>1581562061525</updated>
     </task>
-    <option name="localTasksCounter" value="89" />
+    <task id="LOCAL-00089" summary="spiral start">
+      <created>1582687259821</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1582687259823</updated>
+    </task>
+    <option name="localTasksCounter" value="90" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -732,7 +732,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="more progress on ROI, but static mu center having issues because of laser pulsation (no data equals no gaussian equals python barfs at us)" />
     <MESSAGE value="finally getting correct rotation angle and good looking b prime" />
     <MESSAGE value="run with crosshairs" />
     <MESSAGE value="roi_finished" />
@@ -757,14 +756,15 @@
     <MESSAGE value="avg multiple frames" />
     <MESSAGE value="next: image" />
     <MESSAGE value="renamed a file and wrote script to override nans to zero" />
-    <option name="LAST_COMMIT_MESSAGE" value="renamed a file and wrote script to override nans to zero" />
+    <MESSAGE value="spiral start" />
+    <option name="LAST_COMMIT_MESSAGE" value="spiral start" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1581562060843">
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1582687258905">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1581562060843" />
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1582687258905" />
     <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579841668323" />
     <state x="420" y="539" key="FileChooserDialogImpl" timestamp="1578865801470">
       <screen x="0" y="0" width="2560" height="1560" />
@@ -789,17 +789,17 @@
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1150" y="679" key="VCS.EditChangelistDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1580262899574" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1581562064547">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1582687261867">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1581562064547" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1582687261867" />
     <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579841756028" />
-    <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1582682006385">
+    <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1582766731421">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="416" y="255" key="com.intellij.ide.util.TipDialog/0.0.1440.860@0.0.1440.860" timestamp="1577386000262" />
-    <state x="740" y="463" key="com.intellij.ide.util.TipDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1582682006385" />
+    <state x="740" y="463" key="com.intellij.ide.util.TipDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1582766731421" />
     <state x="740" y="463" key="com.intellij.ide.util.TipDialog/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578867722024" />
     <state x="518" y="90" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1576983755808">
       <screen x="0" y="0" width="1440" height="860" />
