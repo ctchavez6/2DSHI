@@ -88,8 +88,8 @@ x = []
 points = 3000
 num_of_pi = 20
 
-vertical_offset = 0 #int(input("Please enter vertical offset: ")) * -1
-horizontal_offset = 50  #int(input("Please enter horizontal offset: "))
+vertical_offset = 35 #int(input("Please enter vertical offset: ")) * -1
+horizontal_offset = -40  #int(input("Please enter horizontal offset: "))
 
 for theta in np.linspace(0, num_of_pi*np.pi, num=points):
     r = -1*((0.25*theta)**2.5)
@@ -139,7 +139,7 @@ spiral_image.save(filename_R_sample.replace(".csv", "_spiral.png"))
 
 fig = plt.figure()
 plt.plot(data_point_indices, r_values)
-plt.title("R_Values_Over_Spiral\nNum Points = {}".format(len(data_point_indices)))
+plt.title("Phi_Values_Over_Spiral\nNum Points = {}".format(len(data_point_indices)))
 plt.savefig("R_Values_Over_Spiral.png")
 #print("List of x's")
 #print(x)
