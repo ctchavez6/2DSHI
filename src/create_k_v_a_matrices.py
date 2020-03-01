@@ -89,7 +89,7 @@ alpha = np.divide(alpha_numerator, alpha_denom, where=alpha_denom!=0)
 
 
 #compute the phase angle, using above calibration parameters, first computing the bracketed quantity, from the formula
-denom = np.multiply(V, np.subtract(1, np.multiply(alpha, values_r_sample)))
+denom = np.multiply(V, np.subtract(1.00, np.multiply(alpha, values_r_sample)))
 bracket = np.divide(values_r_sample-alpha, denom, where=denom!=0.0) #new formula, fixed for Brandi's error 2.13.20
 Phi = np.arcsin(bracket)
 

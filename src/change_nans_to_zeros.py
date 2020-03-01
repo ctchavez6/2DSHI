@@ -19,7 +19,7 @@ csv_files = list(root.tk.splitlist(filez))
 
 for file in csv_files:
     #print(file)
-    adj_file = file[:-4] + "_adjusted" + file[-4:]
+    adj_file = file[:-4] + "_noNANs" + file[-4:]
     #print(adj_file)
     r_sample_csv_file = pd.read_csv(file, header=None)
     values_r_sample = r_sample_csv_file.values
