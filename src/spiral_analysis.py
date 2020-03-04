@@ -91,9 +91,12 @@ num_of_pi = 20
 # for the m= 1 VPP with 100 um
 # vertical_offset = 35 #int(input("Please enter vertical offset: ")) * -1
 # horizontal_offset = -40  #int(input("Please enter horizontal offset: "))
-# for the m= 1 VPP with 25 um
-vertical_offset = 15 #int(input("Please enter vertical offset: ")) * -1
-horizontal_offset = 50  #int(input("Please enter horizontal offset: "))
+# for the m= 1 VPP with noPH
+# vertical_offset = 15 #int(input("Please enter vertical offset: ")) * -1
+# horizontal_offset = 50  #int(input("Please enter horizontal offset: "))
+# for the m=2 VPP with noPH
+vertical_offset = 5 #int(input("Please enter vertical offset: ")) * -1
+horizontal_offset = 15  #int(input("Please enter horizontal offset: "))
 
 for theta in np.linspace(0, num_of_pi*np.pi, num=points):
     r = -1*((0.25*theta)**2.5)

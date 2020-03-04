@@ -54,38 +54,39 @@ print("Run Directory: {}".format(run_directory))
 if not os.path.exists(cal_phase_dir):
     os.chdir(run_directory)
     os.mkdir(cal_phase_dir)
-    os.chdir(start_dir)
+    os.chdir(cal_phase_dir)
 
+os.chdir(run_directory)
 R_MATRIX = pandas.read_csv(filename_R_sample, header=None).values  # CSV -> Pandas DF -> Numpy Array
 R_BACKGROUND = pandas.read_csv(filename_R_background, header=None).values  # CSV -> Pandas DF -> Numpy Array
-R_SUBTRACTED = np.subtract(R_MATRIX, R_BACKGROUND)
+phi_SUBTRACTED = np.subtract(R_MATRIX, R_BACKGROUND)
 
 #print(type(R_SUBTRACTED))
 
-with open('R_SUBTRACTED.csv', "w+", newline='') as f:
+with open('phi_SUBTRACTED.csv', "w+", newline='') as f:
     csvWriter = csv.writer(f, delimiter=',')
-    csvWriter.writerows(R_SUBTRACTED.tolist())
+    csvWriter.writerows(phi_SUBTRACTED.tolist())
 
     #writer = csv.writer(f)
     #writer.writerows(R_SUBTRACTED)
 
 
-DISPLAYABLE_R_SUBTRACTED = np.zeros((R_SUBTRACTED.shape[0], R_SUBTRACTED.shape[1], 3), dtype=np.uint8)
-DISPLAYABLE_R_SUBTRACTED[:, :, 1] = np.where(R_SUBTRACTED < 0.00, abs(R_SUBTRACTED * (2 ** 8 - 1)), 0)
-DISPLAYABLE_R_SUBTRACTED[:, :, 0] = np.where(R_SUBTRACTED < 0.00, abs(R_SUBTRACTED * (2 ** 8 - 1)), 0)
+DISPLAYABLE_R_SUBTRACTED = np.zeros((phi_SUBTRACTED.shape[0], phi_SUBTRACTED.shape[1], 3), dtype=np.uint8)
+DISPLAYABLE_R_SUBTRACTED[:, :, 1] = np.where(phi_SUBTRACTED < 0.00, abs(phi_SUBTRACTED * (2 ** 8 - 1)), 0)
+DISPLAYABLE_R_SUBTRACTED[:, :, 0] = np.where(phi_SUBTRACTED < 0.00, abs(phi_SUBTRACTED * (2 ** 8 - 1)), 0)
 
-DISPLAYABLE_R_SUBTRACTED[:, :, 0] = np.where(R_SUBTRACTED > 0.00, abs(R_SUBTRACTED * (2 ** 8 - 1)),
+DISPLAYABLE_R_SUBTRACTED[:, :, 0] = np.where(phi_SUBTRACTED > 0.00, abs(phi_SUBTRACTED * (2 ** 8 - 1)),
                                              DISPLAYABLE_R_SUBTRACTED[:, :, 0])
 
-os.chdir(start_dir)
-csv_path = os.path.join(run_directory, "{}".format(R_SUBTRACTED))
+os.chdir(cal_phase_dir)
+csv_path = os.path.join(cal_phase_dir, "{}".format(phi_SUBTRACTED))
 #print("New Array saved as: {}".format(csv_path))
 
 # r_sample_csv_file.to_csv(new_file)  # writes pandas dataframe file to local disk
 # my additions
 
 image = Image.fromarray(DISPLAYABLE_R_SUBTRACTED.astype('uint8'), 'RGB')
-image.save('R_SUBTRACTED.csv'.replace(".csv", ".png"))
+image.save('phi_SUBTRACTED.csv'.replace(".csv", ".png"))
 
 # image.save(new_file.replace(".csv", ".png"))
 
