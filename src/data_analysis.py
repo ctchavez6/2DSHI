@@ -153,7 +153,7 @@ def get_analysis_parameters(csv_files_parent_directory):
             params_file.close()
 
     return user_choice
-
+frame_title = str(input("Enter the legend information for this analyzed configuration: "))
 
 def get_phi_sample():
     print("Welcome to data_analysis.py using phi.csv")
@@ -369,7 +369,7 @@ def generate_images_from_R_matrix(R_MATRIX, csv_filename, shape_params, user_sha
 
             fig = plt.figure()
             plt.plot(data_point_indices, r_values)
-            plt.title("m=2, no PH, Phi_Values_Over_Horizontal_Lineout\ny = {}".format(y_location))
+            plt.title("{}, Phi_Values_Over_Horizontal_Lineout\ny = {}".format(frame_title, y_location))
             plt.savefig(os.path.join(get_data_directory(csv_filename), "R_Values_Over_y={}.png".format(y_location)))
             plot_paths.append(path.join(get_data_directory(csv_filename), "R_Values_Over_y={}.png".format(y_location)))
 
