@@ -12,6 +12,7 @@ from collections import OrderedDict
 from PIL import Image
 from image_processing import bit_depth_conversion as bdc
 import warnings
+import pandas as pd
 
 import os.path
 from os import path
@@ -20,11 +21,17 @@ shape_choices = dict()
 shape_choices[1] = "Circle"
 shape_choices[2] = "Spiral"
 shape_choices[3] = "Lines"
+user_choice = None
 
 circle_options = dict()
 circle_options["x_offset"] = 0
 circle_options["y_offset"] = 0
 circle_options["radii"] = []
+
+h_lines_options = dict()
+h_lines_options["num_lines"] = None
+h_lines_options["direction"] = "Horizontal"
+h_lines_options["y_locations"] = []
 
 old_err_state = np.seterr(divide='raise')
 ignored_states = np.seterr(**old_err_state)
@@ -48,13 +55,18 @@ def get_analysis_parameters(csv_files_parent_directory):
             if not parameter.startswith("radii"):
                 value = split_by_tabs[1].strip()
                 print("Parameter: {}\t\tValue: {}".format(parameter, value))
+                if parameter.startswith("shape"):
+                    user_choice = int(value)
 
-            else:
+            elif parameter.startswith("radii"):
                 value = split_by_tabs[1:]
                 value[-1] = value[-1].strip()
                 for radius in value:
                     circle_options["radii"].append(int(radius))
                 print("Parameter: {}\t\tValue: {}".format(parameter, circle_options["radii"]))
+
+
+
 
     else:
         # Now we have to prompt the user
@@ -112,6 +124,54 @@ def get_analysis_parameters(csv_files_parent_directory):
             params_file = open(os.path.join(csv_files_parent_directory, "data_analysis_parameters.txt"), 'w+')
             params_file.write(params_as_a_string)
             params_file.close()
+        if user_choice == 3:
+            print("You picked lines (horizontal).")
+            circle_options["x_offset"] = int(input("Pick an x offset: "))
+            circle_options["y_offset"] = int(input("Pick an y offset: "))
+            str_ = "Pick as many radii as you'd like.\n "
+            str_ += "To add a radius, enter the integer then press enter.\n"
+            str_ += "When done, just press Enter without any additional input\n"
+
+            print(str_)
+
+            user_input = "_"
+            while user_input != "":
+                user_input = input("Add a radius: ")
+                if len(user_input) > 0:
+                    circle_options["radii"].append(int(user_input))
+
+
+            # shape
+            params_as_a_string += "shape"
+            params_as_a_string += "\t"
+            params_as_a_string += str(user_choice)
+            params_as_a_string += "\n"
+
+            # x offset
+            params_as_a_string += "x_offset"
+            params_as_a_string += "\t"
+            params_as_a_string += str(circle_options["x_offset"])
+            params_as_a_string += "\n"
+
+            # y offset
+            params_as_a_string += "y_offset"
+            params_as_a_string += "\t"
+            params_as_a_string += str(circle_options["y_offset"])
+            params_as_a_string += "\n"
+
+            # radii
+            params_as_a_string += "radii"
+
+            for radius in circle_options["radii"]:
+                params_as_a_string += "\t"
+                params_as_a_string += str(radius)
+
+            params_as_a_string += "\n"
+
+            params_file = open(os.path.join(csv_files_parent_directory, "data_analysis_parameters.txt"), 'w+')
+            params_file.write(params_as_a_string)
+            params_file.close()
+    return user_choice
 
 
 def get_phi_sample():
@@ -140,6 +200,10 @@ def read_in_csv(path_to_phi_csv):
     return R_MATRIX
 
 def generate_images_from_R_matrix(R_MATRIX, csv_filename, circle_params):
+    data_dictionary = dict()
+
+    for radius in circle_params["radii"]:
+        data_dictionary["r={}".format(radius)] = list()
 
 
     with warnings.catch_warnings():
@@ -257,14 +321,14 @@ def generate_images_from_R_matrix(R_MATRIX, csv_filename, circle_params):
             spiral[cord_y, cord_x, :] = 255
             data_point_indices.append(count)
             r_values.append(R_MATRIX[cord_y, cord_x])
+            data_dictionary["r={}".format(radius)].append(R_MATRIX[cord_y, cord_x])
 
 
 
         for (cord_y, cord_x) in zip(marker_coords_y, marker_coords_x):
             count += 1
             spiral[cord_y, cord_x, :] = 255
-            #data_point_indices.append(count)
-            #r_values.append(R_MATRIX[cord_y, cord_x])
+
 
         fig = plt.figure()
         plt.plot(data_point_indices, r_values)
@@ -274,7 +338,8 @@ def generate_images_from_R_matrix(R_MATRIX, csv_filename, circle_params):
 
     spiral_image = Image.fromarray(spiral.astype('uint8'), 'RGB')
     spiral_image.save(csv_filename.replace(".csv", "_circle.png"))
-
+    dataset = pd.DataFrame(data_dictionary)
+    dataset.to_csv(os.path.join(get_data_directory(csv_filename), "lineouts_by_radius.csv"), index=False)
 
 def vertically_stack_all_these_images(parent_folder, paths_to_images):
     # for a vertical stacking it is simple: use vstack
@@ -297,11 +362,18 @@ def delete_all_sub_images(paths_to_images):
 
 phi_csv = get_phi_sample()
 run_dir = get_data_directory(phi_csv)
-get_analysis_parameters(run_dir)
+user_choice = get_analysis_parameters(run_dir)
 r_array = read_in_csv(phi_csv)
-generate_images_from_R_matrix(r_array, phi_csv, circle_options)
-vertically_stack_all_these_images(run_dir, plot_paths)
-delete_all_sub_images(plot_paths)
-
+if user_choice == 1:
+    print("Inside if condition")
+    generate_images_from_R_matrix(r_array, phi_csv, circle_options)
+    vertically_stack_all_these_images(run_dir, plot_paths)
+    delete_all_sub_images(plot_paths)
+elif user_choice == 3:
+    generate_images_from_R_matrix(r_array, phi_csv, h_lines_options)
+    vertically_stack_all_these_images(run_dir, plot_paths)
+    delete_all_sub_images(plot_paths)
+else:
+    print("Missed all if conditions")
 
 os.chdir(start_dir)

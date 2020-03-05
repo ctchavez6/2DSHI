@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/data_analysis.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/R_SUBTRACTED.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/R_SUBTRACTED.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/R_SUBTRACTED.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/R_SUBTRACTED.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_analysis.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -371,21 +369,8 @@
       <workItem from="1583008565824" duration="5185000" />
       <workItem from="1583023734731" duration="1952000" />
       <workItem from="1583027818208" duration="1341000" />
-      <workItem from="1583287472739" duration="9075000" />
-    </task>
-    <task id="LOCAL-00043" summary="latest bug - run params not actually updated by user input">
-      <created>1577331737442</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1577331737442</updated>
-    </task>
-    <task id="LOCAL-00044" summary="a little bit of work on user input validation">
-      <created>1577331766777</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1577331766777</updated>
+      <workItem from="1583287472739" duration="9129000" />
+      <workItem from="1583371606540" duration="2517000" />
     </task>
     <task id="LOCAL-00045" summary="updates on histocam streaming capabilities">
       <created>1577388438530</created>
@@ -716,7 +701,21 @@
       <option name="project" value="LOCAL" />
       <updated>1582938860371</updated>
     </task>
-    <option name="localTasksCounter" value="92" />
+    <task id="LOCAL-00092" summary="more data analysis tools">
+      <created>1583296692737</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1583296692737</updated>
+    </task>
+    <task id="LOCAL-00093" summary="committing before i break anything">
+      <created>1583374124534</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1583374124534</updated>
+    </task>
+    <option name="localTasksCounter" value="94" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -740,8 +739,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="roi_finished" />
-    <MESSAGE value="livestreaming algebra (bw good enough for now)" />
     <MESSAGE value="histograms - good start, but need to adjust horizontal axis' to reflect algebra, minus from -4k to 4k and plus from 0 to 8k" />
     <MESSAGE value="algebra" />
     <MESSAGE value="visualizing R matrix" />
@@ -765,18 +762,20 @@
     <MESSAGE value="spiral start" />
     <MESSAGE value="we can now pull spiral data from csv" />
     <MESSAGE value="background subtraction" />
-    <option name="LAST_COMMIT_MESSAGE" value="background subtraction" />
+    <MESSAGE value="more data analysis tools" />
+    <MESSAGE value="committing before i break anything" />
+    <option name="LAST_COMMIT_MESSAGE" value="committing before i break anything" />
   </component>
   <component name="WindowStateProjectService">
     <state x="1095" y="130" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1583024528348">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1095" y="130" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1583024528348" />
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1582938859749">
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1583374122586">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1582938859749" />
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1583374122586" />
     <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579841668323" />
     <state x="420" y="484" key="FileChooserDialogImpl" timestamp="1583013493103">
       <screen x="0" y="0" width="2560" height="1400" />
@@ -802,11 +801,11 @@
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1150" y="679" key="VCS.EditChangelistDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1580262899574" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1582938861841">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1583296694323">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1582938861841" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1583296694323" />
     <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579841756028" />
     <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1582937366701">
       <screen x="0" y="0" width="2560" height="1560" />
