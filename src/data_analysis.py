@@ -314,7 +314,7 @@ def generate_images_from_R_matrix(R_MATRIX, csv_filename, shape_params, user_sha
 
             fig = plt.figure()
             plt.plot(data_point_indices, r_values)
-            plt.title("{}, Phi_Values_Over_Circle\nRadius = {}, Delta_x = {}, Delta_y = {}".format(frame_title, radius, x_offset, y_offset))
+            plt.title("Phi_Values_Over_Circle\nRadius = {}, Delta_x = {}, Delta_y = {}".format(radius, x_offset, y_offset))
             plt.savefig(os.path.join(get_data_directory(csv_filename), "R_Values_Over_Radius={}.png".format(radius)))
             plot_paths.append(path.join(get_data_directory(csv_filename), "R_Values_Over_Radius={}.png".format(radius)))
 
