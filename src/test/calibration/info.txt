@@ -1,0 +1,30 @@
+Matrix: k
+Min: nan 
+Max: nan 
+Mean: -0.9861435449432616 
+Standard Deviation: 0.016161668419965115 
+ 
+Matrix: V
+Min: nan 
+Max: nan 
+Mean: -0.9861435449432616 
+Standard Deviation: 0.016161668419965115 
+ 
+Matrix: alpha
+Min: nan 
+Max: nan 
+Mean: -0.9861435449432616 
+Standard Deviation: 0.016161668419965115 
+ 
+Matrix: r_min C:/Users/fwess/Documents/GitHub/2DSHI/src/test/avg_Rmin.csv
+Min: nan 
+Max: nan 
+Mean: -0.9861435449432616 
+Standard Deviation: 0.016161668419965115 
+ 
+Matrix: r_max C:/Users/fwess/Documents/GitHub/2DSHI/src/test/avg_Rmax.csv
+Min: nan 
+Max: nan 
+Mean: -0.9861435449432616 
+Standard Deviation: 0.016161668419965115 
+ 
