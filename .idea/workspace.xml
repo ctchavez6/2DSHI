@@ -2,12 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/create_k_v_a_matrices_modified.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_analysis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test_abc/R_Values_Over_Radii.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_abc/R_Values_Over_Radii.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test_abc/data_analysis_parameters.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_abc/data_analysis_parameters.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test_abc/lineouts_by_radius.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_abc/lineouts_by_radius.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test_abc/phi_100um_m=1_vpp_circle.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_abc/phi_100um_m=1_vpp_circle.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test_step/phi.csv" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,15 +67,15 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\fwess\Documents\GitHub" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\image_processing" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\coregistration" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\image_algebra" />
       <recent name="C:\Users\fwess\Documents\GitHub\2DSHI\src\experiment_set_up" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\fwess\Documents\GitHub" />
     </key>
   </component>
   <component name="RunManager" selected="Python.pixel_intensities">
@@ -374,14 +371,8 @@
       <workItem from="1583023734731" duration="1952000" />
       <workItem from="1583027818208" duration="1341000" />
       <workItem from="1583287472739" duration="9129000" />
-      <workItem from="1583371606540" duration="5945000" />
-    </task>
-    <task id="LOCAL-00046" summary="images for later tests">
-      <created>1577388477581</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1577388477581</updated>
+      <workItem from="1583371606540" duration="6116000" />
+      <workItem from="1583887572200" duration="6020000" />
     </task>
     <task id="LOCAL-00047" summary="close to streaming b prime">
       <created>1577406303576</created>
@@ -719,7 +710,14 @@
       <option name="project" value="LOCAL" />
       <updated>1583374132576</updated>
     </task>
-    <option name="localTasksCounter" value="95" />
+    <task id="LOCAL-00095" summary="committing before i break anything, horizontal lineout done">
+      <created>1583377584607</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1583377584607</updated>
+    </task>
+    <option name="localTasksCounter" value="96" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -743,7 +741,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="histograms - good start, but need to adjust horizontal axis' to reflect algebra, minus from -4k to 4k and plus from 0 to 8k" />
     <MESSAGE value="algebra" />
     <MESSAGE value="visualizing R matrix" />
     <MESSAGE value="visualizing R matrix and saving data" />
@@ -768,18 +765,19 @@
     <MESSAGE value="background subtraction" />
     <MESSAGE value="more data analysis tools" />
     <MESSAGE value="committing before i break anything" />
-    <option name="LAST_COMMIT_MESSAGE" value="committing before i break anything" />
+    <MESSAGE value="committing before i break anything, horizontal lineout done" />
+    <option name="LAST_COMMIT_MESSAGE" value="committing before i break anything, horizontal lineout done" />
   </component>
   <component name="WindowStateProjectService">
     <state x="1095" y="130" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1583024528348">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1095" y="130" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1583024528348" />
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1583374131782">
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1583895168253">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1583374131782" />
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1583895168253" />
     <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579841668323" />
     <state x="420" y="484" key="FileChooserDialogImpl" timestamp="1583013493103">
       <screen x="0" y="0" width="2560" height="1400" />
@@ -805,11 +803,11 @@
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1150" y="679" key="VCS.EditChangelistDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1580262899574" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1583374134258">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1583377585799">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1583374134258" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1583377585799" />
     <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579841756028" />
     <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1582937366701">
       <screen x="0" y="0" width="2560" height="1560" />
@@ -821,16 +819,16 @@
       <screen x="0" y="0" width="1440" height="860" />
     </state>
     <state x="518" y="90" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1440.860@0.0.1440.860" timestamp="1576983755808" />
-    <state x="1443" y="711" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1583025025020">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="1443" y="711" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1400@0.0.2560.1400" timestamp="1583025025020" />
-    <state x="1443" y="792" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1560@0.0.2560.1560" timestamp="1582940186288" />
-    <state x="1443" y="792" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579221999979" />
-    <state x="943" y="355" width="840" height="678" key="search.everywhere.popup" timestamp="1582937368985">
+    <state x="1443" y="792" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1583888003135">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
-    <state x="943" y="355" width="840" height="678" key="search.everywhere.popup/0.0.2560.1560@0.0.2560.1560" timestamp="1582937368985" />
+    <state x="1443" y="711" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1400@0.0.2560.1400" timestamp="1583025025020" />
+    <state x="1443" y="792" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1560@0.0.2560.1560" timestamp="1583888003135" />
+    <state x="1443" y="792" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579221999979" />
+    <state x="943" y="355" width="840" height="678" key="search.everywhere.popup" timestamp="1583887582347">
+      <screen x="0" y="0" width="2560" height="1560" />
+    </state>
+    <state x="943" y="355" width="840" height="678" key="search.everywhere.popup/0.0.2560.1560@0.0.2560.1560" timestamp="1583887582347" />
     <state x="943" y="355" width="840" height="678" key="search.everywhere.popup/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1578970281524" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
