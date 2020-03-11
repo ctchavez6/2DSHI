@@ -154,6 +154,7 @@ def get_analysis_parameters(csv_files_parent_directory):
 
     return user_choice
 frame_title = str(input("Enter the legend information for this analyzed configuration: "))
+#this is the one change
 
 def get_phi_sample():
     print("Welcome to data_analysis.py using phi.csv")
