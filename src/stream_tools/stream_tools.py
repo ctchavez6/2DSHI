@@ -904,7 +904,7 @@ class Stream:
                 knn_matches = bf.knnMatch(descriptors1, descriptors2, k=2)
                 lowe_ratio = 0.89
 
-                # Apply ratio test
+                # Apply ratio test_RminRmax
                 good_knn = []
 
                 for m, n in knn_matches:

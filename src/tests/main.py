@@ -245,11 +245,11 @@ if __name__ == "__main__":
     cam_b_image_path = os.path.join(os.path.join(test_materials, "cam_b_frames"), "cam_b_frame_1.png")
 
     if not os.path.exists(cam_a_image_path):
-        raise Exception("Can not run this test. You do not have your tests module set up properly.\n"
+        raise Exception("Can not run this test_RminRmax. You do not have your tests module set up properly.\n"
                         "Obtain image {} and add it to the tests directory, then try again.".format(cam_a_image_path))
 
     if not os.path.exists(cam_b_image_path):
-        raise Exception("Can not run this test. You do not have your tests module set up properly.\n"
+        raise Exception("Can not run this test_RminRmax. You do not have your tests module set up properly.\n"
                         "Obtain image {} and add it to the tests directory, then try again.".format(cam_b_image_path))
 
     #print("\n\tStarting test_euclidean_transform()")
