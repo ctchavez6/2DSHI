@@ -30,18 +30,26 @@ if user_input.lower() in ["quit", "q"]:
 Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
 filename_R_Min = askopenfilename(title='Pick an R_Min') # show an "Open" dialog box and return the path to the selected file
 filename_sh_R_Min = filename_R_Min.split("/")[-1][:-4]
+
 filename_R_Max = askopenfilename(title='Pick an R_Max') # show an "Open" dialog box and return the path to the selected file
 filename_sh_R_Max = filename_R_Max.split("/")[-1][:-4]
 
-print("filename_sh_R_Min: {}".format(filename_sh_R_Min))
-print("filename_sh_R_Max: {}".format(filename_sh_R_Max))
+filename_R_sample = askopenfilename(title='Pick an R_Sample') # show an "Open" dialog box and return the path to the selected file
+filename_sh_R_sample = filename_R_sample.split("/")[-1][:-4]
+
+filename_R_background = askopenfilename(title='Pick an R_Background') # show an "Open" dialog box and return the path to the selected file
+filename_sh_R_background = filename_R_background.split("/")[-1][:-4]
+
+
+#print("filename_sh_R_Min: {}".format(filename_sh_R_Min))
+#print("filename_sh_R_Max: {}".format(filename_sh_R_Max))
 
 # filename_R_sample = askopenfilename(title='Pick an R_Sample') # show an "Open" dialog box and return the path to the selected file
 # filename_sh_R_sample = filename_R_Max.split("/")[-1][:-4]
 
 
 
-run_directory = os.path.abspath(os.path.join(filename_R_Min, os.pardir))
+run_directory = os.path.abspath(os.path.join(filename_R_sample, os.pardir))
 run_directory_parent = os.path.abspath(os.path.join(run_directory, os.pardir))
 rmin_rmax_no_nans_directory = os.path.join(run_directory_parent, str(run_directory.split("/")[-1]) + "_noNANs")
 
@@ -87,18 +95,37 @@ values_r_min = r_min_csv_file.values
 r_max_csv_file = pandas.read_csv(filename_R_Max, header=None)
 values_r_max = r_max_csv_file.values
 
+r_sample_csv_file = pandas.read_csv(filename_R_sample, header=None)
+values_r_sample = r_sample_csv_file.values
+
+r_background_csv_file = pandas.read_csv(filename_R_background, header=None)
+values_r_background = r_background_csv_file.values
+
+
+
 values_r_min_no_nans = values_r_min.copy()
 values_r_max_no_nans = values_r_max.copy()
+values_r_sample_no_nans = values_r_sample.copy()
+values_r_background_no_nans = values_r_background.copy()
+
 
 rmin_where_are_NaNs = np.isnan(values_r_min)
 rmax_where_are_NaNs = np.isnan(values_r_max)
-
+rsample_where_are_NaNs = np.isnan(values_r_sample)
+rbackground_where_are_NaNs = np.isnan(values_r_background)
 
 values_r_min_no_nans[rmin_where_are_NaNs] = float(0)
 values_r_max_no_nans[rmax_where_are_NaNs] = float(0)
+values_r_sample_no_nans[rsample_where_are_NaNs] = float(0)
+values_r_background_no_nans[rbackground_where_are_NaNs] = float(0)
+
+
 
 filename_rmin_nonans = os.path.join(rmin_rmax_no_nans_directory, filename_sh_R_Min + "_noNANs.csv")
 filename_rmax_nonans = os.path.join(rmin_rmax_no_nans_directory, filename_sh_R_Max + "_noNANs.csv")
+filename_rsample_nonans = os.path.join(rmin_rmax_no_nans_directory, filename_sh_R_sample + "_noNANs.csv")
+filename_rbackground_nonans = os.path.join(rmin_rmax_no_nans_directory, filename_sh_R_background + "_noNANs.csv")
+
 
 with open(filename_rmin_nonans, "w+", newline='') as my_csv:
     csvWriter = csv.writer(my_csv, delimiter=',')
@@ -106,10 +133,20 @@ with open(filename_rmin_nonans, "w+", newline='') as my_csv:
 
 with open(filename_rmax_nonans, "w+", newline='') as my_csv:
     csvWriter = csv.writer(my_csv, delimiter=',')
-    csvWriter.writerows(rmax_where_are_NaNs.tolist())
+    csvWriter.writerows(values_r_max_no_nans.tolist())
+
+with open(filename_rsample_nonans, "w+", newline='') as my_csv:
+    csvWriter = csv.writer(my_csv, delimiter=',')
+    csvWriter.writerows(values_r_sample_no_nans.tolist())
+
+with open(filename_rbackground_nonans, "w+", newline='') as my_csv:
+    csvWriter = csv.writer(my_csv, delimiter=',')
+    csvWriter.writerows(values_r_background_no_nans.tolist())
+
 
 
 for i in range(2):
+    info_appendix = ""
     if i == 0:
         print("\n\nFirst Run: Creating Calibration Files for Raw Inputs")
         print("----------------------------------------------------\n")
@@ -118,6 +155,9 @@ for i in range(2):
         print("------------------------------------------------------------------------\n")
         values_r_max = values_r_max_no_nans
         values_r_min = values_r_min_no_nans
+        values_r_sample = values_r_sample_no_nans
+        values_r_background = values_r_background_no_nans
+
         cal_phase_dir = cal_phase_dir_nonans
 
     err_state = ""
@@ -257,9 +297,41 @@ for i in range(2):
 
 
     # #compute the phase angle, using above calibration parameters, first computing the bracketed quantity, from the formula
-    # denom = np.multiply(V, np.subtract(1.00, np.multiply(alpha, values_r_sample)))
-    # bracket = np.divide(values_r_sample-alpha, denom, where=denom!=0.0) #new formula, fixed for Brandi's error 2.13.20
-    # Phi = np.arcsin(bracket)
+    #value_r_sample_subtract_background = np.subtract(values_r_sample, values_r_background)
+
+    denom = np.multiply(V, np.subtract(1.00, np.multiply(alpha, values_r_sample)))
+    bracket = np.divide(values_r_sample-alpha, denom, where=denom!=0.0) #new formula, fixed for Brandi's error 2.13.20
+    clipped_bracket = np.clip(bracket, -1, 1)
+    Phi = np.arcsin(clipped_bracket)
+
+    print("Checking for NaNs")
+    print("bracket: {}".format(np.sum(np.isnan(bracket.flatten()))))
+    print("values_r_sample: {}".format(np.sum(np.isnan(values_r_sample.flatten()))))
+    print("values_r_background: {}".format(np.sum(np.isnan(values_r_background.flatten()))))
+    print("Phi: {}".format(np.sum(np.isnan(Phi.flatten()))))
+
+    info_appendix += "Values inside bracket >  1: {}\n".format(len(bracket[bracket > 1]))
+    info_appendix += "Values inside bracket < -1: {}\n".format(len(bracket[bracket < -1]))
+
+    print("Values of the bracket should lie within -1 <= x <= 1")
+    print("Values greater than 1 =", bracket[bracket > 1])
+    print("Their indices are ", np.nonzero(bracket > 1))
+
+    print("Values less than -1 =", bracket[bracket < -1])
+    print("Their indices are ", np.nonzero(bracket < -1))
+
+
+    if Phi.shape != values_r_background.shape:
+        print("Phi.shape != values_r_background.shape")
+        print("Phi.shape: {}".format(Phi.shape))
+        print("values_r_background.shape: {}".format(values_r_background.shape))
+        float_avg_background = float(np.nanmean(values_r_background.flatten()))
+        phi_minus_bg = Phi - float_avg_background
+
+        info_appendix += "\nPhi.shape != values_r_background.shape:"
+        info_appendix += "\nFor the background, we used a floating point value of {}\n".format(float_avg_background)
+    else:
+        phi_minus_bg = np.subtract(Phi, values_r_background)
 
     # print("Min: {}".format(np.min(Phi)))
     # print("Max: {}".format(np.max(Phi)))
@@ -270,6 +342,9 @@ for i in range(2):
     constants["k"] = k
     constants["V"] = V
     constants["alpha"] = alpha
+    constants["phi"] = Phi
+    constants["phi_minus_background"] = phi_minus_bg
+
 
     for constant in constants:
         csv_path = os.path.join(cal_phase_dir, "{}.csv".format(constant))
@@ -312,10 +387,10 @@ for i in range(2):
         calibration_matrices.write("Min: {} \n".format(np.min(constants_and_inputs[key])))
         calibration_matrices.write("Max: {} \n".format(np.max(constants_and_inputs[key])))
         calibration_matrices.write("Mean: {} \n".format(np.nanmean(constants_and_inputs[key])))
-        calibration_matrices.write("Standard Deviation: {} \n \n".format(np.nanstd(constants_and_inputs[key])))
+        calibration_matrices.write("Standard Deviation: {}\n\n".format(np.nanstd(constants_and_inputs[key])))
 
-
-
+    calibration_matrices.write(info_appendix)
+    calibration_matrices.write("\n")
     calibration_matrices.close()
 
 

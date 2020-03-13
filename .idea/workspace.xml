@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="some optimization, fitting csvs to smallest seen rows/col dimmension">
+    <list default="true" id="ad11036b-8823-4aff-9790-023c0c8bb787" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/extract_csv_dimmensions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/build/_static/underscore-1.3.1.js" beforeDir="false" afterPath="$PROJECT_DIR$/docs/build/_static/underscore-1.3.1.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/create_k_v_a_matrices_modified.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/create_k_v_a_matrices_modified.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/stream_tools/stream_tools.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/R_Values_Over_Horizontal_Lineout.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_RminRmax/R_Values_Over_Horizontal_Lineout.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/avg_Rmax.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_RminRmax/avg_Rmax.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/avg_Rmin.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_RminRmax/avg_Rmin.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/calibration/V.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_RminRmax/calibration/V.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/calibration/alpha.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_RminRmax/calibration/alpha.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/calibration/info.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_RminRmax/calibration/info.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/calibration/k.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_RminRmax/calibration/k.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/data_analysis_parameters.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_RminRmax/data_analysis_parameters.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/lineouts_by_h_line.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_RminRmax/lineouts_by_h_line.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/phi.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_RminRmax/phi.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/phi.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_RminRmax/phi.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/phi_h_lines.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/test_RminRmax/phi_h_lines.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tests/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test_RminRmax/R_Values_Over_Horizontal_Lineout.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test_RminRmax/avg_Rmax.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test_RminRmax/avg_Rmin.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test_RminRmax/calibration/V.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test_RminRmax/calibration/alpha.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test_RminRmax/calibration/info.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test_RminRmax/calibration/k.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test_RminRmax/data_analysis_parameters.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test_RminRmax/lineouts_by_h_line.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test_RminRmax/phi.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test_RminRmax/phi.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test_RminRmax/phi_h_lines.png" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -390,13 +388,8 @@
       <workItem from="1583962119013" duration="797000" />
       <workItem from="1583966260850" duration="612000" />
       <workItem from="1583976203580" duration="3891000" />
-    </task>
-    <task id="LOCAL-00051" summary="priority realighment, focus on ROI">
-      <created>1577764154260</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
-      <option name="project" value="LOCAL" />
-      <updated>1577764154260</updated>
+      <workItem from="1583980528589" duration="368000" />
+      <workItem from="1584061267696" duration="6862000" />
     </task>
     <task id="LOCAL-00052" summary="priority realighment, focus on ROI">
       <created>1577764518646</created>
@@ -734,7 +727,14 @@
       <option name="project" value="LOCAL" />
       <updated>1583980047485</updated>
     </task>
-    <option name="localTasksCounter" value="100" />
+    <task id="LOCAL-00100" summary="updated kva">
+      <created>1583980552700</created>
+      <option name="number" value="00100" />
+      <option name="presentableId" value="LOCAL-00100" />
+      <option name="project" value="LOCAL" />
+      <updated>1583980552700</updated>
+    </task>
+    <option name="localTasksCounter" value="101" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -758,7 +758,6 @@
       <path value="$PROJECT_DIR$/previous_versions_and_reference/pypylon" />
       <path value="$PROJECT_DIR$/pypylon" />
     </ignored-roots>
-    <MESSAGE value="sigma slider and stats writer" />
     <MESSAGE value="r histogram" />
     <MESSAGE value="show keypoints at step 2, write a b and r" />
     <MESSAGE value="we are going to go for extra accuracy with b double prime" />
@@ -783,19 +782,20 @@
     <MESSAGE value="some optimization, fitting csvs to smallest seen rows/col dimmension" />
     <MESSAGE value="renamed a folder for testing purposes" />
     <MESSAGE value="updated kva modified" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated kva modified" />
+    <MESSAGE value="updated kva" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated kva" />
   </component>
   <component name="WindowStateProjectService">
     <state x="1095" y="130" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1583024528348">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1095" y="130" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1583024528348" />
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1583980045608">
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2" timestamp="1583980550764">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="330" y="25" key="CommitChangelistDialog2/0.0.1440.860@0.0.1440.860" timestamp="1577388476655" />
     <state x="587" y="40" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1583966076708" />
-    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1583980045608" />
+    <state x="587" y="45" width="1833" height="809" key="CommitChangelistDialog2/0.0.2560.1560@0.0.2560.1560" timestamp="1583980550764" />
     <state x="587" y="45" key="CommitChangelistDialog2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579841668323" />
     <state x="420" y="484" key="FileChooserDialogImpl" timestamp="1583013493103">
       <screen x="0" y="0" width="2560" height="1400" />
@@ -821,11 +821,11 @@
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="1150" y="679" key="VCS.EditChangelistDialog/0.0.2560.1560@0.0.2560.1560" timestamp="1580262899574" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1583980051059">
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2" timestamp="1583980559568">
       <screen x="0" y="0" width="2560" height="1560" />
     </state>
     <state x="312" y="164" key="Vcs.Push.Dialog.v2/0.0.1440.860@0.0.1440.860" timestamp="1577388479562" />
-    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1583980051059" />
+    <state x="555" y="297" key="Vcs.Push.Dialog.v2/0.0.2560.1560@0.0.2560.1560" timestamp="1583980559568" />
     <state x="555" y="297" key="Vcs.Push.Dialog.v2/2560.-121.1920.1040/0.0.2560.1560@0.0.2560.1560" timestamp="1579841756028" />
     <state x="740" y="463" key="com.intellij.ide.util.TipDialog" timestamp="1582937366701">
       <screen x="0" y="0" width="2560" height="1560" />
