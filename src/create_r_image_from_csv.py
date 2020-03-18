@@ -26,7 +26,7 @@ user_input = input("To proceed and select an appropriate file, press Enter." + q
 
 if user_input.lower() in ["quit", "q"]:
     sys.exit()
-
+#mode = input("Please select a mode. \n\t1) Values between -1 and +1\n\t2) Values between -pi/2 and +pi/2")
 
 filename_R_sample = askopenfilename(title='Pick an R_Sample') # show an "Open" dialog box and return the path to the selected file
 filename_sh_R_sample = filename_R_sample.split("/")[-1][:-4]
