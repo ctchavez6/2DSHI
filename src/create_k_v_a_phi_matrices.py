@@ -166,7 +166,7 @@ for i in range(2):
 
     if values_r_min.shape != values_r_max.shape:
         print("Shapes do not match, Rmin = {}, Rmax = {}".format(values_r_min.shape, values_r_max.shape))
-        choice = int(input("Woold you like to \n"
+        choice = int(input("Would you like to \n"
                        "\t1) Use a float value for all R_Min, R_Max Values\n"
                        "\t2)Take a cut out of the smaller value and proceed as intended\n\t"))
 
