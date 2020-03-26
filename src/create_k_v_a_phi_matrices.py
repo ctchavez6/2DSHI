@@ -288,6 +288,7 @@ for i in range(2):
     max_minus_min = np.subtract(values_r_max, values_r_min)
 
     k = np.divide(((-1.00)*max_times_min + 1.00), max_minus_min, where=max_minus_min!=0)
+
     k_squared = np.multiply(k, k)
     sqrt_k_minus_1 = np.sqrt(np.abs(k_squared - 1.00))
     V = np.subtract(k, sqrt_k_minus_1)
@@ -298,6 +299,11 @@ for i in range(2):
 
     # #compute the phase angle, using above calibration parameters, first computing the bracketed quantity, from the formula
     #value_r_sample_subtract_background = np.subtract(values_r_sample, values_r_background)
+    user_input_for_V = float(input("Float input for V: "))
+    V = np.zeros(values_r_sample.shape, dtype=np.float32) + user_input_for_V
+
+    user_input_for_alpha = float(input("Float input for alpha: "))
+    alpha = np.zeros(values_r_sample.shape, dtype=np.float32) + user_input_for_alpha
 
     denom = np.multiply(V, np.subtract(1.00, np.multiply(alpha, values_r_sample)))
     bracket = np.divide(values_r_sample-alpha, denom, where=denom!=0.0) #new formula, fixed for Brandi's error 2.13.20
