@@ -123,16 +123,17 @@ if __name__ == "__main__":
             im.save_img("b_{}.png".format(j + 1), b_frames_dir, b16)
 
     os.chdir(run_directory)
-    try:
-        print("Writing Stream Configurations to File")
-        wptf.document_configurations(
-            warp_matrix=stream.get_warp_matrix(),
-            sigmas=stream.get_static_sigmas(),
-            static_centers=stream.get_static_centers(),
-            warp_matrix_2=stream.get_warp_matrix2())
-    except TypeError as e:
-        print("TYPE ERROR")
-        raise e
+    if stream.get_warp_matrix() is not None and stream.get_warp_matrix2() is not None:
+        try:
+            print("Writing Stream Configurations to File")
+            wptf.document_configurations(
+                warp_matrix=stream.get_warp_matrix(),
+                sigmas=stream.get_static_sigmas(),
+                static_centers=stream.get_static_centers(),
+                warp_matrix_2=stream.get_warp_matrix2())
+        except TypeError as e:
+            print("TYPE ERROR")
+            raise e
     print("Done")
     os.chdir(current_directory)
     print("You have completed and exited the script.")

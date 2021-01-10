@@ -35,20 +35,20 @@ def determine_run_mode(sys_args):
 
     if run_mode == 0:
         prompt = "\nNo experimental parameters entered.\n\nWould you like to implement last run's parameters?\n"
-        prompt += "a: Yes\n"
-        prompt += "b: Yes, but with some changes.\n\n(Or enter 'q' to quit)\n\n"
+        prompt += "y: Yes\n"
+        prompt += "n: Yes, but with some changes.\n\n(Or enter 'q' to quit)\n\n"
         input_ = input(prompt).lower()
-        options = ["a", "b", "q"]
+        options = ["y", "n", "q"]
         while input_ not in options:
             input_ = input(prompt).lower()
 
         if input_ == "q":
             print("Okay, goodbye.")
             sys.exit(1)
-        elif input_ == "a":
+        elif input_ == "y":
             run_mode = 1
             print(run_mode_feedback.format(run_mode))
-        elif input_ == "b":
+        elif input_ == "n":
             run_mode = 3
             print(run_mode_feedback.format(run_mode))
 

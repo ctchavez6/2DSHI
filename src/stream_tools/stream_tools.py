@@ -24,7 +24,14 @@ twelve_bit_max = (2 ** 12) - 1
 eight_bit_max = (2 ** 8) - 1
 
 def progressBar(value, endvalue, bar_length=20):
+    """
+    Describe function
 
+    :param value: Current progress value (i.e. the 57 in 57% out of 100_
+    :param endvalue: Same example but the 100
+    :param bar_length: Bar length in characters
+    :return:
+    """
     percent = float(value) / endvalue
     arrow = '-' * int(round(percent * bar_length)-1) + '>'
     spaces = ' ' * (bar_length - len(arrow))
@@ -65,7 +72,6 @@ class App(threading.Thread):
         self.at_front = True
 
 
-app = App()
 
 EPSILON = sys.float_info.epsilon  # Smallest possible difference
 
@@ -961,6 +967,9 @@ class Stream:
 
             cv2.destroyAllWindows()
 
+        if coregister_ != "y":
+            self.jump_level = 10
+
         step = 4
         if self.jump_level < step:
 
@@ -989,13 +998,18 @@ class Stream:
                 print("\t\tB Prime (Calculated)      : {}".format((int(mu_b_x), int(mu_b_y))))
                 print("\t\tB Prime (Overwritten to A): {}".format(self.static_center_a))
 
-                option = int(input("Would you like to use the calculated gaussian center (1)"
-                               "or the overwritten gaussian center (2):  "))
 
-                if option == 1:
+                option = input("Would you like to use the calculated gaussian center (y)"
+                               "or the overwritten gaussian center (n):  ")
+
+                if option == "y":
                     self.static_center_b = (int(mu_b_x), int(mu_b_y))  # Picking A
-                elif option == 2:
+                elif option == "n":
                     self.static_center_b = self.static_center_a
+
+            else:
+                continue_stream = False
+                self.jump_level = 10
 
 
 
@@ -1121,11 +1135,12 @@ class Stream:
             cv2.destroyAllWindows()
 
 
-
+        app = None
         step = 6
         if self.jump_level < step:
 
             find_rois_ = input("Step 6B - Re-Coregister - {}".format(y_n_msg))
+            app = App()
 
             if find_rois_.lower() == "y":
                 continue_stream = True
@@ -1139,7 +1154,6 @@ class Stream:
                 x_b, y_b = self.static_center_b
 
                 n_sigma = app.foo
-
                 self.roi_a = self.current_frame_a[
                              y_a - n_sigma * self.static_sigmas_y : y_a + n_sigma * self.static_sigmas_y + 1,
                              x_a - n_sigma * self.static_sigmas_x : x_a + n_sigma * self.static_sigmas_x + 1
@@ -1228,11 +1242,17 @@ class Stream:
 
 
 
+
         step = 7
+
+        if self.static_center_a is None or self.static_center_b is None:
+            print("Regions of Interest not defined: Exiting Program")
+            continue_stream = False
 
         if self.jump_level == step:
             continue_stream = True
-
+        elif self.jump_level > step:
+            continue_stream = False
         else:
             start_algebra = input("Step 7 - Commence Image Algebra (Free Stream): Proceed? (y/n): ")
             if start_algebra.lower() == "y":
@@ -1243,6 +1263,7 @@ class Stream:
         while continue_stream:
             self.frame_count += 1
             self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
+
 
             x_a, y_a = self.static_center_a
             x_b, y_b = self.static_center_b
@@ -1392,7 +1413,9 @@ class Stream:
 
 
             if not continue_stream:
-                app.callback()
+                if app is not None:
+                    app.callback()
+
                 cv2.destroyAllWindows()
 
         satisfied_with_run = False
@@ -1409,8 +1432,13 @@ class Stream:
         start_writing_at = 0
         end_writing_at = 0
 
+
         step = 8
+        if self.jump_level > 8:
+            satisfied_with_run = True
+
         run_folder = os.path.join("D:", "\\" + self.current_run)
+
         while satisfied_with_run is False:
 
             current_r_frame = 0
@@ -1609,10 +1637,14 @@ class Stream:
                                 averages.append(stats[i][1])
                                 sigmas.append(stats[i][2])
 
-                            ax1.errorbar(frames, averages,yerr=sigmas, c='b', capsize=5)
+                            ax1.errorbar(frames, averages, yerr=sigmas, c='b', capsize=5)
                             ax1.set_xlabel('Frame')
                             ax1.set_ylabel('R (Mean)')
                             ax1.set_title('Mean R by Frame')
+                            ax1.axhline(y=-1.0, xmin=starting_frame, xmax=end_frame)
+                            ax1.axhline(y=0.0, xmin=starting_frame, xmax=end_frame)
+                            ax1.axhline(y=1.0, xmin=starting_frame, xmax=end_frame)
+
                             save_path = os.path.join(run_folder, 'mean_r_by_frame.png')
                             fig_.savefig(save_path)
                             plot_img = cv2.imread(save_path, cv2.IMREAD_COLOR)
@@ -1634,9 +1666,13 @@ class Stream:
         cv2.destroyAllWindows()
 
         step = 9
-        write_to_csv = input("Step 9 - Write Recorded R Frame(s) to File(s)? - Proceed? (y/n): ")
 
-        if write_to_csv.lower() == 'y':
+        if not (self.jump_level > step):
+            write_to_csv = input("Step 9 - Write Recorded R Frame(s) to File(s)? - Proceed? (y/n): ")
+        else:
+            write_to_csv = "n"
+
+        if self.jump_level <= step and write_to_csv.lower() == 'y':
 
             r_matrices = self.r_frames
             n_ = 0
@@ -1711,14 +1747,16 @@ class Stream:
 
             print("Matrices and Matrix Stats have finished writing to file.")
         try:
-            if not app.at_front:
-                app.bring_to_front()
+            if app:
+                if not app.at_front:
+                    app.bring_to_front()
         except Exception:
             pass
-        app.callback()
+
+        if app:
+            app.callback()
+
         self.all_cams.StopGrabbing()
-
-
 
         step = 10
         notes = input("Step 10 - Write some notes to a file? - Proceed? (y/n): ")
