@@ -49,10 +49,10 @@ def theoretical_calibration_curve_presets(x, p, q):
     return numerator/denominator
 
 model = Model(theoretical_calibration_curve, independent_vars=['x'])
-arb_alpha = 0.091
-arb_v = .98
-arb_p = .0075
-arb_q = 2.5
+arb_alpha = -0.091
+arb_v = 0.98
+arb_p = 0.075
+arb_q = 5.
 
 
 result = model.fit(r_values, x=frame_index, alpha=arb_alpha, v=arb_v, p=arb_p, q=arb_q)
@@ -60,6 +60,4 @@ value_alpha = float(result.values['alpha'])
 value_v = float(result.values['v'])
 trunc1 = f"{value_alpha:.3f}"
 trunc2 = f"{value_v:.3f}"
-print("alpha:",trunc1,"v:",trunc2)
-result.plot()
-plt.show()
+print("alpha:",trunc1,"v",trunc2)

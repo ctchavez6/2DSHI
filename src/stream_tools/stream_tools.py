@@ -753,6 +753,9 @@ class Stream:
             raise e
 
     def grab_frames2(self, roi_a, roi_b, warp_matrix_2):
+        if warp_matrix_2 is None:
+            return roi_a, roi_b
+
         roi_shape = roi_b.shape[1], roi_b.shape[0]
         roi_b_double_prime = cv2.warpAffine(roi_b, warp_matrix_2, roi_shape, flags=cv2.WARP_INVERSE_MAP)
         return roi_a, roi_b_double_prime
@@ -850,9 +853,12 @@ class Stream:
                 self.histocam_a = histocam.Histocam()
                 self.histocam_b = histocam.Histocam()
 
-
             if start.lower() == 'y':
                 continue_stream = True
+            else:
+                self.frame_count += 1
+                self.current_frame_a, self.current_frame_b = self.grab_frames()
+                self.pre_alignment(histogram)
 
             while continue_stream:
                 self.frame_count += 1
@@ -866,12 +872,26 @@ class Stream:
         if self.jump_level < step:
             coregister_ = input("Step 2 - Co-Register with Euclidean Transform -  {}".format(y_n_msg))
 
+            """
+            Gameplan: 
+                1st: If user chooses to go through step 2's coreg process, then great, use that warp
+                2nd: If user chooses NOT to coreg, Load in from last run
+                        THIS WILL REQUIRE SAVING
+            if coregister_.lower() == "n":
+                # import from last run
+                pass
+            """
+
             if coregister_.lower() == "y":
                 continue_stream = True
                 a_8bit = bdc.to_8_bit(self.current_frame_a)
                 b_8bit = bdc.to_8_bit(self.current_frame_b)
                 warp_ = ic.get_euclidean_transform_matrix(a_8bit, b_8bit)
+
+                #np.save('wp1.npy', warp_)
+
                 self.warp_matrix = warp_
+
 
                 a, b, tx = warp_[0][0], warp_[0][1], warp_[0][2]
                 c, d, ty = warp_[1][0], warp_[1][1], warp_[1][2]
@@ -999,8 +1019,8 @@ class Stream:
                 print("\t\tB Prime (Overwritten to A): {}".format(self.static_center_a))
 
 
-                option = input("Would you like to use the calculated gaussian center (y)"
-                               "or the overwritten gaussian center (n):  ")
+                option = input("Would you like to use the \n\tcalculated gaussian center (y) "
+                               "\n\tor the overwritten gaussian center (n):  ")
 
                 if option == "y":
                     self.static_center_b = (int(mu_b_x), int(mu_b_y))  # Picking A
@@ -1217,8 +1237,11 @@ class Stream:
                 cv2.imshow("ROI A", bdc.to_16_bit(self.roi_a))
                 cv2.imshow("ROI B Prime", bdc.to_16_bit(self.roi_b))
 
-
-                roi_a, b_double_prime = self.grab_frames2(self.roi_a.copy(), self.roi_b.copy(), self.warp_matrix_2.copy())
+                if self.warp_matrix_2 is None:
+                    roi_a = self.roi_a
+                    b_double_prime = self.roi_b
+                else:
+                    roi_a, b_double_prime = self.grab_frames2(self.roi_a.copy(), self.roi_b.copy(), self.warp_matrix_2.copy())
 
                 cv2.imshow("ROI B DOUBLE PRIME", bdc.to_16_bit(b_double_prime))
 
@@ -1279,8 +1302,11 @@ class Stream:
                          y_b - n_sigma * self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + n_sigma,
                          x_b - n_sigma * self.static_sigmas_x: x_b + n_sigma*self.static_sigmas_x + n_sigma]
 
-
-            roi_a, b_double_prime = self.grab_frames2(self.roi_a.copy(), self.roi_b.copy(), self.warp_matrix_2.copy())
+            if self.warp_matrix_2 is None:
+                roi_a = self.roi_a
+                b_double_prime = self.roi_b
+            else:
+                roi_a, b_double_prime = self.grab_frames2(self.roi_a.copy(), self.roi_b.copy(), self.warp_matrix_2.copy())
 
 
             CENTER_B_DP = int(b_double_prime.shape[1]*0.5), int(b_double_prime.shape[0]*0.5)
