@@ -1,7 +1,33 @@
 import os
+from pathlib import Path
 
-def get_latest_run_direc():
-    #data_directory = "/Users/ivansepulveda/PycharmProjects/2DSHI/src/tests/D"  # Ivan's Mac
+
+def get_latest_run_direc(path_override=False, path_to_exclude=None):
+    if not path_override:
+        data_directory = os.path.join("D:")  # Windows PC @ Franks' House
+    else:
+        data_directory = os.path.abspath(os.path.join(os.path.join("D:"), os.pardir))
+
+    all_runs = sorted([os.path.join(data_directory, path) for path in os.listdir(data_directory)
+                       if os.path.isdir(os.path.join(data_directory, path))
+
+                       and path not in ["$RECYCLE.BIN",
+                                        "System Volume Information",
+                                        "BaslerCameraData",
+                                        ".tmp.drivedownload",
+                                        "Recovery"]])
+
+    if path_to_exclude is not None:
+        filtered = [x for x in all_runs if path_to_exclude not in x]
+        all_runs = filtered
+
+    print("top 5 of get_latest_run_direc")
+    print(all_runs[-5:])
+
+    return all_runs[-1]
+
+
+def get_latest_run():
     data_directory = os.path.join("D:", "")  # Windows PC @ Franks' House
 
     all_runs = sorted([os.path.join(data_directory, path) for path in os.listdir(data_directory)
@@ -12,25 +38,15 @@ def get_latest_run_direc():
                                         ".tmp.drivedownload",
                                         "Recovery"]])
 
-    return all_runs[-1]
-
-
-def get_latest_run():
-    #data_directory = "/Users/ivansepulveda/PycharmProjects/2DSHI/src/tests/D"  # Ivan's Mac
-    data_directory = os.path.join("D:", "")  # Windows PC @ Franks' House
-
-    all_runs = sorted([os.path.join(data_directory, path) for path in os.listdir(data_directory)
-                       if os.path.isdir(os.path.join(data_directory, path))
-                       and path not in ["$RECYCLE.BIN", "System Volume Information"]])
-
     all_params_dict = dict()
 
     if len(all_runs) < 1:
         return all_params_dict
 
-    last_run = all_runs[-1]
-    last_run_params_file_path = os.path.join(last_run, "run_parameters.txt")
+    last_run = get_latest_run_direc()
 
+    last_run_params_file_path = os.path.join(last_run, "run_parameters.txt")
+    print("Attempting to retrieve: ", last_run_params_file_path)
     last_run_params_file = open(last_run_params_file_path, 'r')
 
 
@@ -56,7 +72,6 @@ def get_latest_run():
                         "CrystalTemp2",
                         "CompensatorAngle"]
 
-
     for line in last_run_params_file:
         split_by_tabs = line.split('\t')
         parameter = split_by_tabs[0]
@@ -77,14 +92,7 @@ def get_latest_run():
     last_run_params_file.close()
     return all_params_dict
 
-def get_latest_run_name(data_directory):
-    all_runs = sorted([os.path.join(data_directory, path) for path in os.listdir(data_directory)
-                       if os.path.isdir(os.path.join(data_directory, path))
-                       and path not in ["$RECYCLE.BIN", "System Volume Information"]])
-    if len(all_runs) < 1:
-        return ""
-    else:
-        return all_runs[-1]
+
 
 
 
@@ -132,7 +140,6 @@ def get_previous_configuration():
                         "d2",
                         "ty2"]
 
-
     for line in last_run_params_file:
         split_by_tabs = line.split('\t')
         parameter = split_by_tabs[0].strip()
@@ -144,13 +151,6 @@ def get_previous_configuration():
         elif parameter in float_parameters:
             all_params_dict[parameter] = float(value)
         else:
-            #print("Else condition:")
-            #print("line:", line)
-            #print("split by tables:", split_by_tabs)
-            #print("parameter:", parameter)
-            #print("value:", value)
-            #print("{} in int_parameters: {}".format(parameter, parameter in int_parameters))
-            #print("{} in float_parameters: {}".format(parameter, parameter in float_parameters))
             print("Warning: Parameter {} with a value of {} has NOT been accounted for.".format(parameter, value))
 
     last_run_params_file.close()

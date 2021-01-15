@@ -4,7 +4,6 @@ import sys
 import argparse
 import os
 import numpy as np
-import stream_cameras_and_histograms as streams  # OLD CODE
 
 from experiment_set_up import update_camera_configuration as ucc
 from experiment_set_up import write_experimental_params_to_file as wptf

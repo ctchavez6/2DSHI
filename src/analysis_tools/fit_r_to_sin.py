@@ -32,7 +32,6 @@ frame_index = df.loc[:, 'Frame'].values
 r_values = df.loc[:, 'Avg_R'].values
 
 
-
 def theoretical_calibration_curve(x, alpha, v, p, q):
     numerator = alpha + (v * np.sin((p*x) + q))
     denominator = 1 + (alpha * v * np.sin((p*x) + q))

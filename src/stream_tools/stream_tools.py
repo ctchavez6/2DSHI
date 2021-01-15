@@ -5,6 +5,7 @@ from image_processing import stack_images as stack
 from histocam import histocam
 from coregistration import img_characterization as ic
 from coregistration import find_gaussian_profile as fgp
+from experiment_set_up import find_previous_run as fpr
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -16,7 +17,7 @@ from PIL import Image, ImageDraw, ImageFont
 import tkinter as tk
 import threading
 from path_management import image_management as im
-
+from pathlib import Path
 
 y_n_msg = "Proceed? (y/n): "
 sixteen_bit_max = (2 ** 16) - 1
@@ -80,9 +81,6 @@ EPSILON = sys.float_info.epsilon  # Smallest possible difference
 @numba.njit
 def hist1d_test(v, b, r):
     return np.histogram(v, b, r)
-
-
-
 
 
 def set_xvalues(polygon, x0, x1):
@@ -278,7 +276,6 @@ def initialize_histograms_algebra(line_width=3):
         lines["grayscale_avg-0.5sigma"][camera_identifier] = stream_subplots[camera_identifier] \
             .axvline(-100, color='r', linestyle='dotted', linewidth=1)
 
-
         lines["max_vert"][camera_identifier] = stream_subplots[camera_identifier] \
             .axvline(-100, color='g', linestyle='solid', linewidth=1)
 
@@ -299,8 +296,6 @@ def initialize_histograms_algebra(line_width=3):
         stream_subplots[camera_identifier].grid(True)
         stream_subplots[camera_identifier].set_autoscale_on(False)
         stream_subplots[camera_identifier].set_ylim(bottom=0, top=1)
-
-
 
 
     figs = dict()
@@ -338,8 +333,6 @@ def initialize_histograms_r(line_width=3):
     }
     fig_a = plt.figure(figsize=(5, 5))
     stream_subplots["r"] = fig_a.add_subplot()
-
-
 
 
     for camera_identifier in ["r"]:
@@ -380,8 +373,6 @@ def initialize_histograms_r(line_width=3):
 
         stream_subplots[camera_identifier].set_title("R Matrix Histogram")
         stream_subplots[camera_identifier].set_xlim(-1.2, 1.2)
-
-
 
         stream_subplots[camera_identifier].grid(True)
         stream_subplots[camera_identifier].set_autoscale_on(False)
@@ -870,16 +861,31 @@ class Stream:
 
         step = 2
         if self.jump_level < step:
-            coregister_ = input("Step 2 - Co-Register with Euclidean Transform -  {}".format(y_n_msg))
 
             """
             Gameplan: 
                 1st: If user chooses to go through step 2's coreg process, then great, use that warp
                 2nd: If user chooses NOT to coreg, Load in from last run
                         THIS WILL REQUIRE SAVING
-            if coregister_.lower() == "n":
-                # import from last run
-                pass
+            """
+
+            previous_run_directory = fpr.get_latest_run_direc(path_override=True, path_to_exclude=self.current_run)
+            prev_wp1_path = os.path.join(previous_run_directory, "wm1.npy")
+            prev_wp1_exist = os.path.exists(prev_wp1_path)
+
+            if prev_wp1_exist:
+                use_last_wp1 = input("You created a Warp Matrix 1 last run. Would you like to use it? (y/n)  ")
+                if use_last_wp1.lower() == "y":
+                    coregister_ = "n"
+                    self.warp_matrix = np.load(prev_wp1_path)
+
+            else:
+                coregister_ = input("Step 2 - New Co-Registration with with Euclidean Transform? -  {}".format(y_n_msg))
+
+            """
+            coregister_ = input("Step 2 - Co-Registration: "
+                                "\n\tUse Warp Matrix Run from Previous run? (y)"
+                                "\n\tElse, brand new Co-Registration? (n)")
             """
 
             if coregister_.lower() == "y":
@@ -987,7 +993,7 @@ class Stream:
 
             cv2.destroyAllWindows()
 
-        if coregister_ != "y":
+        if self.warp_matrix is None:
             self.jump_level = 10
 
         step = 4
@@ -1030,8 +1036,6 @@ class Stream:
             else:
                 continue_stream = False
                 self.jump_level = 10
-
-
 
 
             while continue_stream:
@@ -1119,8 +1123,6 @@ class Stream:
 
             cv2.destroyAllWindows()
 
-
-
         step = 6
         if self.jump_level < step:
 
@@ -1153,7 +1155,6 @@ class Stream:
                 continue_stream = self.keep_streaming()
 
             cv2.destroyAllWindows()
-
 
         app = None
         step = 6
@@ -1248,22 +1249,11 @@ class Stream:
 
                 continue_stream = self.keep_streaming()
 
-
-
-
         cv2.destroyAllWindows()
-
-
-
-
-
 
         figs, histograms, lines = initialize_histograms_rois()
         figs_alg, histograms_alg, lines_alg = initialize_histograms_algebra()
         figs_r, histograms_r, lines_r = initialize_histograms_r()
-
-
-
 
 
         step = 7
@@ -1640,9 +1630,6 @@ class Stream:
 
 
 
-
-
-
                     continue_stream = self.keep_streaming()
                     if continue_stream is False:
                         satisfied_with_range = False
@@ -1792,4 +1779,18 @@ class Stream:
             notes_file = open(os.path.join(run_folder, 'notes.txt'), 'w+')
             notes_file.write(notes)
             notes_file.close()
+
+        step = 11
+        print("Step 11 - Writing warp matrices to file")
+
+        if self.warp_matrix is not None:
+            wm1_path = os.path.join(run_folder, 'wm1.npy')
+            np.save(wm1_path, self.warp_matrix)
+
+        if self.warp_matrix_2 is not None:
+            wm2_path = os.path.join(run_folder, 'wm2.npy')
+            np.save(wm2_path, self.warp_matrix)
+
+
+
 
