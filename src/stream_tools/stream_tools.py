@@ -843,46 +843,11 @@ class Stream:
         if self.jump_level <= step:
             s5.step_five(self, continue_stream)
 
-
         step = 6
+        app = None
+
         if self.jump_level <= step:
             s6.step_six_a(self, continue_stream)
-            """
-
-            close_in = input("Step 6A - Close in on ROI - {}".format(y_n_msg))
-
-            if close_in.lower() == "y":
-                continue_stream = True
-
-            while continue_stream:
-                self.frame_count += 1
-                self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
-
-                x_a, y_a = self.static_center_a
-                x_b, y_b = self.static_center_b
-
-                n_sigma = 1
-
-                self.roi_a = self.current_frame_a[
-                             y_a - n_sigma * self.static_sigmas_y: y_a + n_sigma * self.static_sigmas_y + 1,
-                             x_a - n_sigma*self.static_sigmas_x: x_a + n_sigma*self.static_sigmas_x + 1
-                             ]
-
-                self.roi_b = self.current_frame_b[
-                             y_b - n_sigma * self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + 1,
-                             x_b - n_sigma*self.static_sigmas_x: x_b + n_sigma*self.static_sigmas_x + 1
-                             ]
-
-                cv2.imshow("ROI A", bdc.to_16_bit(self.roi_a))
-                cv2.imshow("ROI B Prime", bdc.to_16_bit(self.roi_b))
-                continue_stream = self.keep_streaming()
-
-            cv2.destroyAllWindows()
-            """
-
-        app = None
-        step = 6
-        if self.jump_level < step:
 
             find_rois_ = input("Step 6B - Re-Coregister - {}".format(y_n_msg))
             app = tk_app.App()
