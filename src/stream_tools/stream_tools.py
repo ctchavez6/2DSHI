@@ -3,7 +3,6 @@ from pypylon import genicam, pylon  # Import relevant pypylon packages/modules
 import cv2
 from image_processing import bit_depth_conversion as bdc
 from image_processing import stack_images as stack
-from coregistration import img_characterization as ic
 from coregistration import find_gaussian_profile as fgp
 import numpy as np
 import matplotlib.pyplot as plt
@@ -843,12 +842,14 @@ class Stream:
         if self.jump_level <= step:
             s5.step_five(self, continue_stream)
 
-        step = 6
+
         app = tk_app.App()
+        step = 6
 
         if self.jump_level <= step:
             s6.step_six_a(self, continue_stream)
-
+            s6.step_six_b(self, continue_stream, app)
+            """
             find_rois_ = input("Step 6B - Re-Coregister - {}".format(y_n_msg))
 
             if find_rois_.lower() == "y":
@@ -896,6 +897,7 @@ class Stream:
                 continue_stream = False
 
             cv2.destroyAllWindows()
+            """
 
             display_new = input("Step 6C - Display Re-Coregistered Images - {}".format(y_n_msg))
 
