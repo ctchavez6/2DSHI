@@ -15,7 +15,7 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 import tkinter as tk
 import threading
-from . import s1, s2, s3, s4
+from . import s1, s2, s3, s4, s5
 from path_management import image_management as im
 
 y_n_msg = "Proceed? (y/n): "
@@ -872,68 +872,8 @@ class Stream:
         cv2.destroyAllWindows()
 
         step = 5
-        if self.jump_level < step:
-
-            find_rois_ = input("Step 5 - Define Regions of Interest - {}".format(y_n_msg))
-
-            if find_rois_.lower() == "y":
-                continue_stream = True
-
-            while continue_stream:
-                self.frame_count += 1
-                self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
-
-                try:
-                    for img_12bit in [self.current_frame_a]:
-                        center_ = self.static_center_a
-
-                        n_sigma = 1
-
-                        self.mu_x, self.sigma_x_a, self.amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
-                        self.mu_y, self.sigma_y_a, self.amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
-
-                        img_12bit[:, int(center_[0]) + int(self.sigma_x_a * n_sigma)] = 4095
-                        img_12bit[:, int(center_[0]) - int(self.sigma_x_a * n_sigma)] = 4095
-
-                        img_12bit[int(center_[1]) + int(self.sigma_y_a * n_sigma), :] = 4095
-                        img_12bit[int(center_[1]) - int(self.sigma_y_a * n_sigma), :] = 4095
-
-                        if self.frame_count % 10 == 0:
-                            print("\tA  - Sigma X, Sigma Y - {}".format((int(self.sigma_x_a), int(self.sigma_y_a))))
-
-
-                    for img_12bit in [self.current_frame_b]:
-                        center_ = self.static_center_b
-
-                        self.mu_x, self.sigma_x_b, self.amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
-                        self.mu_y, self.sigma_y_b, self.amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
-
-                        img_12bit[:, int(center_[0]) + int(self.sigma_x_b * n_sigma)] = 4095
-                        img_12bit[:, int(center_[0]) - int(self.sigma_x_b * n_sigma)] = 4095
-
-                        img_12bit[int(center_[1]) + int(self.sigma_y_b * n_sigma), :] = 4095
-                        img_12bit[int(center_[1]) - int(self.sigma_y_b * n_sigma), :] = 4095
-
-                        if self.frame_count % 10 == 0:
-                            print("\tB  - Sigma X, Sigma Y - {}".format((int(self.sigma_x_a), int(self.sigma_y_a))))
-
-                    a_as_16bit = bdc.to_16_bit(self.current_frame_a)
-                    b_as_16bit = bdc.to_16_bit(self.current_frame_b)
-
-
-                    cv2.imshow("A", a_as_16bit)
-                    cv2.imshow("B Prime", b_as_16bit)
-
-                except Exception:
-                    print("Exception Occurred")
-
-                continue_stream = self.keep_streaming()
-
-                if continue_stream is False:
-                    self.static_sigmas_x = int(max(self.sigma_a_x, self.sigma_b_x))
-                    self.static_sigmas_y = int(max(self.sigma_a_y, self.sigma_b_y))
-
-            cv2.destroyAllWindows()
+        if self.jump_level <= step:
+            s5.step_five(self, continue_stream)
 
 
         step = 6
