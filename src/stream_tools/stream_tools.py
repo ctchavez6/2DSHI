@@ -14,7 +14,7 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 import tkinter as tk
 import threading
-from . import s1, s2, s3
+from . import s1, s2, s3, s4
 from path_management import image_management as im
 
 y_n_msg = "Proceed? (y/n): "
@@ -847,11 +847,10 @@ class Stream:
         cv2.destroyAllWindows()
 
         step = 3
-        if self.jump_level < step:
+        if self.jump_level <= step:
 
             find_centers_ = input("Step 3 - Find Brightest Pixel Locations - {}".format(y_n_msg))
             s3.step_three(self, continue_stream, find_centers_)
-
 
         if self.warp_matrix is None:
             self.jump_level = 10
@@ -859,8 +858,11 @@ class Stream:
         step = 4
         if self.jump_level < step:
 
-            set_centers_ = input("Step 4 - Set Gaussian-Based Static Centers - {}".format(y_n_msg))
+            s4.step_four(self)
 
+            """
+            set_centers_ = input("Step 4 - Set Gaussian-Based Static Centers - {}".format(y_n_msg))
+            
             if set_centers_.lower() == "y":
                 continue_stream = True
                 a_as_16bit = bdc.to_16_bit(self.current_frame_a)
@@ -897,7 +899,6 @@ class Stream:
                 continue_stream = False
                 self.jump_level = 10
 
-
             while continue_stream:
                 self.frame_count += 1
                 self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
@@ -910,7 +911,7 @@ class Stream:
                 continue_stream = self.keep_streaming()
 
             cv2.destroyAllWindows()
-
+            """
 
         step = 5
         if self.jump_level < step:

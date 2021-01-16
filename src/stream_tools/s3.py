@@ -1,9 +1,8 @@
 import cv2
 from image_processing import bit_depth_conversion as bdc
 
-
+y_n_msg = "Proceed? (y/n): "
 eight_bit_max = (2 ** 8) - 1
-
 
 def step_three(stream, continue_stream, find_centers_):
 

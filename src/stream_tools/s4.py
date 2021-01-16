@@ -1,0 +1,58 @@
+from coregistration import find_gaussian_profile as fgp
+from image_processing import bit_depth_conversion as bdc
+import cv2
+
+eight_bit_max = (2 ** 8) - 1
+y_n_msg = "Proceed? (y/n): "
+
+
+def step_four(stream):
+    set_centers_ = input("Step 4 - Set Gaussian-Based Static Centers - {}".format(y_n_msg))
+
+    if set_centers_.lower() == "y":
+        continue_stream = True
+        a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
+        b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
+
+        max_pixel_a, max_pixel_b = stream.find_centers(a_as_16bit, b_as_16bit)
+
+        mu_a_x, sigma_a_x, amp_a_x = fgp.get_gaus_boundaries_x(stream.current_frame_a, max_pixel_a)
+        mu_a_y, sigma_a_y, amp_a_y = fgp.get_gaus_boundaries_y(stream.current_frame_a, max_pixel_a)
+
+        mu_b_x, sigma_b_x, amp_b_x = fgp.get_gaus_boundaries_x(stream.current_frame_b, max_pixel_b)
+        mu_b_y, sigma_b_y, amp_b_y = fgp.get_gaus_boundaries_y(stream.current_frame_b, max_pixel_b)
+
+        print("Setting Centers\n")
+        print("Calculated Gaussian Centers")
+        stream.static_center_a = (int(mu_a_x), int(mu_a_y))
+        # stream.static_center_b = (int(mu_b_x), int(mu_b_y))  # Original
+        stream.static_center_b = (int(mu_a_x), int(mu_a_y))  # Picking A
+
+        print("\t\tA                         : {}".format(stream.static_center_a))
+        print("\t\tB Prime (Calculated)      : {}".format((int(mu_b_x), int(mu_b_y))))
+        print("\t\tB Prime (Overwritten to A): {}".format(stream.static_center_a))
+
+        option = input("Would you like to use the \n\tcalculated gaussian center (y) "
+                       "\n\tor the overwritten gaussian center (n):  ")
+
+        if option == "y":
+            stream.static_center_b = (int(mu_b_x), int(mu_b_y))  # Picking A
+        elif option == "n":
+            stream.static_center_b = stream.static_center_a
+
+    else:
+        continue_stream = False
+        stream.jump_level = 10
+
+    while continue_stream:
+        stream.frame_count += 1
+        stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
+        a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
+        b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
+        a_as_16bit = cv2.circle(a_as_16bit, stream.static_center_a, 10, (0, eight_bit_max, 0), 2)
+        b_as_16bit = cv2.circle(b_as_16bit, stream.static_center_b, 10, (0, eight_bit_max, 0), 2)
+        cv2.imshow("A", a_as_16bit)
+        cv2.imshow("B Prime", b_as_16bit)
+        continue_stream = stream.keep_streaming()
+
+    cv2.destroyAllWindows()
