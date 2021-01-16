@@ -1084,8 +1084,6 @@ class Stream:
                         img_12bit[int(center_[1]) + int(sigma_y_a * n_sigma), :] = 4095
                         img_12bit[int(center_[1]) - int(sigma_y_a * n_sigma), :] = 4095
 
-
-
                         if self.frame_count % 10 == 0:
                             print("\tA  - Sigma X, Sigma Y - {}".format((int(sigma_x_a), int(sigma_y_a))))
 
