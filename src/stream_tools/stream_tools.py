@@ -882,11 +882,6 @@ class Stream:
             while continue_stream:
                 self.frame_count += 1
                 self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
-                sigma_x_a = 0
-                sigma_y_a = 0
-
-                sigma_x_b = 0
-                sigma_y_b = 0
 
                 try:
                     for img_12bit in [self.current_frame_a]:
