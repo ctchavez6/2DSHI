@@ -844,13 +844,12 @@ class Stream:
             s5.step_five(self, continue_stream)
 
         step = 6
-        app = None
+        app = tk_app.App()
 
         if self.jump_level <= step:
             s6.step_six_a(self, continue_stream)
 
             find_rois_ = input("Step 6B - Re-Coregister - {}".format(y_n_msg))
-            app = tk_app.App()
 
             if find_rois_.lower() == "y":
                 continue_stream = True
