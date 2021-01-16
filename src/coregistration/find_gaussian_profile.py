@@ -6,6 +6,7 @@ from scipy.optimize import curve_fit
 from PIL import Image
 from astropy import modeling
 
+
 def gaussian_distribution(x, mu, sigma, coefficient):
     """
     Returns values for a gaussian distribution based on the input array.
@@ -19,19 +20,17 @@ def gaussian_distribution(x, mu, sigma, coefficient):
     Returns:
         distribution: An array of y-values that correspond to the input parameters.
     """
-    #distribution = coefficient*np.exp(-(x-mu)**2/(2*sigma**2))
-    return coefficient * np.exp(-(x-mu)**2/(2.0*sigma**2))
-    #return distribution
-
-
-
+    # distribution = coefficient*np.exp(-(x-mu)**2/(2*sigma**2))
+    return coefficient * np.exp(-(x - mu) ** 2 / (2.0 * sigma ** 2))
+    # return distribution
 
 
 # Create a function which returns a Gaussian (normal) distribution.
 def gauss(x, *p):
     a, b, c, d = p
-    y = a*np.exp(-np.power((x - b), 2.)/(2. * c**2.)) # + d
+    y = a * np.exp(-np.power((x - b), 2.) / (2. * c ** 2.))  # + d
     return y
+
 
 def read_image_from_file(image_path, file_bit_depth=16, original_bit_depth=12):
     """
@@ -47,8 +46,8 @@ def read_image_from_file(image_path, file_bit_depth=16, original_bit_depth=12):
     Returns:
         The image array in it's intended bit depth.
     """
-    return cv2.imread(image_path, -1) / (2**(file_bit_depth-original_bit_depth))
-    #return np.asarray(cv2.imread(image_path, -1)) / (2**(file_bit_depth-original_bit_depth))
+    return cv2.imread(image_path, -1) / (2 ** (file_bit_depth - original_bit_depth))
+    # return np.asarray(cv2.imread(image_path, -1)) / (2**(file_bit_depth-original_bit_depth))
 
 
 def get_maximum_pixel_intensity(image_array):
@@ -98,13 +97,16 @@ def crop_surrounding_noise(image, maximum_coords, upper_limit_noise=10):
 
     # Steps of cropping surrounding noise
     horizontal_center, vertical_center = maximum_coords[0], maximum_coords[1]
-    horizontal_lineout = np.asarray(image[vertical_center:vertical_center+1, :])[0]
-    vertical_lineout = image[:, horizontal_center:horizontal_center+1].flatten()
-    index_of_1st_pixel_above_noise_limit_h = next(x[0] for x in enumerate(horizontal_lineout) if x[1] > upper_limit_noise)
-    index_of_last_pixel_above_noise_limit_flo_h = len(horizontal_lineout) - next(x[0] for x in enumerate(reversed(horizontal_lineout)) if x[1] > upper_limit_noise) - 1
+    horizontal_lineout = np.asarray(image[vertical_center:vertical_center + 1, :])[0]
+    vertical_lineout = image[:, horizontal_center:horizontal_center + 1].flatten()
+    index_of_1st_pixel_above_noise_limit_h = next(
+        x[0] for x in enumerate(horizontal_lineout) if x[1] > upper_limit_noise)
+    index_of_last_pixel_above_noise_limit_flo_h = len(horizontal_lineout) - next(
+        x[0] for x in enumerate(reversed(horizontal_lineout)) if x[1] > upper_limit_noise) - 1
 
     index_of_1st_pixel_above_noise_limit_v = next(x[0] for x in enumerate(vertical_lineout) if x[1] > upper_limit_noise)
-    index_of_last_pixel_above_noise_limit_flo_v = len(vertical_lineout) - next(x[0] for x in enumerate(reversed(vertical_lineout)) if x[1] > upper_limit_noise) - 1
+    index_of_last_pixel_above_noise_limit_flo_v = len(vertical_lineout) - next(
+        x[0] for x in enumerate(reversed(vertical_lineout)) if x[1] > upper_limit_noise) - 1
 
     fig_a, ax = plt.subplots()
     ax.title.set_text('Original Image')
@@ -118,10 +120,12 @@ def crop_surrounding_noise(image, maximum_coords, upper_limit_noise=10):
 
     fig_c, cx = plt.subplots()
     cx.title.set_text('Horizontal & Vertical Region of Interest (Above Noise)')
-    cx.imshow(image[index_of_1st_pixel_above_noise_limit_v:index_of_last_pixel_above_noise_limit_flo_v, index_of_1st_pixel_above_noise_limit_h:index_of_last_pixel_above_noise_limit_flo_h])
+    cx.imshow(image[index_of_1st_pixel_above_noise_limit_v:index_of_last_pixel_above_noise_limit_flo_v,
+              index_of_1st_pixel_above_noise_limit_h:index_of_last_pixel_above_noise_limit_flo_h])
     fig_c.savefig("Region_of_Interest_Horizontal_Vertical.png")
     plt.close('all')
-    return image[index_of_1st_pixel_above_noise_limit_v:index_of_last_pixel_above_noise_limit_flo_v, index_of_1st_pixel_above_noise_limit_h:index_of_last_pixel_above_noise_limit_flo_h]
+    return image[index_of_1st_pixel_above_noise_limit_v:index_of_last_pixel_above_noise_limit_flo_v,
+           index_of_1st_pixel_above_noise_limit_h:index_of_last_pixel_above_noise_limit_flo_h]
 
 
 def plot_horizonal_lineout_intensity(image, coordinates):
@@ -135,23 +139,21 @@ def plot_horizonal_lineout_intensity(image, coordinates):
     Returns:
         (np.ndarray, np.ndarray): A tuple equal to (indices, intensity values). Both components as a np.ndarray
     """
-    #print("Inside Function plot_horizonal_lineout_intensity(image, coordinates)")
+    # print("Inside Function plot_horizonal_lineout_intensity(image, coordinates)")
 
     fig = plt.figure()
     y_max, x_max = coordinates
 
-
-    lineout = np.asarray(image[x_max:x_max+1, :])[0]
+    lineout = np.asarray(image[x_max:x_max + 1, :])[0]
     indices = np.arange(0, len(lineout))
-    #print("Lineout Shape: ", lineout.shape)
+    # print("Lineout Shape: ", lineout.shape)
     plt.plot(indices, lineout)
     plt.title("Left-Right Trimmed Line-out")
-    #plt.show()
+    # plt.show()
     plt.show()
     plt.close('all')
     fig.savefig("Lineout.png")
     return indices, lineout
-
 
 
 def fit_function(x_coords, y_coords):
@@ -162,7 +164,6 @@ def fit_function(x_coords, y_coords):
     print('Mean: {} +\- {}'.format(mu, np.sqrt(pcov[0, 0])))
     print('Standard Deviation: {} +\- {}'.format(sigma, np.sqrt(pcov[1, 1])))
     print('Amplitude: {} +\- {}'.format(amp, np.sqrt(pcov[2, 2])))
-
 
     maximum_intensity = max(y_coords.tolist())
     print("maximum_intensity:", maximum_intensity)
@@ -186,11 +187,11 @@ def fit_function(x_coords, y_coords):
     plt.plot(x_coords, y_model_output, label='Model')
     plt.title("Scipy Optimize Fit - ./coregistration/cam_b_frame_186.png")
     plt.legend()
-    #plt.show()
+    # plt.show()
     fig.savefig("ScipyOptimizeCurveFit_For-coregistration-cam_b_frame_186.png")
 
-
     plt.close('all')
+
 
 def get_noise_boundaries(image, coordinates_of_maxima, upper_limit_noise=10):
     # Steps of cropping surrounding noise
@@ -216,63 +217,60 @@ def get_noise_boundaries(image, coordinates_of_maxima, upper_limit_noise=10):
             first_j_above_uln = y_index
             break
 
-
     last_i_above_uln = 0
-    for i in range(len(horizontal_lineout))[::-1]: #, -1):
+    for i in range(len(horizontal_lineout))[::-1]:  # , -1):
         x_index = i
         intensity = horizontal_lineout[i]
-        #print(x_index, intensity)
+        # print(x_index, intensity)
         if intensity > upper_limit_noise:
             print("At x = {}, y = {} ------ Intensity = {}".format(x_index, vertical_center, intensity))
             last_i_above_uln = x_index
             break
 
     last_j_above_uln = 0
-    for j in range(len(horizontal_lineout))[::-1]: #, -1):
+    for j in range(len(horizontal_lineout))[::-1]:  # , -1):
         y_index = j
         intensity = horizontal_lineout[j]
-        #print(x_index, intensity)
+        # print(x_index, intensity)
         if intensity > upper_limit_noise:
             print("At x = {}, y = {} ------ Intensity = {}".format(horizontal_center, y_index, intensity))
             last_j_above_uln = y_index
             break
 
-
-
-    index_of_last_pixel_above_noise_limit_flo_h = len(horizontal_lineout) - next(x[0] for x in enumerate(reversed(horizontal_lineout)) if x[1] > upper_limit_noise) - 1
+    index_of_last_pixel_above_noise_limit_flo_h = len(horizontal_lineout) - next(
+        x[0] for x in enumerate(reversed(horizontal_lineout)) if x[1] > upper_limit_noise) - 1
 
     fig_a, ax = plt.subplots()
-    #xdisplay, ydisplay = ax.transData.transform_point((horizontal_center, vertical_center))
-    #print("xdisplay, ydisplay: ", xdisplay, ydisplay)
+    # xdisplay, ydisplay = ax.transData.transform_point((horizontal_center, vertical_center))
+    # print("xdisplay, ydisplay: ", xdisplay, ydisplay)
     ax.title.set_text('Image With NoiseSubtracted ROI Boxed')
     ax.axvline(first_i_above_uln, color='y', linestyle='dashed', linewidth=1)
     ax.axvline(last_i_above_uln, color='y', linestyle='dashed', linewidth=1)
     ax.axhline(first_j_above_uln, color='y', linestyle='dashed', linewidth=1)
     ax.axhline(last_j_above_uln, color='y', linestyle='dashed', linewidth=1)
 
-    #ax.imshow(image)
-    #fig_a.savefig("Image With NoiseSubtracted ROI Boxed.png")
-    #plt.close('all')
+    # ax.imshow(image)
+    # fig_a.savefig("Image With NoiseSubtracted ROI Boxed.png")
+    # plt.close('all')
     return first_i_above_uln, last_i_above_uln, first_j_above_uln, last_j_above_uln
 
 
 def get_gaus_boundaries_x(image, coords_of_max):
-    #fig = plt.figure()
-    #xm, ym = coords_of_max
+    # fig = plt.figure()
+    # xm, ym = coords_of_max
     ym, xm = coords_of_max
-    #print("Inside get_gaus_boundaries_x(image, coords_of_max):")
-    #print("coords_of_max = {}".format(coords_of_max))
-    lineout = np.array(np.asarray(image[int(xm):int(xm)+1, :])[0])
+    # print("Inside get_gaus_boundaries_x(image, coords_of_max):")
+    # print("coords_of_max = {}".format(coords_of_max))
+    lineout = np.array(np.asarray(image[int(xm):int(xm) + 1, :])[0])
     indices = np.arange(0, len(lineout))
-    #print("Maximum has a value of image[xm, ym], which is: ", image[xm, ym])
+    # print("Maximum has a value of image[xm, ym], which is: ", image[xm, ym])
 
-    p_initial = [image[int(xm), int(ym)]*1.0, 960.00, 5.0, 0.0]
+    p_initial = [image[int(xm), int(ym)] * 1.0, 960.00, 5.0, 0.0]
 
     popt, pcov = curve_fit(gauss, indices, lineout, p0=p_initial)
 
     amp, mu, sigma = popt[0], popt[1], popt[2]
     offset = popt[3]
-
 
     """
     #print("mu: ", mu)
@@ -342,27 +340,22 @@ def get_gaus_boundaries_x(image, coords_of_max):
     return int(mu), int(sigma), int(amp)
 
 
-
 def get_gaus_boundaries_y(image, coords_of_max):
-
     image = np.array(image)
 
     ym, xm = coords_of_max
 
-    p_initial = [image[xm, ym]*1.0, 600.00, 5.0, 0.0]
+    p_initial = [image[xm, ym] * 1.0, 600.00, 5.0, 0.0]
 
-    ys = np.array(image[:, ym:ym+1].flatten())  # Vertical Line Out
+    ys = np.array(image[:, ym:ym + 1].flatten())  # Vertical Line Out
 
     lineout = ys
 
-    indices = np.arange(0, len(lineout)) # 0 to 1199
+    indices = np.arange(0, len(lineout))  # 0 to 1199
 
     popt, pcov = curve_fit(gauss, indices, lineout, p0=p_initial)
 
     amp, mu, sigma, offset = popt[0], popt[1], popt[2], popt[3]
-
-
-
 
     """
     y_fit = gauss(indices, *popt)
@@ -390,9 +383,9 @@ def get_gaus_boundaries_y(image, coords_of_max):
 
     plt.show()
     plt.close('all')
-    
-    
-        
+
+
+
     #print(ys)
     #print("ys: ", ys)
 
@@ -422,10 +415,9 @@ def get_gaus_boundaries_y(image, coords_of_max):
     fig.savefig("ScipyOptimizeCurveFit_Y-coregistration-cam_b_frame_186.png")
 
     plt.close('all')
-    
+
     """
     return mu, sigma, amp
-
 
 
 def save_img(filename, directory, image, sixteen_bit=True):
@@ -436,7 +428,7 @@ def save_img(filename, directory, image, sixteen_bit=True):
     if sixteen_bit:
         img = image.astype(np.uint16)
         img = np.asarray(img, dtype=np.uint16)
-        img = Image.fromarray(img*16)
+        img = Image.fromarray(img * 16)
         img.save(filename, compress_level=0)
     else:
         cv2.imwrite(filename, image.astype(np.uint16))

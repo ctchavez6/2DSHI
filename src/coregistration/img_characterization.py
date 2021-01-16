@@ -17,9 +17,6 @@ def get_euclidean_transform_matrix(gray1, gray2):
     e_thresh = 1e-6
     criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, n_iters, e_thresh)
 
-    #gray1 = cv2.cvtColor(gray1, cv2.COLOR_BGR2GRAY)
-    #gray2 = cv2.cvtColor(gray2, cv2.COLOR_BGR2GRAY)
-
     # Define the motion model: can be TRANSLATION OR AFFINE OR HOMOGRAPHY
     warp_mode = cv2.MOTION_EUCLIDEAN
 
