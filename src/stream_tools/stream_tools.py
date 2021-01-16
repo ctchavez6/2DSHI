@@ -5,7 +5,6 @@ from image_processing import bit_depth_conversion as bdc
 from image_processing import stack_images as stack
 from coregistration import img_characterization as ic
 from coregistration import find_gaussian_profile as fgp
-from experiment_set_up import find_previous_run as fpr
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -13,9 +12,8 @@ import numba
 import csv as csv
 import os
 from PIL import Image, ImageDraw, ImageFont
-import tkinter as tk
-import threading
-from . import s1, s2, s3, s4, s5
+from . import App as tk_app
+from . import s1, s2, s3, s4, s5, s6
 from path_management import image_management as im
 
 y_n_msg = "Proceed? (y/n): "
@@ -39,37 +37,7 @@ def progressBar(value, endvalue, bar_length=20):
     sys.stdout.write("\rPercent: [{0}] {1}%".format(arrow + spaces, int(round(percent * 100))))
     sys.stdout.flush()
 
-class App(threading.Thread):
 
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.start()
-        self.foo = 1
-        self.at_front = False
-
-    def callback(self):
-        self.root.quit()
-
-    def scale_onChange(self, value):
-        self.foo = float(value)
-
-
-    def run(self):
-        self.root = tk.Tk()
-        self.root.protocol("WM_DELETE_WINDOW", self.callback)
-
-        label = tk.Label(self.root, text="Sigma")
-        label.pack()
-
-        scale = tk.Scale(from_=1.00, to=2.50, tickinterval=0.0001, resolution = 0.25, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange).pack()
-        #scale.pack()
-
-        #self.foo = label
-        self.root.mainloop()
-
-    def bring_to_front(self):
-        self.root.lift()
-        self.at_front = True
 
 
 
@@ -877,7 +845,9 @@ class Stream:
 
 
         step = 6
-        if self.jump_level < step:
+        if self.jump_level <= step:
+            s6.step_six_a(self, continue_stream)
+            """
 
             close_in = input("Step 6A - Close in on ROI - {}".format(y_n_msg))
 
@@ -908,13 +878,14 @@ class Stream:
                 continue_stream = self.keep_streaming()
 
             cv2.destroyAllWindows()
+            """
 
         app = None
         step = 6
         if self.jump_level < step:
 
             find_rois_ = input("Step 6B - Re-Coregister - {}".format(y_n_msg))
-            app = App()
+            app = tk_app.App()
 
             if find_rois_.lower() == "y":
                 continue_stream = True
@@ -997,7 +968,6 @@ class Stream:
                     roi_a, b_double_prime = self.grab_frames2(self.roi_a.copy(), self.roi_b.copy(), self.warp_matrix_2.copy())
 
                 cv2.imshow("ROI B DOUBLE PRIME", bdc.to_16_bit(b_double_prime))
-
 
                 continue_stream = self.keep_streaming()
 
