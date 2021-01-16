@@ -1,6 +1,4 @@
 import os
-from pathlib import Path
-
 
 def get_latest_run_direc(path_override=False, path_to_exclude=None):
     if not path_override:
@@ -20,9 +18,6 @@ def get_latest_run_direc(path_override=False, path_to_exclude=None):
     if path_to_exclude is not None:
         filtered = [x for x in all_runs if path_to_exclude not in x]
         all_runs = filtered
-
-    print("top 5 of get_latest_run_direc")
-    print(all_runs[-5:])
 
     return all_runs[-1]
 
@@ -48,7 +43,6 @@ def get_latest_run():
     last_run_params_file_path = os.path.join(last_run, "run_parameters.txt")
     print("Attempting to retrieve: ", last_run_params_file_path)
     last_run_params_file = open(last_run_params_file_path, 'r')
-
 
     string_parameters = ["video_a",
                          "video_b",
@@ -117,7 +111,6 @@ def get_previous_configuration():
         return None
 
     last_run_params_file = open(last_run_params_file_path, 'r')
-
 
     int_parameters = ["static_center_a_x",
                       "static_center_a_y",
