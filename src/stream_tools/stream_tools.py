@@ -1188,7 +1188,6 @@ class Stream:
                 warp_2_ = ic.get_euclidean_transform_matrix(roi_a_8bit, roi_b_8bit)
                 self.warp_matrix_2 = warp_2_
 
-
                 a, b, tx = warp_2_[0][0], warp_2_[0][1], warp_2_[0][2]
                 c, d, ty = warp_2_[1][0], warp_2_[1][1], warp_2_[1][2]
 
