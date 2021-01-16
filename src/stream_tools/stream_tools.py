@@ -1,3 +1,4 @@
+import traceback
 from pypylon import genicam, pylon  # Import relevant pypylon packages/modules
 import cv2
 from image_processing import bit_depth_conversion as bdc
@@ -588,6 +589,14 @@ class Stream:
         self.stacked_streams = None
         self.data_directory = None
 
+        self.mu_x, self.sigma_x_a, self.amp_x = None, None, None
+        self.mu_y, self.sigma_y_a, self.amp_y = None, None, None
+        self.mu_x, self.sigma_x_b, self.amp_x = None, None, None
+        self.mu_y, self.sigma_y_b, self.amp_y = None, None, None
+
+        self.sigma_a_x, self.sigma_b_x = None, None
+        self.sigma_a_y, self.sigma_b_y = None, None
+
         self.static_center_a = None
         self.static_center_b = None
 
@@ -739,6 +748,7 @@ class Stream:
                     self.b_prime_frames.append(b_prime)
                     return a, b_prime
         except Exception as e:
+            traceback.print_exc()
             raise e
 
     def grab_frames2(self, roi_a, roi_b, warp_matrix_2):
@@ -856,62 +866,10 @@ class Stream:
             self.jump_level = 10
 
         step = 4
-        if self.jump_level < step:
-
+        if self.jump_level <= step:
             s4.step_four(self)
 
-            """
-            set_centers_ = input("Step 4 - Set Gaussian-Based Static Centers - {}".format(y_n_msg))
-            
-            if set_centers_.lower() == "y":
-                continue_stream = True
-                a_as_16bit = bdc.to_16_bit(self.current_frame_a)
-                b_as_16bit = bdc.to_16_bit(self.current_frame_b)
-
-                max_pixel_a, max_pixel_b = self.find_centers(a_as_16bit, b_as_16bit)
-
-                mu_a_x, sigma_a_x, amp_a_x = fgp.get_gaus_boundaries_x(self.current_frame_a, max_pixel_a)
-                mu_a_y, sigma_a_y, amp_a_y = fgp.get_gaus_boundaries_y(self.current_frame_a, max_pixel_a)
-
-                mu_b_x, sigma_b_x, amp_b_x = fgp.get_gaus_boundaries_x(self.current_frame_b, max_pixel_b)
-                mu_b_y, sigma_b_y, amp_b_y = fgp.get_gaus_boundaries_y(self.current_frame_b, max_pixel_b)
-
-                print("Setting Centers\n")
-                print("Calculated Gaussian Centers")
-                self.static_center_a = (int(mu_a_x), int(mu_a_y))
-                #self.static_center_b = (int(mu_b_x), int(mu_b_y))  # Original
-                self.static_center_b = (int(mu_a_x), int(mu_a_y))  # Picking A
-
-                print("\t\tA                         : {}".format(self.static_center_a))
-                print("\t\tB Prime (Calculated)      : {}".format((int(mu_b_x), int(mu_b_y))))
-                print("\t\tB Prime (Overwritten to A): {}".format(self.static_center_a))
-
-
-                option = input("Would you like to use the \n\tcalculated gaussian center (y) "
-                               "\n\tor the overwritten gaussian center (n):  ")
-
-                if option == "y":
-                    self.static_center_b = (int(mu_b_x), int(mu_b_y))  # Picking A
-                elif option == "n":
-                    self.static_center_b = self.static_center_a
-
-            else:
-                continue_stream = False
-                self.jump_level = 10
-
-            while continue_stream:
-                self.frame_count += 1
-                self.current_frame_a, self.current_frame_b = self.grab_frames(warp_matrix=self.warp_matrix)
-                a_as_16bit = bdc.to_16_bit(self.current_frame_a)
-                b_as_16bit = bdc.to_16_bit(self.current_frame_b)
-                a_as_16bit = cv2.circle(a_as_16bit, self.static_center_a, 10, (0, eight_bit_max, 0), 2)
-                b_as_16bit = cv2.circle(b_as_16bit, self.static_center_b, 10, (0, eight_bit_max, 0), 2)
-                cv2.imshow("A", a_as_16bit)
-                cv2.imshow("B Prime", b_as_16bit)
-                continue_stream = self.keep_streaming()
-
-            cv2.destroyAllWindows()
-            """
+        cv2.destroyAllWindows()
 
         step = 5
         if self.jump_level < step:
@@ -936,33 +894,33 @@ class Stream:
 
                         n_sigma = 1
 
-                        mu_x, sigma_x_a, amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
-                        mu_y, sigma_y_a, amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
+                        self.mu_x, self.sigma_x_a, self.amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
+                        self.mu_y, self.sigma_y_a, self.amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
 
-                        img_12bit[:, int(center_[0]) + int(sigma_x_a * n_sigma)] = 4095
-                        img_12bit[:, int(center_[0]) - int(sigma_x_a * n_sigma)] = 4095
+                        img_12bit[:, int(center_[0]) + int(self.sigma_x_a * n_sigma)] = 4095
+                        img_12bit[:, int(center_[0]) - int(self.sigma_x_a * n_sigma)] = 4095
 
-                        img_12bit[int(center_[1]) + int(sigma_y_a * n_sigma), :] = 4095
-                        img_12bit[int(center_[1]) - int(sigma_y_a * n_sigma), :] = 4095
+                        img_12bit[int(center_[1]) + int(self.sigma_y_a * n_sigma), :] = 4095
+                        img_12bit[int(center_[1]) - int(self.sigma_y_a * n_sigma), :] = 4095
 
                         if self.frame_count % 10 == 0:
-                            print("\tA  - Sigma X, Sigma Y - {}".format((int(sigma_x_a), int(sigma_y_a))))
+                            print("\tA  - Sigma X, Sigma Y - {}".format((int(self.sigma_x_a), int(self.sigma_y_a))))
 
 
                     for img_12bit in [self.current_frame_b]:
                         center_ = self.static_center_b
 
-                        mu_x, sigma_x_b, amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
-                        mu_y, sigma_y_b, amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
+                        self.mu_x, self.sigma_x_b, self.amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
+                        self.mu_y, self.sigma_y_b, self.amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
 
-                        img_12bit[:, int(center_[0]) + int(sigma_x_b * n_sigma)] = 4095
-                        img_12bit[:, int(center_[0]) - int(sigma_x_b * n_sigma)] = 4095
+                        img_12bit[:, int(center_[0]) + int(self.sigma_x_b * n_sigma)] = 4095
+                        img_12bit[:, int(center_[0]) - int(self.sigma_x_b * n_sigma)] = 4095
 
-                        img_12bit[int(center_[1]) + int(sigma_y_b * n_sigma), :] = 4095
-                        img_12bit[int(center_[1]) - int(sigma_y_b * n_sigma), :] = 4095
+                        img_12bit[int(center_[1]) + int(self.sigma_y_b * n_sigma), :] = 4095
+                        img_12bit[int(center_[1]) - int(self.sigma_y_b * n_sigma), :] = 4095
 
                         if self.frame_count % 10 == 0:
-                            print("\tB  - Sigma X, Sigma Y - {}".format((int(sigma_x_a), int(sigma_y_a))))
+                            print("\tB  - Sigma X, Sigma Y - {}".format((int(self.sigma_x_a), int(self.sigma_y_a))))
 
                     a_as_16bit = bdc.to_16_bit(self.current_frame_a)
                     b_as_16bit = bdc.to_16_bit(self.current_frame_b)
@@ -977,10 +935,11 @@ class Stream:
                 continue_stream = self.keep_streaming()
 
                 if continue_stream is False:
-                    self.static_sigmas_x = int(max(sigma_a_x, sigma_b_x))
-                    self.static_sigmas_y = int(max(sigma_a_y, sigma_b_y))
+                    self.static_sigmas_x = int(max(self.sigma_a_x, self.sigma_b_x))
+                    self.static_sigmas_y = int(max(self.sigma_a_y, self.sigma_b_y))
 
             cv2.destroyAllWindows()
+
 
         step = 6
         if self.jump_level < step:

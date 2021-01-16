@@ -16,27 +16,27 @@ def step_four(stream):
 
         max_pixel_a, max_pixel_b = stream.find_centers(a_as_16bit, b_as_16bit)
 
-        mu_a_x, sigma_a_x, amp_a_x = fgp.get_gaus_boundaries_x(stream.current_frame_a, max_pixel_a)
-        mu_a_y, sigma_a_y, amp_a_y = fgp.get_gaus_boundaries_y(stream.current_frame_a, max_pixel_a)
+        stream.mu_a_x, stream.sigma_a_x, stream.amp_a_x = fgp.get_gaus_boundaries_x(stream.current_frame_a, max_pixel_a)
+        stream.mu_a_y, stream.sigma_a_y, stream.amp_a_y = fgp.get_gaus_boundaries_y(stream.current_frame_a, max_pixel_a)
 
-        mu_b_x, sigma_b_x, amp_b_x = fgp.get_gaus_boundaries_x(stream.current_frame_b, max_pixel_b)
-        mu_b_y, sigma_b_y, amp_b_y = fgp.get_gaus_boundaries_y(stream.current_frame_b, max_pixel_b)
+        stream.mu_b_x, stream.sigma_b_x, stream.amp_b_x = fgp.get_gaus_boundaries_x(stream.current_frame_b, max_pixel_b)
+        stream.mu_b_y, stream.sigma_b_y, stream.amp_b_y = fgp.get_gaus_boundaries_y(stream.current_frame_b, max_pixel_b)
 
         print("Setting Centers\n")
         print("Calculated Gaussian Centers")
-        stream.static_center_a = (int(mu_a_x), int(mu_a_y))
+        stream.static_center_a = (int(stream.mu_a_x), int(stream.mu_a_y))
         # stream.static_center_b = (int(mu_b_x), int(mu_b_y))  # Original
-        stream.static_center_b = (int(mu_a_x), int(mu_a_y))  # Picking A
+        stream.static_center_b = (int(stream.mu_a_x), int(stream.mu_a_y))  # Picking A
 
         print("\t\tA                         : {}".format(stream.static_center_a))
-        print("\t\tB Prime (Calculated)      : {}".format((int(mu_b_x), int(mu_b_y))))
+        print("\t\tB Prime (Calculated)      : {}".format((int(stream.mu_b_x), int(stream.mu_b_y))))
         print("\t\tB Prime (Overwritten to A): {}".format(stream.static_center_a))
 
         option = input("Would you like to use the \n\tcalculated gaussian center (y) "
                        "\n\tor the overwritten gaussian center (n):  ")
 
         if option == "y":
-            stream.static_center_b = (int(mu_b_x), int(mu_b_y))  # Picking A
+            stream.static_center_b = (int(stream.mu_b_x), int(stream.mu_b_y))  # Picking A
         elif option == "n":
             stream.static_center_b = stream.static_center_a
 
