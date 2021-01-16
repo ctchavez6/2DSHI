@@ -1,5 +1,6 @@
 import os
 
+
 def get_latest_run():
     """
     TODO add documentation.

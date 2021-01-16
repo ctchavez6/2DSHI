@@ -10,14 +10,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import numba
-from image_processing import img_algebra as ia
 import csv as csv
 import os
 from PIL import Image, ImageDraw, ImageFont
 import tkinter as tk
 import threading
+from . import s1
 from path_management import image_management as im
-from pathlib import Path
 
 y_n_msg = "Proceed? (y/n): "
 sixteen_bit_max = (2 ** 16) - 1
@@ -837,27 +836,11 @@ class Stream:
         self.all_cams.StartGrabbing()
 
         step = 1
-        if self.jump_level < step:
-            start = input("Step 1 - Stream Raw Camera Feed -  {}".format(y_n_msg))
+        if self.jump_level <= step:
+            start = input("Step 1 - Stream Raw Camera Feed -  {}".format(y_n_msg)).lower()
+            display_stream = True if start == "y" else False
+            s1.step_one(self, histogram, display_stream, continue_stream)
 
-            if (self.histocam_a is None or self.histocam_b is None) and histogram:
-                self.histocam_a = histocam.Histocam()
-                self.histocam_b = histocam.Histocam()
-
-            if start.lower() == 'y':
-                continue_stream = True
-            else:
-                self.frame_count += 1
-                self.current_frame_a, self.current_frame_b = self.grab_frames()
-                self.pre_alignment(histogram)
-
-            while continue_stream:
-                self.frame_count += 1
-                self.current_frame_a, self.current_frame_b = self.grab_frames()
-                self.pre_alignment(histogram)
-                continue_stream = self.keep_streaming()
-
-            cv2.destroyAllWindows()
 
         step = 2
         if self.jump_level < step:
