@@ -9,12 +9,7 @@ from coregistration import img_characterization as ic
 def step_two(stream, continue_stream):
     y_n_msg = "Proceed? (y/n): "
 
-    """
-    Gameplan:
-        1st: If user chooses to go through step 2's coreg process, then great, use that warp
-        2nd: If user chooses NOT to coreg, Load in from last run
-                THIS WILL REQUIRE SAVING
-    """
+
 
     previous_run_directory = fpr.get_latest_run_direc(path_override=True, path_to_exclude=stream.current_run)
     prev_wp1_path = os.path.join(previous_run_directory, "wm1.npy")
@@ -36,13 +31,11 @@ def step_two(stream, continue_stream):
                         "\n\tElse, brand new Co-Registration? (n)")
     """
 
-    if coregister_.lower() == "y":
+    if coregister_.lower().startswith("y"):
         continue_stream = True
         a_8bit = bdc.to_8_bit(stream.current_frame_a)
         b_8bit = bdc.to_8_bit(stream.current_frame_b)
         warp_ = ic.get_euclidean_transform_matrix(a_8bit, b_8bit)
-
-        # np.save('wp1.npy', warp_)
 
         stream.warp_matrix = warp_
 

@@ -13,6 +13,7 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 from . import App as tk_app
 from . import s1, s2, s3, s4, s5, s6
+from . import s11
 from path_management import image_management as im
 
 y_n_msg = "Proceed? (y/n): "
@@ -1383,16 +1384,7 @@ class Stream:
             notes_file.close()
 
         step = 11
-        print("Step 11 - Writing warp matrices to file")
-
-        if self.warp_matrix is not None:
-            wm1_path = os.path.join(run_folder, 'wm1.npy')
-            np.save(wm1_path, self.warp_matrix)
-
-        if self.warp_matrix_2 is not None:
-            wm2_path = os.path.join(run_folder, 'wm2.npy')
-            np.save(wm2_path, self.warp_matrix)
-
+        s11.step_eleven(self, run_folder)
 
 
 
