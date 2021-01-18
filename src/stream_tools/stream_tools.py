@@ -13,32 +13,13 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 from . import App as tk_app
 from . import s1, s2, s3, s4, s5, s6
-from . import s10, s11
+from . import s9, s10, s11
 from path_management import image_management as im
 
 y_n_msg = "Proceed? (y/n): "
 sixteen_bit_max = (2 ** 16) - 1
 twelve_bit_max = (2 ** 12) - 1
 eight_bit_max = (2 ** 8) - 1
-
-def progressBar(value, endvalue, bar_length=20):
-    """
-    Describe function
-
-    :param value: Current progress value (i.e. the 57 in 57% out of 100_
-    :param endvalue: Same example but the 100
-    :param bar_length: Bar length in characters
-    :return:
-    """
-    percent = float(value) / endvalue
-    arrow = '-' * int(round(percent * bar_length)-1) + '>'
-    spaces = ' ' * (bar_length - len(arrow))
-
-    sys.stdout.write("\rPercent: [{0}] {1}%".format(arrow + spaces, int(round(percent * 100))))
-    sys.stdout.flush()
-
-
-
 
 
 EPSILON = sys.float_info.epsilon  # Smallest possible difference
@@ -1093,8 +1074,13 @@ class Stream:
                                  y_b - n_sigma * self.static_sigmas_y: y_b + n_sigma * self.static_sigmas_y + n_sigma,
                                  x_b - n_sigma * self.static_sigmas_x: x_b + n_sigma * self.static_sigmas_x + n_sigma]
 
-                    roi_a, b_double_prime = self.grab_frames2(self.roi_a.copy(), self.roi_b.copy(),
-                                                              self.warp_matrix_2.copy())
+
+                    if self.warp_matrix_2 is not None:
+                        roi_a, b_double_prime = self.grab_frames2(self.roi_a.copy(), self.roi_b.copy(),
+                                                                  self.warp_matrix_2.copy())
+                    else:
+                        roi_a, b_double_prime = self.grab_frames2(self.roi_a.copy(), self.roi_b.copy(),
+                                                                  self.warp_matrix_1.copy())
 
                     CENTER_B_DP = int(b_double_prime.shape[1] * 0.5), int(b_double_prime.shape[0] * 0.5)
 
@@ -1289,79 +1275,9 @@ class Stream:
             write_to_csv = "n"
 
         if self.jump_level <= step and write_to_csv.lower() == 'y':
+            s9.step_nine(self, start_writing_at, end_writing_at, run_folder, a_images, a_frames, b_prime_images,
+                         b_prime_frames, stats)
 
-            r_matrices = self.r_frames
-            n_ = 0
-            print("Writing R Matrices")
-            for i in range(start_writing_at, end_writing_at + 1):
-                n_ += 1
-                r_matrix = r_matrices[i - 1]
-                csv_path = os.path.join(run_folder, "r_matrix_{}.csv".format(n_))
-                with open(csv_path, "w+", newline='') as my_csv:
-                    csvWriter = csv.writer(my_csv, delimiter=',')
-                    csvWriter.writerows(r_matrix.tolist())
-
-            n_ = 0
-            a_frames_dir = os.path.join(run_folder, "cam_a_frames")
-            print("Writing A Matrices")
-            for i in range(start_writing_at, end_writing_at + 1):
-            #for a_matrix in a_frames:
-                n_ += 1
-                a_matrix = a_frames[i - 1]
-                csv_path = os.path.join(run_folder, "a_matrix_{}.csv".format(n_))
-                with open(csv_path, "w+", newline='') as my_csv:
-                    csvWriter = csv.writer(my_csv, delimiter=',')
-                    csvWriter.writerows(a_matrix.tolist())
-
-                #a16 = bdc.to_16_bit(a_matrix)
-                #im.save_img("a_{}.png".format(n_), a_frames_dir, a16)
-
-            print("Writing A Images")
-            n_ = 0
-            for i in range(start_writing_at, end_writing_at + 1):
-            #for img_a in a_images:
-                n_ += 1
-                img_a = a_images[i-1]
-                a16 = bdc.to_16_bit(img_a)
-                im.save_img("a_{}.png".format(n_), a_frames_dir, a16)
-
-
-            b_frames_dir = os.path.join(run_folder, "cam_b_frames")
-
-            n_ = 0
-            print("Writing B Matrices")
-            for i in range(start_writing_at, end_writing_at + 1):
-            #for b_matrix in b_prime_frames:
-                n_ += 1
-                b_matrix = b_prime_frames[i-1]
-                csv_path = os.path.join(run_folder, "b_matrix_{}.csv".format(n_))
-                with open(csv_path, "w+", newline='') as my_csv:
-                    csvWriter = csv.writer(my_csv, delimiter=',')
-                    csvWriter.writerows(b_matrix.tolist())
-
-                #b16 = bdc.to_16_bit(b_matrix)
-                #im.save_img("b_{}.png".format(n_), b_frames_dir, b16)
-
-            print("Writing B Images")
-            n_ = 0
-            for i in range(start_writing_at, end_writing_at + 1):
-            #for img_b in b_prime_images:
-                n_ += 1
-                img_b = b_prime_images[i-1]
-                b16 = bdc.to_16_bit(img_b)
-                im.save_img("b_{}.png".format(n_), b_frames_dir, b16)
-
-            print("Writing R Matrix Stats to file:")
-            stats_csv_path = os.path.join(run_folder, "r_matrices_stats.csv")
-            with open(stats_csv_path, "w+", newline='') as stats_csv:
-                stats_csvWriter = csv.writer(stats_csv, delimiter=',')
-                stats_csvWriter.writerow(stats[0])
-                count = 0
-                for i in range(start_writing_at, end_writing_at + 1):
-                    count += 1
-                    stats_csvWriter.writerow([count, stats[i][1], stats[i][2]])
-
-            print("Matrices and Matrix Stats have finished writing to file.")
         try:
             if app:
                 if not app.at_front:
@@ -1378,21 +1294,11 @@ class Stream:
             print("Error while calling app.callback() or app.destroy()")
             traceback.print_exc()
 
-
-
         self.all_cams.StopGrabbing()
 
         step = 10
         s10.step_ten(run_folder)
-        """
-        notes = input("Step 10 - Write some notes to a file? - Proceed? (y/n): ")
-        if notes.lower() == 'y':
-            notes = input("Write notes below:\n\n")
-            notes_file = open(os.path.join(run_folder, 'notes.txt'), 'w+')
-            notes_file.write(notes)
-            notes_file.close()
-        
-        """
+
         step = 11
         s11.step_eleven(self, run_folder)
 
