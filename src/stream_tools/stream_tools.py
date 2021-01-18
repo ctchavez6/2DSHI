@@ -13,7 +13,7 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 from . import App as tk_app
 from . import s1, s2, s3, s4, s5, s6
-from . import s11
+from . import s10, s11
 from path_management import image_management as im
 
 y_n_msg = "Proceed? (y/n): "
@@ -1369,12 +1369,22 @@ class Stream:
         except Exception:
             pass
 
-        if app:
+        try:
             app.callback()
+            app.destroy()
+        except RuntimeError:
+            pass
+        except Exception as e:
+            print("Error while calling app.callback() or app.destroy()")
+            traceback.print_exc()
+
+
 
         self.all_cams.StopGrabbing()
 
         step = 10
+        #s10.step_ten(run_folder)
+
         notes = input("Step 10 - Write some notes to a file? - Proceed? (y/n): ")
 
         if notes.lower() == 'y':
@@ -1382,7 +1392,8 @@ class Stream:
             notes_file = open(os.path.join(run_folder, 'notes.txt'), 'w+')
             notes_file.write(notes)
             notes_file.close()
-
+        """
+        """
         step = 11
         s11.step_eleven(self, run_folder)
 

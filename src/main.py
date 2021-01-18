@@ -136,6 +136,8 @@ if __name__ == "__main__":
     print("Done")
     os.chdir(current_directory)
     print("You have completed and exited the script.")
+    sys.exit()
+
 
 
 

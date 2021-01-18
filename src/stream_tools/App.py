@@ -12,6 +12,9 @@ class App(threading.Thread):
     def callback(self):
         self.root.quit()
 
+    def destroy(self):
+        self.root.destroy()
+
     def scale_onChange(self, value):
         self.foo = float(value)
 
@@ -23,10 +26,7 @@ class App(threading.Thread):
         label = tk.Label(self.root, text="Sigma")
         label.pack()
 
-        scale = tk.Scale(from_=1.00, to=2.50, tickinterval=0.0001, resolution = 0.25, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange).pack()
-        #scale.pack()
-
-        #self.foo = label
+        tk.Scale(from_=1.00, to=2.50, tickinterval=0.0001, resolution = 0.25, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange).pack()
         self.root.mainloop()
 
     def bring_to_front(self):
