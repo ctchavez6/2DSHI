@@ -1,5 +1,6 @@
 import tkinter as tk
 import threading
+import traceback
 
 class App(threading.Thread):
 
@@ -32,3 +33,30 @@ class App(threading.Thread):
     def bring_to_front(self):
         self.root.lift()
         self.at_front = True
+
+
+def kill_app(app):
+    try:
+        if app:
+            if not app.at_front:
+                app.bring_to_front()
+    except Exception:
+        pass
+
+    try:
+        app.callback()
+        app.destroy()
+    except RuntimeError:
+        pass
+    except Exception as e:
+        print("Error while calling app.callback() or app.destroy()")
+        traceback.print_exc()
+
+
+def bring_to_front(app):
+    try:
+        if app:
+            if not app.at_front:
+                app.bring_to_front()
+    except Exception:
+        pass
