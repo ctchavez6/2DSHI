@@ -15,6 +15,7 @@ twelve_bit_max = (2 ** 12) - 1
 eight_bit_max = (2 ** 8) - 1
 EPSILON = sys.float_info.epsilon  # Smallest possible difference
 
+
 class Stream:
     def __init__(self, fb=-1, save_imgs=False):
         self.save_imgs = save_imgs
@@ -73,6 +74,12 @@ class Stream:
         self.a_images = None
         self.b_prime_images = None
 
+        self.start_writing_at = 0
+        self.end_writing_at = 0
+
+        self.max_pixel_a = None
+        self.max_pixel_b = None
+
 
     def get_12bit_a_frames(self):
         return self.a_frames
@@ -119,16 +126,23 @@ class Stream:
     def set_warp_matrix2(self, w):
         self.warp_matrix_2 = w
 
-    def offer_to_jump(self):
+    def offer_to_jump(self, highest_possible_jump):
         offer = input("Would you like to use the previous parameters to JUMP to a specific step? (y/n): ")
+        level_descriptions = {
+            1: "Step 1 : Stream Raw Camera Feed",
+            2: "Step 2 : Co-Register with Euclidean Transform",
+            3: "Step 3 : Find Brightest Pixel Locations",
+            4: "Step 4 : Set Gaussian-Based Static Centers",
+            5: "Step 5 : Define Regions of Interest",
+            6: "Step 6 : Close in on ROI & Re-Co Register",
+            7: "Step 7 : Commence Image Algebra (Free Stream)"
+        }
+
         if offer.lower() == 'y':
-            print("Step 1       : Stream Raw Camera Feed")
-            print("Step 2       : Co-Register with Euclidean Transform")
-            print("Step 3       : Find Brightest Pixel Locations")
-            print("Step 4       : Set Gaussian-Based Static Centers")
-            print("Step 5       : Define Regions of Interest ")
-            print("Step 6A - 6C : Close in on ROI & Re-Co Register")
-            print("Step 7       : Commence Image Algebra (Free Stream)")
+            for i in range(1, max(level_descriptions.keys()) + 1):
+                if i <= highest_possible_jump:
+                    print(level_descriptions[i])
+
             jump_level_input = int(input("Which level would you like to jump to?  "))
             self.jump_level = jump_level_input
 
@@ -299,21 +313,19 @@ class Stream:
 
         step = 1
         if self.jump_level <= step:
-            start = input("Step 1 - Stream Raw Camera Feed -  {}".format(y_n_msg)).lower()
-            display_stream = True if start == "y" else False
-            s1.step_one(self, histogram, display_stream, continue_stream)
+            s1.step_one(self, histogram, continue_stream)
+        else:
+            self.current_frame_a, self.current_frame_b = self.grab_frames()
 
         step = 2
         if self.jump_level <= step:
             s2.step_two(self, continue_stream)
-
-        cv2.destroyAllWindows()
+        else:
+            s2.step_two(self, continue_stream, autoload_prev_wm1=True)
 
         step = 3
         if self.jump_level <= step:
-
-            find_centers_ = input("Step 3 - Find Brightest Pixel Locations - {}".format(y_n_msg))
-            s3.step_three(self, continue_stream, find_centers_)
+            s3.step_three(self, continue_stream)
 
         if self.warp_matrix is None:
             self.jump_level = 10
@@ -321,12 +333,15 @@ class Stream:
         step = 4
         if self.jump_level <= step:
             s4.step_four(self)
-
+        else:
+            s4.step_four(self, autoload_prev_static_centers=True)
         cv2.destroyAllWindows()
 
         step = 5
         if self.jump_level <= step:
             s5.step_five(self, continue_stream)
+        else:
+            s5.step_five(self, continue_stream, autoload_roi=True)
 
         app = tk_app.App()
         step = 6
@@ -335,6 +350,8 @@ class Stream:
             s6.step_six_a(self, continue_stream)
             s6.step_six_b(self, continue_stream, app)
             s6.step_six_c(self, continue_stream)
+        else:
+            s6.load_wm2_if_present(self)
 
         cv2.destroyAllWindows()
 
@@ -348,20 +365,12 @@ class Stream:
             print("Regions of Interest not defined: Exiting Program")
             continue_stream = False
 
-        if self.jump_level == step:
-            continue_stream = True
-        elif self.jump_level > step:
-            continue_stream = False
-        else:
+        if self.jump_level <= step:
             start_algebra = input("Step 7 - Commence Image Algebra (Free Stream): Proceed? (y/n): ")
             if start_algebra.lower() == "y":
                 continue_stream = True
-
-        s7.step_seven(self, continue_stream, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
-               histograms_r, lines_r, figs_r)
-
-
-
+            s7.step_seven(self, continue_stream, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
+                   histograms_r, lines_r, figs_r)
 
         self.stats = list()
         self.a_frames = list()
@@ -370,22 +379,16 @@ class Stream:
         self.a_images = list()
         self.b_prime_images = list()
 
-        self.start_writing_at = 0
-        self.end_writing_at = 0
-
         run_folder = os.path.join("D:", "\\" + self.current_run)
 
         step = 8
-        if self.jump_level > 8:
-            satisfied_with_run = True
-        else:
+        if not self.jump_level > 8:
             s8.step_eight(self, run_folder, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                histograms_r, lines_r, figs_r)
 
         cv2.destroyAllWindows()
 
         step = 9
-
         if not (self.jump_level > step):
             write_to_csv = input("Step 9 - Write Recorded R Frame(s) to File(s)? - Proceed? (y/n): ")
         else:
@@ -406,6 +409,4 @@ class Stream:
 
         step = 11
         s11.step_eleven(self, run_folder)
-
-
 

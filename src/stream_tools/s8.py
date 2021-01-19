@@ -57,7 +57,7 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                                                               stream.warp_matrix_2.copy())
                 else:
                     roi_a, b_double_prime = stream.grab_frames2(stream.roi_a.copy(), stream.roi_b.copy(),
-                                                              stream.warp_matrix_1.copy())
+                                                              stream.warp_matrix.copy())
 
                 CENTER_B_DP = int(b_double_prime.shape[1] * 0.5), int(b_double_prime.shape[0] * 0.5)
 

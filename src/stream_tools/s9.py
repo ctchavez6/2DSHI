@@ -8,7 +8,7 @@ def step_nine(stream, start_writing_at, end_writing_at, run_folder, a_images, a_
               stats):
     r_matrices = stream.r_frames
     n_ = 0
-    print("Writing R Matrices")
+    print("\tWriting R Matrices")
     for i in range(start_writing_at, end_writing_at + 1):
         n_ += 1
         r_matrix = r_matrices[i - 1]
@@ -19,7 +19,7 @@ def step_nine(stream, start_writing_at, end_writing_at, run_folder, a_images, a_
 
     n_ = 0
     a_frames_dir = os.path.join(run_folder, "cam_a_frames")
-    print("Writing A Matrices")
+    print("\tWriting A Matrices")
     for i in range(start_writing_at, end_writing_at + 1):
         # for a_matrix in a_frames:
         n_ += 1
@@ -32,7 +32,7 @@ def step_nine(stream, start_writing_at, end_writing_at, run_folder, a_images, a_
         # a16 = bdc.to_16_bit(a_matrix)
         # im.save_img("a_{}.png".format(n_), a_frames_dir, a16)
 
-    print("Writing A Images")
+    print("\tWriting A Images")
     n_ = 0
     for i in range(start_writing_at, end_writing_at + 1):
         # for img_a in a_images:
@@ -44,7 +44,7 @@ def step_nine(stream, start_writing_at, end_writing_at, run_folder, a_images, a_
     b_frames_dir = os.path.join(run_folder, "cam_b_frames")
 
     n_ = 0
-    print("Writing B Matrices")
+    print("\tWriting B Matrices")
     for i in range(start_writing_at, end_writing_at + 1):
         # for b_matrix in b_prime_frames:
         n_ += 1
@@ -57,7 +57,7 @@ def step_nine(stream, start_writing_at, end_writing_at, run_folder, a_images, a_
         # b16 = bdc.to_16_bit(b_matrix)
         # im.save_img("b_{}.png".format(n_), b_frames_dir, b16)
 
-    print("Writing B Images")
+    print("\tWriting B Images")
     n_ = 0
     for i in range(start_writing_at, end_writing_at + 1):
         # for img_b in b_prime_images:
@@ -66,7 +66,7 @@ def step_nine(stream, start_writing_at, end_writing_at, run_folder, a_images, a_
         b16 = bdc.to_16_bit(img_b)
         im.save_img("b_{}.png".format(n_), b_frames_dir, b16)
 
-    print("Writing R Matrix Stats to file:")
+    print("\tWriting R Matrix Stats to file:")
     stats_csv_path = os.path.join(run_folder, "r_matrices_stats.csv")
     with open(stats_csv_path, "w+", newline='') as stats_csv:
         stats_csvWriter = csv.writer(stats_csv, delimiter=',')
@@ -75,4 +75,4 @@ def step_nine(stream, start_writing_at, end_writing_at, run_folder, a_images, a_
         for i in range(start_writing_at, end_writing_at + 1):
             count += 1
             stats_csvWriter.writerow([count, stats[i][1], stats[i][2]])
-    print("Matrices and Matrix Stats have finished writing to file.")
+    print("\tMatrices and Matrix Stats have finished writing to file.")

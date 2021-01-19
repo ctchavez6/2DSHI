@@ -1,7 +1,10 @@
 import cv2
 
+y_n_msg = "Proceed? (y/n): "
 
-def step_one(stream, histogram, display_stream, continue_stream):
+def step_one(stream, histogram, continue_stream):
+    start = input("Step 1 - Stream Raw Camera Feed -  {}".format(y_n_msg)).lower()
+    display_stream = True if start == "y" else False
 
     if (stream.histocam_a is None or stream.histocam_b is None) and histogram:
         stream.histocam_a = stream.Histocam()

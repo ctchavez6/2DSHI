@@ -6,20 +6,24 @@ from image_processing import bit_depth_conversion as bdc
 from coregistration import img_characterization as ic
 
 
-def step_two(stream, continue_stream):
-    y_n_msg = "Proceed? (y/n): "
-
-
-
+def step_two(stream, continue_stream, autoload_prev_wm1=False):
     previous_run_directory = fpr.get_latest_run_direc(path_override=True, path_to_exclude=stream.current_run)
     prev_wp1_path = os.path.join(previous_run_directory, "wm1.npy")
     prev_wp1_exist = os.path.exists(prev_wp1_path)
+
+    if prev_wp1_exist and autoload_prev_wm1:
+        stream.warp_matrix = np.load(prev_wp1_path)
+        cv2.destroyAllWindows()
+        return
+
     coregister_ = "n"
+    y_n_msg = "Proceed? (y/n): "
 
     if prev_wp1_exist:
         use_last_wp1 = input("Step 2 - You created a Warp Matrix 1 last run. Would you like to use it? (y/n)  ")
         if use_last_wp1.lower() == "y":
             stream.warp_matrix = np.load(prev_wp1_path)
+            stream.warp_matrix = stream.warp_matrix.copy()
         else:
             coregister_ = "y"
     else:
@@ -58,7 +62,6 @@ def step_two(stream, continue_stream):
         temp_a_8bit = np.array(stream.current_frame_a, dtype='uint8')  # bdc.to_8_bit()
         temp_b_prime_8bit = np.array(stream.current_frame_b, dtype='uint8')
         # temp_b_prime_8bit = bdc.to_8_bit(stream.current_frame_b)
-        GOOD_MATCH_PERCENT = 0.10
         orb = cv2.ORB_create(nfeatures=10000, scoreType=cv2.ORB_FAST_SCORE, nlevels=20)
         keypoints1, descriptors1 = orb.detectAndCompute(temp_a_8bit, None)
         keypoints2, descriptors2 = orb.detectAndCompute(temp_b_prime_8bit, None)

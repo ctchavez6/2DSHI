@@ -2,9 +2,23 @@ from image_processing import bit_depth_conversion as bdc
 from coregistration import img_characterization as ic
 import numpy as np
 import cv2
-
+import pickle
+import os
+import cv2
+from experiment_set_up import find_previous_run as fpr
 
 y_n_msg = "Proceed? (y/n): "
+
+def load_wm2_if_present(stream):
+    previous_run_directory = fpr.get_latest_run_direc(path_override=True, path_to_exclude=stream.current_run)
+
+    prev_wp2_path = os.path.join(previous_run_directory, "wm1.npy")
+    prev_wp2_exist = os.path.exists(prev_wp2_path)
+
+    if prev_wp2_exist:
+        stream.warp_matrix = np.load(prev_wp2_path)
+        cv2.destroyAllWindows()
+        return
 
 
 def step_six_a(stream, continue_stream):
@@ -124,3 +138,5 @@ def step_six_c(stream, continue_stream):
         cv2.imshow("ROI B DOUBLE PRIME", bdc.to_16_bit(b_double_prime))
 
         continue_stream = stream.keep_streaming()
+
+    cv2.destroyAllWindows()
