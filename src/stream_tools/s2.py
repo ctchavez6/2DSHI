@@ -9,7 +9,7 @@ from experiment_set_up import user_input_validation as uiv
 
 def step_two(stream, continue_stream, autoload_prev_wm1=False):
     """
-    Finds initial co-registration matrix. For details see links below
+    Finds or imports initial co-registration matrix. For details see links below
         https://mathworld.wolfram.com/AffineTransformation.html
         https://math.stackexchange.com/questions/13150/extracting-rotation-scale-values-from-2d-transformation-matrix
 
@@ -29,12 +29,10 @@ def step_two(stream, continue_stream, autoload_prev_wm1=False):
         cv2.destroyAllWindows()
         return
 
-    coregister_ = "n"
-    y_n_msg = "Proceed? (y/n): "
+    coregister_ = "n"  # TODO MAKE THIS A BOOLEAN BY DEFAULT, FIGURE OUT IF DEFAULT SHOULD BE TRUE OR FALSE
 
     if prev_wp1_exist:
         step_description = "Step 2 - You created a Warp Matrix 1 last run. Would you like to use it?"
-        #use_last_wp1 = input("Step 2 - You created a Warp Matrix 1 last run. Would you like to use it? (y/n)  ")
         use_last_wp1 = uiv.yes_no_quit(step_description)
         if use_last_wp1 is True:
             stream.warp_matrix = np.load(prev_wp1_path)
