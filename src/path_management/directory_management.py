@@ -24,7 +24,7 @@ def get_latest_run():
 
 def get_all_runs():
     """
-    TODO add documentation.
+    TODO: Check if we are using this anywhere, if so, add documentation, else delete.
     """
     data_directory = os.path.join("D:", "")
 
