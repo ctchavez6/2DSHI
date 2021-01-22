@@ -36,7 +36,7 @@ def step_three(stream, continue_stream):
         b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
         max_pixel_a, max_pixel_b = stream.find_centers(a_as_16bit, b_as_16bit)
 
-        stream.max_pixel_a = max_pixel_a
+        stream.max_pixel_a = max_pixel_a # TODO, REMOVE REDUNDANT VARIABLES
         stream.max_pixel_b = max_pixel_b
 
         a_as_16bit = cv2.circle(a_as_16bit, max_pixel_a, 10, (0, eight_bit_max, 0), 2)
