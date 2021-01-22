@@ -45,8 +45,6 @@ def getComponents(normalised_homography):
 
 #end_result = os.path.join(end_result, "Img_{}_{}".format("N", run))
 
-
-
 img_a_path = os.path.join("D:", "2DSHI_Runs")
 img_a_path = os.path.join(img_a_path, run)
 algebra_directory = os.path.join(img_a_path, "Image_Algebra")
