@@ -290,66 +290,6 @@ def get_gaus_boundaries_y(image, coords_of_max):
 
     amp, mu, sigma, offset = popt[0], popt[1], popt[2], popt[3]
 
-    """
-    y_fit = gauss(indices, *popt)
-
-    # Create a plot of our work, showing both the data and the fit.
-    fig, ax = plt.subplots()
-
-    #ax.errorbar(x, y, e)
-    ax.plot(indices, lineout, label='data')
-    ax.plot(indices, y_fit, color='red', label='fit')
-    ax.axvline(x=mu)
-    ax.axvline(x=mu - sigma)
-    ax.axvline(x=mu + sigma)
-
-    ax.axvline(x=mu - 4*sigma, c='g')
-    ax.axvline(x=mu + 4*sigma, c='g')
-
-    ax.axhline(y=amp + offset)
-
-    print(popt)
-    ax.legend()
-    ax.set_xlabel(r'$x$')
-    ax.set_ylabel(r'$f(x)$')
-    ax.set_title('Vertical')
-
-    plt.show()
-    plt.close('all')
-
-
-
-    #print(ys)
-    #print("ys: ", ys)
-
-    #print("Scipy Optimize Curve Fit Parameters: y")
-    popt, pcov = curve_fit(gaussian_distribution, xs, ys)
-    mu, sigma, amp = popt[0], popt[1], popt[2]
-    #print('Mean: {} +\- {}'.format(mu, np.sqrt(pcov[0, 0])))
-    #print('Standard Deviation: {} +\- {}'.format(sigma, np.sqrt(pcov[1, 1])))
-    #print('Amplitude: {} +\- {}'.format(amp, np.sqrt(pcov[2, 2])))
-
-    mu, sigma, amp = popt[0], popt[1], popt[2]
-    plt.axvline(mu + (1 * sigma), color='b', linestyle='dashed', linewidth=1, label="1sigma")
-    plt.axvline(mu - (1 * sigma), color='b', linestyle='dashed', linewidth=1)
-    plt.axvline(mu + (2 * sigma), color='r', linestyle='dashed', linewidth=1, label="2sigma")
-    plt.axvline(mu - (2 * sigma), color='r', linestyle='dashed', linewidth=1)
-    plt.axvline(mu + (3 * sigma), color='g', linestyle='dashed', linewidth=1, label="3sigma")
-    plt.axvline(mu - (3 * sigma), color='g', linestyle='dashed', linewidth=1)
-    plt.axvline(mu + (4 * sigma), color='gray', linestyle='dashed', linewidth=1, label="4sigma")
-    plt.axvline(mu - (4 * sigma), color='gray', linestyle='dashed', linewidth=1)
-
-    y_model_output = gaussian_distribution(xs, *popt)
-    plt.plot(xs, ys, label='Data')
-    plt.plot(xs, y_model_output, label='Model')
-    plt.title("Scipy Optimize Fit Y - ./coregistration/cam_b_frame_186.png")
-    plt.legend()
-    #plt.show()
-    fig.savefig("ScipyOptimizeCurveFit_Y-coregistration-cam_b_frame_186.png")
-
-    plt.close('all')
-
-    """
     return mu, sigma, amp
 
 
