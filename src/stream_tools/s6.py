@@ -6,9 +6,16 @@ import cv2
 from experiment_set_up import find_previous_run as fpr
 from experiment_set_up import user_input_validation as uiv
 
-y_n_msg = "Proceed? (y/n): "
 
 def load_wm2_if_present(stream):
+    """
+    If a second Warp Matrix was created during the previous run, this function may be used to call and load it into the
+    current run.
+
+    Args:
+        stream (Stream): Instance of a Stream object currently connected to cameras A and B.
+
+    """
     previous_run_directory = fpr.get_latest_run_direc(path_override=True, path_to_exclude=stream.current_run)
 
     prev_wp2_path = os.path.join(previous_run_directory, "wm1.npy")
@@ -18,12 +25,16 @@ def load_wm2_if_present(stream):
         stream.warp_matrix = np.load(prev_wp2_path)
         cv2.destroyAllWindows()
         return
-
+# TODO: ADD FUNCTION STEP 6 THAT AUTOMATICALLY GOES THROUGH 6A-6C SO THAT MAIN AND STREAM TOOLS LOOK CLEANER
 
 def step_six_a(stream, continue_stream):
+    """
+    During Step 5 the ROI is shown, but you can still see the rest of the image. Here we are able to only show pixels
+    that fall inside our regions of interest.
+
+    """
     desc = "Step 6A - Close in on ROI?"
     close_in = uiv.yes_no_quit(desc)
-    #close_in = input("Step 6A - Close in on ROI - {}".format(y_n_msg))
 
     if close_in is True:
         continue_stream = True
@@ -55,9 +66,14 @@ def step_six_a(stream, continue_stream):
 
 
 def step_six_b(stream, continue_stream, app):
+    """
+    Now our images are much smaller (Started at 800x1200 pixels and are now down to maybe 300x300 depending on beam
+    intensity), we might be able to get a better co-registration by searching for a new Euclidean Transform. At this
+    step, user will have a choice whether or not they want a second warp matrix or to proceed with just the initial.
+
+    """
     desc = "Step 6B - Re-Coregister?"
     find_rois_ = uiv.yes_no_quit(desc)
-    #find_rois_ = input("Step 6B - Re-Coregister - {}".format(y_n_msg))
 
     if find_rois_ is True:
         continue_stream = True
@@ -104,6 +120,8 @@ def step_six_b(stream, continue_stream, app):
         a, b, tx = warp_2_[0][0], warp_2_[0][1], warp_2_[0][2]
         c, d, ty = warp_2_[1][0], warp_2_[1][1], warp_2_[1][2]
 
+        # TODO: ADD A PARAMETER THAT MAKES PRINTING OPTIONAL
+
         print("\tTranslation X:{}".format(tx))
         print("\tTranslation Y:{}\n".format(ty))
 
@@ -121,9 +139,12 @@ def step_six_b(stream, continue_stream, app):
     cv2.destroyAllWindows()
 
 def step_six_c(stream, continue_stream):
+    """
+    Here we may display the newly re-co-registered images
+
+    """
     desc = "Step 6C - Display Re-Coregistered Images ?"
     display_new = uiv.yes_no_quit(desc)
-    #display_new = input("Step 6C - Display Re-Coregistered Images - {}".format(y_n_msg))
 
     if display_new is True:
         continue_stream = True
@@ -151,7 +172,7 @@ def step_six_c(stream, continue_stream):
         cv2.imshow("ROI B Prime", bdc.to_16_bit(stream.roi_b))
 
         if stream.warp_matrix_2 is None:
-            roi_a = stream.roi_a
+            roi_a = stream.roi_a  #TODO: ARE WE EVEN USING ROI A HERE?
             b_double_prime = stream.roi_b
         else:
             roi_a, b_double_prime = stream.grab_frames2(stream.roi_a.copy(), stream.roi_b.copy(), stream.warp_matrix_2.copy())
