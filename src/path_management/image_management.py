@@ -25,14 +25,6 @@ def reduce_bit_depth(image_array, original_bit_depth=12, intended_bit_depth=8):
 
 def save_img(filename, directory, image, bit_depth=16):
     """
-    Saves an image to the specified directory at a specified bit depth.
-    (For our purposes, all images are grayscale).
-
-    Args:
-        filename (str): The filename you with to use (i.e. img_23.png)
-        directory (str): The directory you with to save the img to (i.e. C:/username/images).
-        image (numpy.array): TODO: Verify this is a numpy array and add description.
-        bit_depth (int): The intended bit depth. Must be a power of 2 >= 8 (i.e. 8, 16, 32).
 
     """
     cwd = os.getcwd()
