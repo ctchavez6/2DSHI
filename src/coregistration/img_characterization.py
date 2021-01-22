@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import math
+import sys
+from experiment_set_up import  user_input_validation as uiv
 
 def initialize_orb_detector(nfeatures=100000, scoreType=cv2.ORB_FAST_SCORE, nlevels=20):
     return cv2.ORB_create(nfeatures=nfeatures, scoreType=scoreType, nlevels=nlevels)
@@ -24,8 +26,42 @@ def get_euclidean_transform_matrix(gray1, gray2):
     cc, warp = cv2.findTransformECC(gray1, gray2, init_warp, warp_mode, criteria, inputMask=None, gaussFiltSize=3)
 
     return warp
+"""
 
 
+
+def get_euclidean_transform_matrix(gray1, gray2):
+    n_iters = 1000
+    e_thresh = 1e-6
+    criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, n_iters, e_thresh)
+
+    # Define the motion model: can be TRANSLATION OR AFFINE OR HOMOGRAPHY
+    warp_mode = cv2.MOTION_EUCLIDEAN
+
+    init_warp = np.array([[1, 0, 0], [0, 1, 0]], dtype=np.float32)
+    warp_successful = False
+    retry = True
+
+    #cc, warp = cv2.findTransformECC(gray1, gray2, init_warp, warp_mode, criteria, inputMask=None, gaussFiltSize=3)
+    warp_successful = True
+    warp = None
+
+    while retry and not warp_successful:
+        try:
+            cc, warp = cv2.findTransformECC(gray1, gray2, init_warp, warp_mode, criteria, inputMask=None, gaussFiltSize=3)
+            warp_successful = True
+        except cv2.error:
+            warp_successful = False
+            desc = "Warp Matrix was not successful. Try again?"
+            retry = uiv.yes_no_quit(desc)
+
+    if not retry or warp is None:
+        print("Script may not proceed w/o warp matric")
+        sys.exit(0)
+
+    return warp
+
+"""
 
 
 

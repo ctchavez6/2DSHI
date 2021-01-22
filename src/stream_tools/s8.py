@@ -5,6 +5,8 @@ from image_processing import bit_depth_conversion as bdc
 from PIL import Image, ImageDraw, ImageFont
 from . import histograms as hgs
 import cv2
+from experiment_set_up import user_input_validation as uiv
+
 
 y_n_msg = "Proceed? (y/n): "
 sixteen_bit_max = (2 ** 16) - 1
@@ -14,7 +16,9 @@ eight_bit_max = (2 ** 8) - 1
 
 def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                histograms_r, lines_r, figs_r):
-    record_r_matrices = input("Step 8 - Image Algebra (Record): Proceed? (y/n): ")
+    #record_r_matrices = input("Step 8 - Image Algebra (Record): Proceed? (y/n): ")
+    desc = "Step 8 - Image Algebra (Record): Proceed"
+    record_r_matrices = uiv.yes_no_quit(desc)
     satisfied_with_run = False
 
     while satisfied_with_run is False:
@@ -31,7 +35,7 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
         stream.stats.append(["Frame", "Avg_R", "Sigma_R"])
 
         # r_matrix_limit = int(input("R Matrix Frame Break: "))
-        if record_r_matrices.lower() == "y":
+        if record_r_matrices is True:
             continue_stream = True
             while continue_stream:
                 stream.frame_count += 1
@@ -234,6 +238,6 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                     satisfaction_input = input("Are you satisfied with this run? (y/n): ")
                     if satisfaction_input.lower() == 'y':
                         satisfied_with_run = True
-        if record_r_matrices.lower() == "n":
+        if record_r_matrices is False:
             satisfied_with_run = True
             continue_stream = False

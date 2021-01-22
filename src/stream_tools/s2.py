@@ -4,6 +4,7 @@ import os
 import numpy as np
 from image_processing import bit_depth_conversion as bdc
 from coregistration import img_characterization as ic
+from experiment_set_up import user_input_validation as uiv
 
 
 def step_two(stream, continue_stream, autoload_prev_wm1=False):
@@ -20,14 +21,18 @@ def step_two(stream, continue_stream, autoload_prev_wm1=False):
     y_n_msg = "Proceed? (y/n): "
 
     if prev_wp1_exist:
-        use_last_wp1 = input("Step 2 - You created a Warp Matrix 1 last run. Would you like to use it? (y/n)  ")
-        if use_last_wp1.lower() == "y":
+        step_description = "Step 2 - You created a Warp Matrix 1 last run. Would you like to use it?"
+        #use_last_wp1 = input("Step 2 - You created a Warp Matrix 1 last run. Would you like to use it? (y/n)  ")
+        use_last_wp1 = uiv.yes_no_quit(step_description)
+        if use_last_wp1 is True:
             stream.warp_matrix = np.load(prev_wp1_path)
             stream.warp_matrix = stream.warp_matrix.copy()
         else:
-            coregister_ = "y"
+            coregister_ = True
     else:
-        coregister_ = input("Step 2 - New Co-Registration with with Euclidean Transform? -  {}".format(y_n_msg))
+        step_description = "Step 2 - New Co-Registration with with Euclidean Transform?"
+        coregister_  = uiv.yes_no_quit(step_description)
+        #coregister_ = input("Step 2 - New Co-Registration with with Euclidean Transform? -  {}".format(y_n_msg))
 
     """
     coregister_ = input("Step 2 - Co-Registration: "
@@ -35,7 +40,7 @@ def step_two(stream, continue_stream, autoload_prev_wm1=False):
                         "\n\tElse, brand new Co-Registration? (n)")
     """
 
-    if coregister_.lower().startswith("y"):
+    if coregister_ is True:
         continue_stream = True
         a_8bit = bdc.to_8_bit(stream.current_frame_a)
         b_8bit = bdc.to_8_bit(stream.current_frame_b)

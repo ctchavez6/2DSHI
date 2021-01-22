@@ -1,16 +1,16 @@
 import cv2
-
-y_n_msg = "Proceed? (y/n): "
+from experiment_set_up import user_input_validation as uiv
 
 def step_one(stream, histogram, continue_stream):
-    start = input("Step 1 - Stream Raw Camera Feed -  {}".format(y_n_msg)).lower()
-    display_stream = True if start == "y" else False
+    step_description = "Step 1 - Stream Raw Camera Feed"
+    start = uiv.yes_no_quit(step_description)
+    display_stream = True if start is True else False
 
     if (stream.histocam_a is None or stream.histocam_b is None) and histogram:
         stream.histocam_a = stream.Histocam()
         stream.histocam_b = stream.Histocam()
 
-    if display_stream:
+    if display_stream is True:
         continue_stream = True
     else:
         stream.frame_count += 1

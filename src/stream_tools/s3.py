@@ -1,15 +1,16 @@
 import cv2
 from image_processing import bit_depth_conversion as bdc
-import json
+from experiment_set_up import user_input_validation as uiv
 
 
 y_n_msg = "Proceed? (y/n): "
 eight_bit_max = (2 ** 8) - 1
 
 def step_three(stream, continue_stream):
-    find_centers_ = input("Step 3 - Find Brightest Pixel Locations - {}".format(y_n_msg))
+    step_description = "Step 3 - Find Brightest Pixel Locations"
+    find_centers_ = uiv.yes_no_quit(step_description)
 
-    if find_centers_.lower() == "y":
+    if find_centers_ is True:
         continue_stream = True
 
     while continue_stream:
@@ -29,8 +30,6 @@ def step_three(stream, continue_stream):
         cv2.imshow("A", a_as_16bit)
         cv2.imshow("B Prime", b_as_16bit)
         continue_stream = stream.keep_streaming()
-
-
 
     cv2.destroyAllWindows()
 

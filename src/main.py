@@ -3,7 +3,6 @@
 import sys
 import argparse
 import os
-import numpy as np
 
 from experiment_set_up import update_camera_configuration as ucc
 from experiment_set_up import write_experimental_params_to_file as wptf
@@ -101,9 +100,7 @@ if __name__ == "__main__":
         except TypeError as e:
             print("TYPE ERROR")
             raise e
-    print("Done")
     os.chdir(current_directory)
-    print("You have completed and exited the script.")
     sys.exit()
 
 

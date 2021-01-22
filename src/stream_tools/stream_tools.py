@@ -8,6 +8,7 @@ import os
 from . import App as tk_app
 from . import histograms as hgs
 from . import s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11
+from experiment_set_up import user_input_validation as uiv
 
 y_n_msg = "Proceed? (y/n): "
 sixteen_bit_max = (2 ** 16) - 1
@@ -127,7 +128,9 @@ class Stream:
         self.warp_matrix_2 = w
 
     def offer_to_jump(self, highest_possible_jump):
-        offer = input("Would you like to use the previous parameters to JUMP to a specific step? (y/n): ")
+        desc = "Would you like to use the previous parameters to JUMP to a specific step?"
+        offer = uiv.yes_no_quit(desc)
+        #offer = input("Would you like to use the previous parameters to JUMP to a specific step? (y/n): ")
         level_descriptions = {
             1: "Step 1 : Stream Raw Camera Feed",
             2: "Step 2 : Co-Register with Euclidean Transform",
@@ -138,13 +141,20 @@ class Stream:
             7: "Step 7 : Commence Image Algebra (Free Stream)"
         }
 
-        if offer.lower() == 'y':
+        options = set()
+
+        if offer is True:
             for i in range(1, max(level_descriptions.keys()) + 1):
                 if i <= highest_possible_jump:
                     print(level_descriptions[i])
+                    options.add(str(i))
 
-            jump_level_input = int(input("Which level would you like to jump to?  "))
-            self.jump_level = jump_level_input
+            jump_level_input = input("Which level would you like to jump to?  ")
+
+            while not uiv.valid_input(jump_level_input, options):
+                jump_level_input = input("Which level would you like to jump to?  ")
+
+            self.jump_level = int(jump_level_input)
 
     def get_cameras(self, config_files):
         """
@@ -389,12 +399,7 @@ class Stream:
         cv2.destroyAllWindows()
 
         step = 9
-        if not (self.jump_level > step):
-            write_to_csv = input("Step 9 - Write Recorded R Frame(s) to File(s)? - Proceed? (y/n): ")
-        else:
-            write_to_csv = "n"
-
-        if self.jump_level <= step and write_to_csv.lower() == 'y':
+        if self.jump_level <= step:
             s9.step_nine(self, self.start_writing_at, self.end_writing_at, run_folder, self.a_images, self.a_frames,
                          self.b_prime_images, self.b_prime_frames, self.stats)
 

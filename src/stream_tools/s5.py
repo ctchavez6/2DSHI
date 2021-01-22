@@ -5,6 +5,7 @@ import traceback
 import os
 import pickle
 from experiment_set_up import find_previous_run as fpr
+from experiment_set_up import user_input_validation as uiv
 
 y_n_msg = "Proceed? (y/n): "
 
@@ -17,7 +18,6 @@ def step_five(stream, continue_stream, autoload_roi=False):
     prev_sigma_y_path = os.path.join(previous_run_directory, "static_sigma_y.p")
     prev_sigma_y_exist = os.path.exists(prev_sigma_y_path)
 
-
     if autoload_roi and prev_sigma_x_exist and prev_sigma_y_exist:
         with open(prev_sigma_x_path, 'rb') as fp:
             stream.static_sigmas_x = pickle.load(fp)
@@ -28,9 +28,10 @@ def step_five(stream, continue_stream, autoload_roi=False):
         cv2.destroyAllWindows()
         return
 
-    find_rois_ = input("Step 5 - Define Regions of Interest - {}".format(y_n_msg))
+    step_description = "Step 5 - Define Regions of Interest"
+    find_rois_ = uiv.yes_no_quit(step_description)
 
-    if find_rois_.lower() == "y":
+    if find_rois_ is True:
         continue_stream = True
 
     while continue_stream:
@@ -77,9 +78,7 @@ def step_five(stream, continue_stream, autoload_roi=False):
             cv2.imshow("B Prime", b_as_16bit)
 
         except Exception as e:
-
             print("Exception Occurred")
-
             traceback.print_exc()
             raise e
 

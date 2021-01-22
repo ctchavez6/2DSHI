@@ -1,11 +1,10 @@
 from image_processing import bit_depth_conversion as bdc
 from coregistration import img_characterization as ic
 import numpy as np
-import cv2
-import pickle
 import os
 import cv2
 from experiment_set_up import find_previous_run as fpr
+from experiment_set_up import user_input_validation as uiv
 
 y_n_msg = "Proceed? (y/n): "
 
@@ -22,9 +21,11 @@ def load_wm2_if_present(stream):
 
 
 def step_six_a(stream, continue_stream):
-    close_in = input("Step 6A - Close in on ROI - {}".format(y_n_msg))
+    desc = "Step 6A - Close in on ROI?"
+    close_in = uiv.yes_no_quit(desc)
+    #close_in = input("Step 6A - Close in on ROI - {}".format(y_n_msg))
 
-    if close_in.lower() == "y":
+    if close_in is True:
         continue_stream = True
 
     while continue_stream:
@@ -54,9 +55,11 @@ def step_six_a(stream, continue_stream):
 
 
 def step_six_b(stream, continue_stream, app):
-    find_rois_ = input("Step 6B - Re-Coregister - {}".format(y_n_msg))
+    desc = "Step 6B - Re-Coregister?"
+    find_rois_ = uiv.yes_no_quit(desc)
+    #find_rois_ = input("Step 6B - Re-Coregister - {}".format(y_n_msg))
 
-    if find_rois_.lower() == "y":
+    if find_rois_ is True:
         continue_stream = True
 
     while continue_stream:
@@ -67,15 +70,31 @@ def step_six_b(stream, continue_stream, app):
         x_b, y_b = stream.static_center_b
 
         n_sigma = app.foo
-        stream.roi_a = stream.current_frame_a[
-                     y_a - n_sigma * stream.static_sigmas_y: y_a + n_sigma * stream.static_sigmas_y + 1,
-                     x_a - n_sigma * stream.static_sigmas_x: x_a + n_sigma * stream.static_sigmas_x + 1
-                     ]
+        try:
+            stream.roi_a = stream.current_frame_a[
+                         y_a - n_sigma * stream.static_sigmas_y: y_a + n_sigma * stream.static_sigmas_y + 1,
+                         x_a - n_sigma * stream.static_sigmas_x: x_a + n_sigma * stream.static_sigmas_x + 1
+                         ]
 
-        stream.roi_b = stream.current_frame_b[
-                     y_b - n_sigma * stream.static_sigmas_y: y_b + n_sigma * stream.static_sigmas_y + 1,
-                     x_b - n_sigma * stream.static_sigmas_x: x_b + n_sigma * stream.static_sigmas_x + 1
-                     ]
+            stream.roi_b = stream.current_frame_b[
+                         y_b - n_sigma * stream.static_sigmas_y: y_b + n_sigma * stream.static_sigmas_y + 1,
+                         x_b - n_sigma * stream.static_sigmas_x: x_b + n_sigma * stream.static_sigmas_x + 1
+                         ]
+        except Exception as e:
+            print("Error occurred trying to set warp matrices")
+            print("Please verify validity of following variables:")
+            potential_error_vars = {
+                "x_a": x_a,
+                "y_a": y_a,
+                "n_sigma": n_sigma,
+                "stream.static_sigmas_y": stream.static_sigmas_y,
+                "stream.static_sigmas_x": stream.static_sigmas_x,
+            }
+
+            for var in potential_error_vars:
+                print(var, type(potential_error_vars[var]), var)
+
+            raise e
 
         roi_a_8bit = bdc.to_8_bit(stream.roi_a)
         roi_b_8bit = bdc.to_8_bit(stream.roi_b)
@@ -102,9 +121,11 @@ def step_six_b(stream, continue_stream, app):
     cv2.destroyAllWindows()
 
 def step_six_c(stream, continue_stream):
-    display_new = input("Step 6C - Display Re-Coregistered Images - {}".format(y_n_msg))
+    desc = "Step 6C - Display Re-Coregistered Images ?"
+    display_new = uiv.yes_no_quit(desc)
+    #display_new = input("Step 6C - Display Re-Coregistered Images - {}".format(y_n_msg))
 
-    if display_new.lower() == "y":
+    if display_new is True:
         continue_stream = True
 
     cv2.destroyAllWindows()

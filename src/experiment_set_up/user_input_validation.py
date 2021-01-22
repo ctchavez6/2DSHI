@@ -1,5 +1,40 @@
 import sys
 
+
+def valid_input(input, options, feedback=True):
+    if len(input) < 1:
+        print("Please enter one of the following options: ", options)
+        return False
+    if input[0] == "q":
+        sys.exit()
+    if input[0] not in options:
+        print("Please enter one of the following options: ", options)
+        return False
+    return True
+
+def yes_no_quit(preceding_msg, specify_options=True, app=None):
+    """
+    Returns:
+        True if the use wishes to continue with the current step.
+        False if the user wants to skip this current step (if possible).
+        None if they want to quit the program entirely.
+    """
+    ynq = "" if not specify_options else "(y/n/q): "
+    user_input = input("{0}  {1}".format(preceding_msg, ynq)).lower()
+
+    while not valid_input(user_input, {"y", "n", "q"}):
+        user_input = input("{0}  {1}".format(preceding_msg, ynq)).lower()
+
+    if user_input[0] == "q":
+        if app is not None:
+            app.destroy()
+        sys.exit()
+    elif user_input[0] == "y":
+        return True
+    elif user_input[0] == "n":
+        return False
+
+
 def display_dict_values(d):
     for key in d:
         print("\t{}: {}".format(key, d[key]))
@@ -16,6 +51,8 @@ def determine_run_mode(sys_args):
         return 1
 
     if '-rpp' not in adjusted_command_line_input and len(adjusted_command_line_input) > 1:
+        desc = None
+
         prompt = "You've chosen to explicitly enter command line parameters. Would you like to run the experiment" +\
                  "under these exact conditions? (y/n) [Or 'q' to quit.]"
         input_ = input(prompt).lower()
@@ -32,18 +69,13 @@ def determine_run_mode(sys_args):
         prompt = "\nNo experimental parameters entered.\n\nWould you like to implement last run's parameters?\n"
         prompt += "y: Yes\n"
         prompt += "n: Yes, but with some changes.\n\n(Or enter 'q' to quit)\n\n"
-        input_ = input(prompt).lower()
-        options = ["y", "n", "q"]
-        while input_ not in options:
-            input_ = input(prompt).lower()
 
-        if input_ == "q":
-            print("Okay, goodbye.")
-            sys.exit(1)
-        elif input_ == "y":
+        input_ = yes_no_quit(prompt, specify_options=False)
+
+        if input_ is True:
             run_mode = 1
             print(run_mode_feedback.format(run_mode))
-        elif input_ == "n":
+        elif input_ is False:
             run_mode = 3
             print(run_mode_feedback.format(run_mode))
 
@@ -111,3 +143,4 @@ def update_previous_params(args_):
             param_input = input(param_prompt)
 
     return modified_args
+

@@ -4,6 +4,7 @@ from experiment_set_up import find_previous_run as fpr
 import pickle
 import cv2
 import os
+from experiment_set_up import user_input_validation as uiv
 
 eight_bit_max = (2 ** 8) - 1
 y_n_msg = "Proceed? (y/n): "
@@ -28,9 +29,10 @@ def step_four(stream, autoload_prev_static_centers=False):
         cv2.destroyAllWindows()
         return
 
-    set_centers_ = input("Step 4 - Set Gaussian-Based Static Centers - {}".format(y_n_msg))
+    step_description = "Step 4 - Set Gaussian-Based Static Centers"
+    set_centers_ = uiv.yes_no_quit(step_description)
 
-    if set_centers_.lower() == "y":
+    if set_centers_ is True:
         continue_stream = True
         a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
         b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
