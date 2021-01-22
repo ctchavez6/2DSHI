@@ -17,8 +17,13 @@ def to_16_bit(image_array, original_bit_depth=12):
 
 def to_8_bit(image_array, original_bit_depth=12):
     """
-    TODO Add documentation.
+    Takes an image array and represents it as 8 bit array TODO: Describe how
+
+    Args:
+        image_array (numpy.ndarray): The original image array.
+    Returns:
+        numpy.ndarray: The same image represented as a 8 bit array (TODO: Verify if Conversion is indeed lossy )
     """
-    if original_bit_depth == 12:
+    if original_bit_depth == 12:s
         return np.array(image_array/16, dtype=np.uint8).astype(np.uint8)
     return None
