@@ -9,7 +9,8 @@ def read_img(img_path):
 def reduce_bit_depth(image_array, original_bit_depth=12, intended_bit_depth=8):
     """
     Lossy.
-    TODO Add documentation.
+    TODO: Check if we are using this function anywhere, and if so, add documentation. Else, delete.
+
     """
     if intended_bit_depth not in (8, 12):
         raise RuntimeError(
