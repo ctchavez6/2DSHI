@@ -24,6 +24,6 @@ def to_8_bit(image_array, original_bit_depth=12):
     Returns:
         numpy.ndarray: The same image represented as a 8 bit array (TODO: Verify if Conversion is indeed lossy )
     """
-    if original_bit_depth == 12:s
+    if original_bit_depth == 12:
         return np.array(image_array/16, dtype=np.uint8).astype(np.uint8)
     return None
