@@ -295,7 +295,7 @@ def get_gaus_boundaries_y(image, coords_of_max):
 
 def save_img(filename, directory, image, sixteen_bit=True):
     """
-    TODO Add documentation.
+    TODO: THIS IS THE THIRD SAVE_IMG, ARE WE EVEN USING IT!?
     """
     os.chdir(directory)
     if sixteen_bit:
