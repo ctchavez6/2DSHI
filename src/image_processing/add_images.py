@@ -5,6 +5,7 @@ import math
 import os
 from PIL import Image
 
+#TODO: Research if we are using add_images.py anywhere, if so delete bad code and duplicate functions, else delete.
 run = "2019_12_14__13_08"
 
 
