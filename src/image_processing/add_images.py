@@ -43,30 +43,6 @@ def getComponents(normalised_homography):
   return (translation_, math.degrees(theta_), scale_, shear_)
 
 
-def getComponents_mod(normalised_homography):
-  '''((translationx, translationy), rotation, (scalex, scaley), shear)'''
-  a = normalised_homography[0,0]
-  b = normalised_homography[0,1]
-  c = normalised_homography[0,2]
-  d = normalised_homography[1,0]
-  e = normalised_homography[1,1]
-  f = normalised_homography[1,2]
-
-  p = math.sqrt(a*a + b*b)
-  r = (a*e - b*d)/(p)
-  q = (a*d+b*e)/(a*e - b*d)
-
-  translation_ = (c,f)
-  scale_ = (p,r)
-  shear_ = q
-  theta_ = math.atan2(b,a)
-
-  return (translation_, math.degrees(theta_), 0.00, 0.00)
-
-
-
-
-
 #end_result = os.path.join(end_result, "Img_{}_{}".format("N", run))
 
 
