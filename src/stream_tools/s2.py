@@ -8,6 +8,18 @@ from experiment_set_up import user_input_validation as uiv
 
 
 def step_two(stream, continue_stream, autoload_prev_wm1=False):
+    """
+    Finds initial co-registration matrix. For details see links below
+        https://mathworld.wolfram.com/AffineTransformation.html
+        https://math.stackexchange.com/questions/13150/extracting-rotation-scale-values-from-2d-transformation-matrix
+
+    Args:
+        stream (Stream): An instance of the Stream class currently connected to cameras.
+        continue_stream (bool): TODO: Check if this is needed as a parameter, or can exist within s2
+
+    Returns:
+        bool: The return value. True for success, False otherwise.
+    """
     previous_run_directory = fpr.get_latest_run_direc(path_override=True, path_to_exclude=stream.current_run)
     prev_wp1_path = os.path.join(previous_run_directory, "wm1.npy")
     prev_wp1_exist = os.path.exists(prev_wp1_path)
@@ -32,13 +44,6 @@ def step_two(stream, continue_stream, autoload_prev_wm1=False):
     else:
         step_description = "Step 2 - New Co-Registration with with Euclidean Transform?"
         coregister_  = uiv.yes_no_quit(step_description)
-        #coregister_ = input("Step 2 - New Co-Registration with with Euclidean Transform? -  {}".format(y_n_msg))
-
-    """
-    coregister_ = input("Step 2 - Co-Registration: "
-                        "\n\tUse Warp Matrix Run from Previous run? (y)"
-                        "\n\tElse, brand new Co-Registration? (n)")
-    """
 
     if coregister_ is True:
         continue_stream = True

@@ -8,7 +8,7 @@ def step_one(stream, histogram, continue_stream):
     Args:
         stream (Stream): An instance of the Stream Class
         histogram (bool): True if you'd like to display histograms for pixel values, false otherwise.
-        continue_stream (bool): True to continue streaming camera feeds, false othewise
+        continue_stream (bool): True to continue streaming camera feeds, false otherwise
 
     Returns:
         bool: The return value. True for success, False otherwise.
@@ -34,4 +34,4 @@ def step_one(stream, histogram, continue_stream):
         stream.pre_alignment(histogram)
         continue_stream = stream.keep_streaming()
 
-    cv2.destroyAllWindows()
+    cv2.destroyAllWindows()  # Upon leaving stream, we want to close any CV2 windows.
