@@ -7,6 +7,21 @@ y_n_msg = "Proceed? (y/n): "
 eight_bit_max = (2 ** 8) - 1
 
 def step_three(stream, continue_stream):
+    """
+    This step draws a black circle around the location of the brightest pixel in each camera.
+    This is useful in two ways:
+        1: If brightest pixel is not centered, you likely don't have a gaussian distribution and therefore need to
+           reconfigure your beams (likely).
+        2: If beam profile is gaussian, knowing the exact or approximate locations of the peak can speed up the process
+           of find each beam's gaussian profile (center, amplitude, standard deviation) by giving the algorithm an
+           initial estimate for the centers.
+
+    Args:
+        stream (Stream): An instance of the Stream class currently connected to your cameras.
+        continue_stream (bool): TODO: REMOVE
+
+
+    """
     step_description = "Step 3 - Find Brightest Pixel Locations"
     find_centers_ = uiv.yes_no_quit(step_description)
 
