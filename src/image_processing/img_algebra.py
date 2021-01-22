@@ -1,6 +1,4 @@
-#from src.path_management import image_management as im
 import numpy as np
-
 
 
 def add_imgs(img1, img2):

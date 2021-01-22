@@ -1,4 +1,3 @@
-from . import update_camera_configuration as ucc
 import os
 
 # Fix ability to update config file later

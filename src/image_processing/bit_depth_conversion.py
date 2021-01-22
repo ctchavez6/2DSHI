@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def to_16_bit(image_array, original_bit_depth=12):
     """
     Takes an image array and represents it as 16 bit by multiplying all the values by the corresponding integer and
@@ -14,6 +15,7 @@ def to_16_bit(image_array, original_bit_depth=12):
         return np.array(image_array * 2**(16-original_bit_depth), dtype=np.uint16).astype(np.uint16)
     else:
         raise Exception('Original Bit Depth was greater than or equal to 16')
+
 
 def to_8_bit(image_array, original_bit_depth=12):
     """
