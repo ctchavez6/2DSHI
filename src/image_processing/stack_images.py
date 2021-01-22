@@ -4,7 +4,15 @@ import cv2
 
 def resize_img(image_array, new_width, new_height):
     """
-    TODO Add documentation.
+    Resizes an image to the specified height and width.
+
+    Args:
+        image_array (2D np.array): Original Image array
+        new_width (int): New Image Width in Pixels.
+        new_height (int): New Image Width in Pixels.
+
+    Returns:
+        bool: The return value. True for success, False otherwise.
     """
     return cv2.resize(image_array, (new_width, new_height), interpolation=cv2.INTER_AREA)
 
