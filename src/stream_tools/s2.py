@@ -20,6 +20,9 @@ def step_two(stream, continue_stream, autoload_prev_wm1=False):
     Returns:
         bool: The return value. True for success, False otherwise.
     """
+
+    # ((translationx, translationy), rotation, (scalex, scaley), shear)
+
     previous_run_directory = fpr.get_latest_run_direc(path_override=True, path_to_exclude=stream.current_run)
     prev_wp1_path = os.path.join(previous_run_directory, "wm1.npy")
     prev_wp1_exist = os.path.exists(prev_wp1_path)
