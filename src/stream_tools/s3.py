@@ -1,12 +1,14 @@
 import cv2
 from image_processing import bit_depth_conversion as bdc
 from experiment_set_up import user_input_validation as uiv
-
+from experiment_set_up import find_previous_run as fpr
+import os
+import pickle
 
 y_n_msg = "Proceed? (y/n): "
 eight_bit_max = (2 ** 8) - 1
 
-def step_three(stream, continue_stream):
+def step_three(stream, continue_stream, autoload=False):
     """
     This step draws a black circle around the location of the brightest pixel in each camera.
     This is useful in two ways:
@@ -22,6 +24,24 @@ def step_three(stream, continue_stream):
 
 
     """
+    previous_run_directory = fpr.get_latest_run_direc(path_override=True, path_to_exclude=stream.current_run)
+
+    prev_bpa_path = os.path.join(previous_run_directory, "max_pixel_a.p")
+    prev_bpa_exist = os.path.exists(prev_bpa_path)
+
+    prev_bpb_path = os.path.join(previous_run_directory, "max_pixel_b.p")
+    prev_bpb_exist = os.path.exists(prev_bpb_path)
+
+    if autoload and prev_bpa_exist and prev_bpb_exist:
+        with open(prev_bpa_path, 'rb') as fp:
+            stream.max_pixel_a = pickle.load(fp)
+
+        with open(prev_bpb_path, 'rb') as fp:
+            stream.max_pixel_b = pickle.load(fp)
+
+        cv2.destroyAllWindows()
+        return
+
     step_description = "Step 3 - Find Brightest Pixel Locations"
     find_centers_ = uiv.yes_no_quit(step_description)
 

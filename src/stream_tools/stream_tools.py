@@ -3,19 +3,15 @@ from pypylon import pylon  # Import relevant pypylon packages/modules
 import cv2
 from image_processing import bit_depth_conversion as bdc
 from coregistration import find_gaussian_profile as fgp
-import sys
 import os
 from . import App as tk_app
 from . import histograms as hgs
 from . import s1, s2, s3, s4, s5, s6, s7, s8, s9, s10
 from experiment_set_up import user_input_validation as uiv
-from . import  store_params as sp
+from . import store_params as sp
 
-y_n_msg = "Proceed? (y/n): "
-sixteen_bit_max = (2 ** 16) - 1
 twelve_bit_max = (2 ** 12) - 1
 eight_bit_max = (2 ** 8) - 1
-EPSILON = sys.float_info.epsilon  # Smallest possible difference
 
 
 class Stream:
@@ -323,26 +319,25 @@ class Stream:
 
         self.all_cams.StartGrabbing()
 
-        step = 1
-        if self.jump_level <= step:
+        if self.jump_level <= 1:
             s1.step_one(self, histogram, continue_stream)
         else:
             self.current_frame_a, self.current_frame_b = self.grab_frames()
 
-        step = 2
-        if self.jump_level <= step:
+        if self.jump_level <= 2:
             s2.step_two(self, continue_stream)
         else:
             s2.step_two(self, continue_stream, autoload_prev_wm1=True)
         sp.store_warp_matrices(self, run_folder)
 
-        step = 3
-        if self.jump_level <= step:
+        if self.jump_level <= 3:
             s3.step_three(self, continue_stream)
+        else:
+            s3.step_three(self, continue_stream, autoload=True)
+        sp.store_brightest_pixels(self, run_folder)
 
         if self.warp_matrix is None:
             self.jump_level = 10
-        sp.store_brightest_pixels(self, run_folder)
 
         step = 4
         if self.jump_level <= step:
@@ -350,7 +345,6 @@ class Stream:
         else:
             s4.step_four(self, autoload_prev_static_centers=True)
         sp.store_static_centers(self, run_folder)
-
 
         step = 5
         if self.jump_level <= step:
@@ -369,8 +363,6 @@ class Stream:
         else:
             s6.load_wm2_if_present(self)
         sp.store_warp_matrices(self, run_folder)
-
-        cv2.destroyAllWindows()
 
         figs, histograms, lines = hgs.initialize_histograms_rois()
         figs_alg, histograms_alg, lines_alg = hgs.initialize_histograms_algebra()
