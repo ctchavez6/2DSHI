@@ -205,12 +205,17 @@ class Stream:
         return (x_a, y_a), (x_b, y_b)
 
 
-    def grab_frames(self, warp_matrix=None, warp_matrix2=None):
+    def grab_frames(self, warp_matrix=None, grab_single=False):
         try:
-            #timeout_ms = 6000000
-            timeout_ms = 1000
-            grab_result_a = self.cam_a.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
-            grab_result_b = self.cam_b.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
+            timeout_ms = 6000000
+
+            if not grab_single:
+                grab_result_a = self.cam_a.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
+                grab_result_b = self.cam_b.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
+            else:
+                grab_result_a = self.cam_a.GrabOne(timeout_ms, pylon.TimeoutHandling_ThrowException)
+                grab_result_b = self.cam_b.GrabOne(timeout_ms, pylon.TimeoutHandling_ThrowException)
+
             if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
                 a, b = grab_result_a.GetArray(), grab_result_b.GetArray()
                 if self.save_imgs:

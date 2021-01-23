@@ -53,7 +53,7 @@ def step_two(stream, continue_stream, autoload_prev_wm1=False):
 
         while retry or (not warp_successful):
             try:
-                for i in range(3):
+                for i in range(2):
                     stream.frame_count += 1
                     stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
 
