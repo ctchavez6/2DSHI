@@ -1,13 +1,11 @@
-from tkinter import Tk
-from tkinter import filedialog as fd
-from tkinter.filedialog import askopenfilename, askdirectory
-from scipy.optimize import curve_fit
-import matplotlib.pyplot as plt
 import os
 import sys
-import pandas as pd
+from tkinter.filedialog import askopenfilename
 
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+from scipy.optimize import curve_fit
 
 # These two lines are error handling
 old_err_state = np.seterr(divide='raise')

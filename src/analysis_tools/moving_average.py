@@ -1,17 +1,12 @@
-from tkinter import Tk
-from tkinter import filedialog as fd
-from tkinter.filedialog import askopenfilename
-import matplotlib.pyplot as plt
-from scipy import ndimage, misc
-import os
-from os import path
-import sys
-import cv2
-import pandas
-from path_management import image_management as im
-import numpy as np
 import csv
+import os
+import sys
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
 
+import numpy as np
+import pandas
+from scipy import ndimage
 
 start_dir = os.getcwd()
 quit_string = "\nTo quit, type 'q' or 'quit', then press Enter: "

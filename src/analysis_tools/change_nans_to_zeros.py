@@ -1,9 +1,10 @@
-import os, sys
-import numpy as np
-from tkinter import Tk
-from tkinter.filedialog import  askopenfilenames
-import pandas as pd
 import csv
+import os
+from tkinter import Tk
+from tkinter.filedialog import askopenfilenames
+
+import numpy as np
+import pandas as pd
 
 start_dir = os.getcwd()
 

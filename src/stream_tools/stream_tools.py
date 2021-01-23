@@ -1,6 +1,5 @@
 import traceback
 from pypylon import pylon  # Import relevant pypylon packages/modules
-from pypylon import genicam
 import cv2
 from image_processing import bit_depth_conversion as bdc
 from coregistration import find_gaussian_profile as fgp

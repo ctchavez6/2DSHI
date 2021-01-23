@@ -1,18 +1,20 @@
 import cv2
 import numpy as np
 import math
-import sys
-from experiment_set_up import  user_input_validation as uiv
+
 
 def initialize_orb_detector(nfeatures=100000, scoreType=cv2.ORB_FAST_SCORE, nlevels=20):
     return cv2.ORB_create(nfeatures=nfeatures, scoreType=scoreType, nlevels=nlevels)
+
 
 def characterize_img(img, orb_detector, mask=None):
     keypoints, descriptors = orb_detector.detectAndCompute(img, mask=mask)
     return keypoints, descriptors
 
+
 def draw_keypoints(img, keypoints, color=(0, 255, 0)):
     return cv2.drawKeypoints(img, keypoints, color=color, flags=0, outImage=np.array([]))
+
 
 def get_euclidean_transform_matrix(gray1, gray2):
     n_iters = 1000
@@ -24,43 +26,6 @@ def get_euclidean_transform_matrix(gray1, gray2):
     init_warp = np.array([[1, 0, 0], [0, 1, 0]], dtype=np.float32)
     cc, warp = cv2.findTransformECC(gray1, gray2, init_warp, warp_mode, criteria, inputMask=None, gaussFiltSize=3)
     return warp
-"""
-
-
-
-def get_euclidean_transform_matrix(gray1, gray2):
-    n_iters = 1000
-    e_thresh = 1e-6
-    criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, n_iters, e_thresh)
-
-    # Define the motion model: can be TRANSLATION OR AFFINE OR HOMOGRAPHY
-    warp_mode = cv2.MOTION_EUCLIDEAN
-
-    init_warp = np.array([[1, 0, 0], [0, 1, 0]], dtype=np.float32)
-    warp_successful = False
-    retry = True
-
-    #cc, warp = cv2.findTransformECC(gray1, gray2, init_warp, warp_mode, criteria, inputMask=None, gaussFiltSize=3)
-    warp_successful = True
-    warp = None
-
-    while retry and not warp_successful:
-        try:
-            cc, warp = cv2.findTransformECC(gray1, gray2, init_warp, warp_mode, criteria, inputMask=None, gaussFiltSize=3)
-            warp_successful = True
-        except cv2.error:
-            warp_successful = False
-            desc = "Warp Matrix was not successful. Try again?"
-            retry = uiv.yes_no_quit(desc)
-
-    if not retry or warp is None:
-        print("Script may not proceed w/o warp matric")
-        sys.exit(0)
-
-    return warp
-
-"""
-
 
 
 def find_matches(img1, img2, matcher=cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True), threshold=90):
@@ -100,6 +65,7 @@ def get_homography_components(homography_matrix):
     theta_ = math.atan2(b,a)
 
     return translation_, math.degrees(theta_), scale_, shear_
+
 
 def derive_homography(img_a_8bit, img_b_8bit, supress_shear=False):
 
@@ -145,13 +111,10 @@ def derive_homography(img_a_8bit, img_b_8bit, supress_shear=False):
 
     # Find the homography matrix.
     homography, mask = cv2.findHomography(p1, p2, cv2.RANSAC)
-    transform_matrix, mask = cv2.findTransformECC()
     homography_components = get_homography_components(homography)
     translation = homography_components[0]
     angle = homography_components[1]
     scale = homography_components[2]
-
-
     shear = homography_components[3]
 
     print("Suggested Angle of Rotation: {}".format(angle))
@@ -159,16 +122,12 @@ def derive_homography(img_a_8bit, img_b_8bit, supress_shear=False):
     print("Suggested scale: {}".format(scale))
     print("Suggested shear: {}".format(shear))
 
-
     return homography
-
 
 
 def derive_euclidean_transform(source_, target_):
     #transformation = cv2.estimateAffinePartial2D(source_, target_)
     return 1, 1
-
-
 
 
 def transform_img(img_b_16bit, homography):
