@@ -9,6 +9,7 @@ from . import App as tk_app
 from . import histograms as hgs
 from . import s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11
 from experiment_set_up import user_input_validation as uiv
+from . import  store_params as sp
 
 y_n_msg = "Proceed? (y/n): "
 sixteen_bit_max = (2 ** 16) - 1
@@ -305,7 +306,6 @@ class Stream:
                 print("Cam B:")
                 b = self.full_img_w_roi_borders(b, self.static_center_b)
 
-
         if histogram:
             self.histocam_a.update(a)
             self.histocam_b.update(b)
@@ -319,6 +319,8 @@ class Stream:
 
     def start(self, histogram=False):
         continue_stream = False
+        run_folder = os.path.join("D:", "\\" + self.current_run)
+
         self.all_cams.StartGrabbing()
 
         step = 1
@@ -332,6 +334,7 @@ class Stream:
             s2.step_two(self, continue_stream)
         else:
             s2.step_two(self, continue_stream, autoload_prev_wm1=True)
+        sp.store_warp_matrices(self, run_folder)
 
         step = 3
         if self.jump_level <= step:
@@ -339,19 +342,22 @@ class Stream:
 
         if self.warp_matrix is None:
             self.jump_level = 10
+        sp.store_brightest_pixels(self, run_folder)
 
         step = 4
         if self.jump_level <= step:
             s4.step_four(self)
         else:
             s4.step_four(self, autoload_prev_static_centers=True)
-        cv2.destroyAllWindows()
+        sp.store_static_centers(self, run_folder)
+
 
         step = 5
         if self.jump_level <= step:
             s5.step_five(self, continue_stream)
         else:
             s5.step_five(self, continue_stream, autoload_roi=True)
+        sp.store_static_sigmas(self, run_folder)
 
         app = tk_app.App()
         step = 6
@@ -362,6 +368,7 @@ class Stream:
             s6.step_six_c(self, continue_stream)
         else:
             s6.load_wm2_if_present(self)
+        sp.store_warp_matrices(self, run_folder)
 
         cv2.destroyAllWindows()
 
@@ -389,7 +396,6 @@ class Stream:
         self.a_images = list()
         self.b_prime_images = list()
 
-        run_folder = os.path.join("D:", "\\" + self.current_run)
 
         step = 8
         if not self.jump_level > 8:
@@ -412,6 +418,6 @@ class Stream:
         step = 10
         s10.step_ten(run_folder)
 
-        step = 11
-        s11.step_eleven(self, run_folder)
+        #step = 11
+        #s11.step_eleven(self, run_folder)
 

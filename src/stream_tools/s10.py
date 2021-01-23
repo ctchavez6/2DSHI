@@ -2,7 +2,7 @@ import os
 from experiment_set_up import user_input_validation as uiv
 
 def step_ten(run_folder):
-    step_description = "Step 5 - Define Regions of Interest"
+    step_description = "Step 10 - Write some notes to a file?"
     notes = uiv.yes_no_quit(step_description)
 
     if notes is True:
