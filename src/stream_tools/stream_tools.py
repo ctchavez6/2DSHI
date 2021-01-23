@@ -31,8 +31,6 @@ class Stream:
         self.frame_count = 0
         self.frame_break = fb
         self.break_key = 'q'
-        self.coregistration_break_key = 'c'  # Irrelevant
-        self.keypoints_break_key = 'k'       # Irrelevant
         self.current_frame_a = None
         self.current_frame_b = None
         self.histocam_a = None
