@@ -7,7 +7,7 @@ import sys
 import os
 from . import App as tk_app
 from . import histograms as hgs
-from . import s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11
+from . import s1, s2, s3, s4, s5, s6, s7, s8, s9, s10
 from experiment_set_up import user_input_validation as uiv
 from . import  store_params as sp
 
