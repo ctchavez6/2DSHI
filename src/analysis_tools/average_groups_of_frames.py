@@ -1,8 +1,5 @@
-#import tkinter as tk
 from tkinter import Tk
-import tkinter
-import sys
-from tkinter.filedialog import askopenfilename, askopenfilenames
+from tkinter.filedialog import askopenfilenames
 import pandas
 import numpy as np
 import os

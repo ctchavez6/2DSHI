@@ -1,20 +1,11 @@
 #computes the calibratiion parametrers from Rmin and Rmax, outputing their values into a new folder
 from tkinter import Tk
-from tkinter import filedialog as fd
 from tkinter.filedialog import askopenfilename, askdirectory
-import matplotlib.pyplot as plt
-from scipy import ndimage, misc
 import os
-from os import path
 import sys
-import cv2
 import pandas
-from path_management import image_management as im
 import numpy as np
 import csv
-from matplotlib import cm
-from collections import OrderedDict
-from PIL import Image
 
 old_err_state = np.seterr(divide='raise')
 ignored_states = np.seterr(**old_err_state)
