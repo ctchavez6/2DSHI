@@ -1,9 +1,10 @@
 import traceback
 from pypylon import pylon  # Import relevant pypylon packages/modules
+from pypylon import genicam
 import cv2
 from image_processing import bit_depth_conversion as bdc
 from coregistration import find_gaussian_profile as fgp
-import os
+import os, sys
 from . import App as tk_app
 from . import histograms as hgs
 from . import s1, s2, s3, s4, s5, s6, s7, s8, s9, s10
@@ -208,8 +209,10 @@ class Stream:
 
     def grab_frames(self, warp_matrix=None, warp_matrix2=None):
         try:
-            grab_result_a = self.cam_a.RetrieveResult(6000000, pylon.TimeoutHandling_ThrowException)
-            grab_result_b = self.cam_b.RetrieveResult(6000000, pylon.TimeoutHandling_ThrowException)
+            #timeout_ms = 6000000
+            timeout_ms = 1000
+            grab_result_a = self.cam_a.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
+            grab_result_b = self.cam_b.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
             if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
                 a, b = grab_result_a.GetArray(), grab_result_b.GetArray()
                 if self.save_imgs:
@@ -339,24 +342,20 @@ class Stream:
         if self.warp_matrix is None:
             self.jump_level = 10
 
-        step = 4
-        if self.jump_level <= step:
+        if self.jump_level <= 4:
             s4.step_four(self)
         else:
             s4.step_four(self, autoload_prev_static_centers=True)
         sp.store_static_centers(self, run_folder)
 
-        step = 5
-        if self.jump_level <= step:
+        if self.jump_level <= 5:
             s5.step_five(self, continue_stream)
         else:
             s5.step_five(self, continue_stream, autoload_roi=True)
         sp.store_static_sigmas(self, run_folder)
 
         app = tk_app.App()
-        step = 6
-
-        if self.jump_level <= step:
+        if self.jump_level <= 6:
             s6.step_six_a(self, continue_stream)
             s6.step_six_b(self, continue_stream, app)
             s6.step_six_c(self, continue_stream)
@@ -372,13 +371,10 @@ class Stream:
 
         if self.static_center_a is None or self.static_center_b is None:
             print("Regions of Interest not defined: Exiting Program")
-            continue_stream = False
+            sys.exit(0)
 
         if self.jump_level <= step:
-            start_algebra = input("Step 7 - Commence Image Algebra (Free Stream): Proceed? (y/n): ")
-            if start_algebra.lower() == "y":
-                continue_stream = True
-            s7.step_seven(self, continue_stream, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
+            s7.step_seven(self, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                    histograms_r, lines_r, figs_r)
 
         self.stats = list()
@@ -388,16 +384,13 @@ class Stream:
         self.a_images = list()
         self.b_prime_images = list()
 
-
-        step = 8
-        if not self.jump_level > 8:
+        if self.jump_level <= 8:
             s8.step_eight(self, run_folder, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                histograms_r, lines_r, figs_r)
 
         cv2.destroyAllWindows()
 
-        step = 9
-        if self.jump_level <= step:
+        if self.jump_level <= 9:
             s9.step_nine(self, self.start_writing_at, self.end_writing_at, run_folder, self.a_images, self.a_frames,
                          self.b_prime_images, self.b_prime_frames, self.stats)
 

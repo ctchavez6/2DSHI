@@ -18,13 +18,11 @@ def get_euclidean_transform_matrix(gray1, gray2):
     n_iters = 1000
     e_thresh = 1e-6
     criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, n_iters, e_thresh)
-
     # Define the motion model: can be TRANSLATION OR AFFINE OR HOMOGRAPHY
     warp_mode = cv2.MOTION_EUCLIDEAN
 
     init_warp = np.array([[1, 0, 0], [0, 1, 0]], dtype=np.float32)
     cc, warp = cv2.findTransformECC(gray1, gray2, init_warp, warp_mode, criteria, inputMask=None, gaussFiltSize=3)
-
     return warp
 """
 

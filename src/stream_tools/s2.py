@@ -1,6 +1,6 @@
 import cv2
 from experiment_set_up import find_previous_run as fpr
-import os
+import os, sys
 import numpy as np
 from image_processing import bit_depth_conversion as bdc
 from coregistration import img_characterization as ic
@@ -47,10 +47,31 @@ def step_two(stream, continue_stream, autoload_prev_wm1=False):
         coregister_  = uiv.yes_no_quit(step_description)
 
     if coregister_ is True:
-        continue_stream = True
-        a_8bit = bdc.to_8_bit(stream.current_frame_a)
-        b_8bit = bdc.to_8_bit(stream.current_frame_b)
-        warp_ = ic.get_euclidean_transform_matrix(a_8bit, b_8bit)
+        warp_ = None
+        retry = True
+        warp_successful = False
+
+        while retry or (not warp_successful):
+            try:
+                for i in range(3):
+                    stream.frame_count += 1
+                    stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
+
+                a_8bit = bdc.to_8_bit(stream.current_frame_a)
+                b_8bit = bdc.to_8_bit(stream.current_frame_b)
+                warp_ = ic.get_euclidean_transform_matrix(a_8bit, b_8bit)
+                retry = False
+                warp_successful = True
+            except (GeneratorExit, KeyboardInterrupt, SystemExit, Exception):
+                #pass
+            #except cv2.Error or Exception:
+                warp_successful = False
+                desc = "Warp Matrix was not successful. Try again?"
+                retry = uiv.yes_no_quit(desc)
+                if retry is False:
+                    print("Script may not continue without Warp Matrix 1")
+                    sys.exit(0)
+
 
         stream.warp_matrix = warp_
 
@@ -106,6 +127,7 @@ def step_two(stream, continue_stream, autoload_prev_wm1=False):
         cv2.waitKey(60000)
         cv2.destroyAllWindows()
 
+    continue_stream = True
     while continue_stream:
         stream.frame_count += 1
         stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)

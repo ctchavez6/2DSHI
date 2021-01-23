@@ -16,7 +16,6 @@ eight_bit_max = (2 ** 8) - 1
 
 def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                histograms_r, lines_r, figs_r):
-    #record_r_matrices = input("Step 8 - Image Algebra (Record): Proceed? (y/n): ")
     desc = "Step 8 - Image Algebra (Record): Proceed"
     record_r_matrices = uiv.yes_no_quit(desc)
     satisfied_with_run = False

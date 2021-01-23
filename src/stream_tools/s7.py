@@ -3,6 +3,7 @@ import cv2
 from image_processing import bit_depth_conversion as bdc
 from . import histograms as hgs
 from PIL import Image, ImageDraw, ImageFont
+from experiment_set_up import user_input_validation as uiv
 
 
 y_n_msg = "Proceed? (y/n): "
@@ -10,8 +11,12 @@ sixteen_bit_max = (2 ** 16) - 1
 twelve_bit_max = (2 ** 12) - 1
 eight_bit_max = (2 ** 8) - 1
 
-def step_seven(stream, continue_stream, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
+def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                histograms_r, lines_r, figs_r):
+
+    desc = "Step 7 - Commence Image Algebra (Free Stream):"
+    continue_stream = uiv.yes_no_quit(desc)
+
     while continue_stream:
         stream.frame_count += 1
         stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
