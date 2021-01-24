@@ -28,7 +28,6 @@ class Stream:
         self.all_cams = None
         self.latest_grab_results = {"a": None, "b": None}
         self.frame_count = 0
-        self.frame_break = fb
         self.break_key = 'q'
         self.current_frame_a = None
         self.current_frame_b = None
@@ -187,13 +186,13 @@ class Stream:
 
         self.all_cams = instant_camera_array
 
-    def keep_streaming(self):
-        if not self.all_cams.IsGrabbing():
-            return False
-        if self.frame_count == self.frame_break:
-            return False
+    def keep_streaming(self, one_by_one=False):
         if cv2.waitKey(1) & 0xFF == ord(self.break_key):
             return False
+        if (not one_by_one) and not self.all_cams.IsGrabbing():
+            return False
+        if one_by_one and not self.all_cams.IsGrabbing():
+            return True
         return True
 
     def find_centers(self, frame_a_16bit, frame_b_16bit):
@@ -212,8 +211,15 @@ class Stream:
                 grab_result_a = self.cam_a.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
                 grab_result_b = self.cam_b.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
             else:
+                if self.all_cams.IsGrabbing():
+                    self.all_cams.StopGrabbing()
+
+                #ga, gb = self.all_cams.GrabOne
                 grab_result_a = self.cam_a.GrabOne(timeout_ms, pylon.TimeoutHandling_ThrowException)
                 grab_result_b = self.cam_b.GrabOne(timeout_ms, pylon.TimeoutHandling_ThrowException)
+
+                if self.all_cams.IsGrabbing():
+                    self.all_cams.StopGrabbing()
 
             if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
                 a, b = grab_result_a.GetArray(), grab_result_b.GetArray()
@@ -241,10 +247,9 @@ class Stream:
         return roi_a, roi_b_double_prime
 
 
-
     def show_16bit_representations(self, a_as_12bit, b_as_12bit, b_prime=False, show_centers=False):
-        a_as_16bit = bdc.to_16_bit(a_as_12bit)
-        b_as_16bit = bdc.to_16_bit(b_as_12bit)
+        a_as_16bit, b_as_16bit = bdc.to_16_bit(a_as_12bit), bdc.to_16_bit(b_as_12bit)
+
         if not show_centers:
             if not b_prime:
                 cv2.imshow("Cam A", a_as_16bit)
@@ -289,6 +294,10 @@ class Stream:
             print("Warning: RuntimeError occurred while trying to calculate gaussian! ")
 
         return img_12bit
+
+    def show_frame_by_frame(self):
+        pass
+
 
     def pre_alignment(self, histogram=False, centers=False, roi_borders=False, crop=False):
         a, b = self.current_frame_a, self.current_frame_b
