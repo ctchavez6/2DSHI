@@ -12,7 +12,8 @@ from . import store_params as sp
 
 twelve_bit_max = (2 ** 12) - 1
 eight_bit_max = (2 ** 8) - 1
-
+latest_only = pylon.GrabStrategy_LatestImageOnly
+grab_loop_cam_default = pylon.GrabLoop_ProvidedByInstantCamera
 
 class Stream:
     def __init__(self, fb=-1, save_imgs=False):
@@ -203,26 +204,16 @@ class Stream:
         return (x_a, y_a), (x_b, y_b)
 
 
-    def grab_frames(self, warp_matrix=None, grab_single=False):
+    def grab_frames(self, warp_matrix=None, latest_only=False):
         try:
-            timeout_ms = 6000000
-
-            if not grab_single:
-                grab_result_a = self.cam_a.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
-                grab_result_b = self.cam_b.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
-            else:
-                if self.all_cams.IsGrabbing():
-                    self.all_cams.StopGrabbing()
-
-                #ga, gb = self.all_cams.GrabOne
-                grab_result_a = self.cam_a.GrabOne(timeout_ms, pylon.TimeoutHandling_ThrowException)
-                grab_result_b = self.cam_b.GrabOne(timeout_ms, pylon.TimeoutHandling_ThrowException)
-
-                if self.all_cams.IsGrabbing():
-                    self.all_cams.StopGrabbing()
+            timeout_ms = 5000
+            grab_result_a = self.cam_a.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
+            grab_result_b = self.cam_b.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
 
             if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
                 a, b = grab_result_a.GetArray(), grab_result_b.GetArray()
+                grab_result_a.Release()
+                grab_result_b.Release()
                 if self.save_imgs:
                     self.a_frames.append(a)
                     self.b_frames.append(b)
@@ -327,11 +318,34 @@ class Stream:
             else:
                 self.show_16bit_representations(a, b, False, centers)
 
-    def start(self, histogram=False):
+    def start(self, config_files, histogram=False):
+        tlFactory = pylon.TlFactory.GetInstance()
+        devices = tlFactory.EnumerateDevices()
+        if len(devices) == 0:
+            raise Exception("No camera present.")
+
+        cameras = pylon.InstantCameraArray(2)
+
+        for i, camera in enumerate(cameras):
+            camera.Attach(tlFactory.CreateDevice(devices[i]))
+            camera.Open()
+            pylon.FeaturePersistence.Load(config_files[chr(97 + i)], camera.GetNodeMap())
+
+            #pylon.FeaturePersistence.Load(config_file, camera.GetNodeMap())
+            if i == 0:
+                self.cam_a = camera
+            if i == 1:
+                self.cam_b = camera
+        # Starts grabbing for all cameras
+        self.all_cams = cameras
+        self.all_cams.StartGrabbing(pylon.GrabStrategy_LatestImageOnly,
+                              pylon.GrabLoop_ProvidedByUser)
+
         continue_stream = False
         run_folder = os.path.join("D:", "\\" + self.current_run)
 
-        self.all_cams.StartGrabbing()
+        #self.all_cams.StartGrabbing(latest_only, grab_loop_cam_default)
+        #self.all_cams.StartGrabbing(pylon.GrabStrategy_OneByOne, pylon.GrabLoop_ProvidedByInstantCamera)
 
         if self.jump_level <= 1:
             s1.step_one(self, histogram, continue_stream)
@@ -368,8 +382,8 @@ class Stream:
         app = tk_app.App()
         if self.jump_level <= 6:
             s6.step_six_a(self, continue_stream)
-            s6.step_six_b(self, continue_stream, app)
-            s6.step_six_c(self, continue_stream)
+            #s6.step_six_b(self, continue_stream, app)
+            #s6.step_six_c(self, continue_stream)
         else:
             s6.load_wm2_if_present(self)
         sp.store_warp_matrices(self, run_folder)
@@ -411,7 +425,6 @@ class Stream:
 
         self.all_cams.StopGrabbing()
 
-        step = 10
         s10.step_ten(run_folder)
 
         #step = 11

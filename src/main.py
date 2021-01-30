@@ -12,6 +12,7 @@ from experiment_set_up import config_file_setup as cam_setup
 from experiment_set_up import user_input_validation as uiv
 
 from stream_tools import stream_tools
+#from stream_tools import  steam_toosls2 as stream_tools
 from image_processing import bit_depth_conversion as bdc
 from path_management import image_management as im
 from datetime import datetime
@@ -62,13 +63,13 @@ if __name__ == "__main__":
     config_files_by_cam = cam_setup.assign_config_files(parameter_dictionary, args, camera_configurations_folder)
 
     stream = stream_tools.Stream(fb=args["FrameBreak"], save_imgs=args["SaveImages"])  # Create a Stream() Instance
-    stream.get_cameras(config_files_by_cam)  # Get Basler Cameras, and load corresponding camera configuration files
     stream.set_current_run(current_datetime)
+    #stream.get_cameras(config_files_by_cam)  # Get Basler Cameras, and load corresponding camera configuration files
 
     highest_jump_level = find_previous_run.get_highest_jump_level(stream)
     stream.offer_to_jump(highest_jump_level)
 
-    stream.start(histogram=args["DisplayHistocam"])  # Start steam (Display Histogram if user specified so in input)
+    stream.start(config_files_by_cam, histogram=args["DisplayHistocam"])  # Start steam (Display Histogram if user specified so in input)
 
     print("Stream has ended.")
 
