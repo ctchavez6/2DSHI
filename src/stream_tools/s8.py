@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 from . import histograms as hgs
 import cv2
 from experiment_set_up import user_input_validation as uiv
+from . import App as tk_app
 
 
 y_n_msg = "Proceed? (y/n): "
@@ -240,3 +241,5 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
         if record_r_matrices is False:
             satisfied_with_run = True
             continue_stream = False
+    cv2.destroyAllWindows()
+    tk_app.attempt_to_quit(app)

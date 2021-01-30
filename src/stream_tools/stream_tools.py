@@ -12,8 +12,6 @@ from . import store_params as sp
 
 twelve_bit_max = (2 ** 12) - 1
 eight_bit_max = (2 ** 8) - 1
-latest_only = pylon.GrabStrategy_LatestImageOnly
-grab_loop_cam_default = pylon.GrabLoop_ProvidedByInstantCamera
 
 class Stream:
     def __init__(self, fb=-1, save_imgs=False):
@@ -204,7 +202,7 @@ class Stream:
         return (x_a, y_a), (x_b, y_b)
 
 
-    def grab_frames(self, warp_matrix=None, latest_only=False):
+    def grab_frames(self, warp_matrix=None):
         try:
             timeout_ms = 5000
             grab_result_a = self.cam_a.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
@@ -324,28 +322,18 @@ class Stream:
         if len(devices) == 0:
             raise Exception("No camera present.")
 
-        cameras = pylon.InstantCameraArray(2)
-
-        for i, camera in enumerate(cameras):
+        self.all_cams = pylon.InstantCameraArray(2)
+        self.cam_a, self.cam_b = self.all_cams[0], self.all_cams[1]
+        for i, camera in enumerate(self.all_cams):
             camera.Attach(tlFactory.CreateDevice(devices[i]))
             camera.Open()
             pylon.FeaturePersistence.Load(config_files[chr(97 + i)], camera.GetNodeMap())
 
-            #pylon.FeaturePersistence.Load(config_file, camera.GetNodeMap())
-            if i == 0:
-                self.cam_a = camera
-            if i == 1:
-                self.cam_b = camera
         # Starts grabbing for all cameras
-        self.all_cams = cameras
-        self.all_cams.StartGrabbing(pylon.GrabStrategy_LatestImageOnly,
-                              pylon.GrabLoop_ProvidedByUser)
+        self.all_cams.StartGrabbing(pylon.GrabStrategy_LatestImageOnly, pylon.GrabLoop_ProvidedByUser)
 
         continue_stream = False
         run_folder = os.path.join("D:", "\\" + self.current_run)
-
-        #self.all_cams.StartGrabbing(latest_only, grab_loop_cam_default)
-        #self.all_cams.StartGrabbing(pylon.GrabStrategy_OneByOne, pylon.GrabLoop_ProvidedByInstantCamera)
 
         if self.jump_level <= 1:
             s1.step_one(self, histogram, continue_stream)
@@ -379,15 +367,14 @@ class Stream:
             s5.step_five(self, continue_stream, autoload_roi=True)
         sp.store_static_sigmas(self, run_folder)
 
-        app = tk_app.App()
         if self.jump_level <= 6:
             s6.step_six_a(self, continue_stream)
             #s6.step_six_b(self, continue_stream, app)
             #s6.step_six_c(self, continue_stream)
-        else:
-            s6.load_wm2_if_present(self)
+        #else:
+            #s6.load_wm2_if_present(self)
         sp.store_warp_matrices(self, run_folder)
-
+        app = tk_app.App()
         figs, histograms, lines = hgs.initialize_histograms_rois()
         figs_alg, histograms_alg, lines_alg = hgs.initialize_histograms_algebra()
         figs_r, histograms_r, lines_r = hgs.initialize_histograms_r()
@@ -413,20 +400,9 @@ class Stream:
             s8.step_eight(self, run_folder, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                histograms_r, lines_r, figs_r)
 
-        cv2.destroyAllWindows()
-
         if self.jump_level <= 9:
             s9.step_nine(self, self.start_writing_at, self.end_writing_at, run_folder, self.a_images, self.a_frames,
                          self.b_prime_images, self.b_prime_frames, self.stats)
 
-
-        tk_app.bring_to_front(app)
-        tk_app.kill_app(app)
-
         self.all_cams.StopGrabbing()
-
         s10.step_ten(run_folder)
-
-        #step = 11
-        #s11.step_eleven(self, run_folder)
-

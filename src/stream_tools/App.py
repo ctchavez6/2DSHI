@@ -60,3 +60,7 @@ def bring_to_front(app):
                 app.bring_to_front()
     except Exception:
         pass
+
+def attempt_to_quit(app):
+    bring_to_front(app)
+    kill_app(app)
