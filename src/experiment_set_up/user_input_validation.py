@@ -2,12 +2,13 @@ import sys
 
 
 def valid_input(input, options, feedback=True):
-    if len(input) < 1:
+    stripped_input = input.strip()
+    if len(stripped_input) < 1:
         print("Please enter one of the following options: ", options)
         return False
-    if input[0] == "q":
+    if stripped_input[0] == "q":
         sys.exit()
-    if input[0] not in options:
+    if stripped_input[0] not in options:
         print("Please enter one of the following options: ", options)
         return False
     return True

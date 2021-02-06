@@ -1,7 +1,6 @@
 import tkinter as tk
 import threading
 import traceback
-
 class App(threading.Thread):
 
     def __init__(self):
@@ -9,6 +8,8 @@ class App(threading.Thread):
         self.start()
         self.foo = 1
         self.at_front = False
+        self.is_toggle_pressed_down = False
+        self.stop_streaming_override = False
 
     def callback(self):
         self.root.quit()
@@ -19,6 +20,16 @@ class App(threading.Thread):
     def scale_onChange(self, value):
         self.foo = float(value)
 
+    def toggle(self):
+        if self.stop_streaming_override is True:
+                #self.toggle_btn.config('relief')[-1] == 'sunken':
+            self.stop_streaming_override = False
+            #self.toggle_btn.config(relief="raised")
+            #print("self.is_toggle_pressed_down: ", self.is_toggle_pressed_down)
+        else:
+            #self.toggle_btn.config(relief="sunken")
+            self.stop_streaming_override = True
+            #print("self.is_toggle_pressed_down: ", self.is_toggle_pressed_down)
 
     def run(self):
         self.root = tk.Tk()
@@ -28,6 +39,7 @@ class App(threading.Thread):
         label.pack()
 
         tk.Scale(from_=1.00, to=2.50, tickinterval=0.0001, resolution = 0.25, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange).pack()
+        tk.Button(text="Toggle", width=12, relief="raised", command=self.toggle).pack()
         self.root.mainloop()
 
     def bring_to_front(self):

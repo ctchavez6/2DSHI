@@ -56,12 +56,17 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                              y_b - n_sigma * stream.static_sigmas_y: y_b + n_sigma * stream.static_sigmas_y + n_sigma,
                              x_b - n_sigma * stream.static_sigmas_x: x_b + n_sigma * stream.static_sigmas_x + n_sigma]
 
+
+                #roi_a, b_double_prime = stream.grab_frames(warp_matrix=stream.warp_matrix)
+
+
                 if stream.warp_matrix_2 is not None:
                     roi_a, b_double_prime = stream.grab_frames2(stream.roi_a.copy(), stream.roi_b.copy(),
                                                               stream.warp_matrix_2.copy())
                 else:
                     roi_a, b_double_prime = stream.grab_frames2(stream.roi_a.copy(), stream.roi_b.copy(),
                                                               stream.warp_matrix.copy())
+
 
                 CENTER_B_DP = int(b_double_prime.shape[1] * 0.5), int(b_double_prime.shape[0] * 0.5)
 
