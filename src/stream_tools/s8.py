@@ -7,6 +7,7 @@ from . import histograms as hgs
 import cv2
 from experiment_set_up import user_input_validation as uiv
 from . import App as tk_app
+from . import s7
 
 
 y_n_msg = "Proceed? (y/n): "
@@ -15,8 +16,21 @@ twelve_bit_max = (2 ** 12) - 1
 eight_bit_max = (2 ** 8) - 1
 
 
+
+
 def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                histograms_r, lines_r, figs_r):
+
+    X_TO_Y_RATIO = stream.static_sigmas_x/stream.static_sigmas_y
+
+    R_VIS_HEIGHT = 500
+    R_VIS_WIDTH = int(R_VIS_HEIGHT*X_TO_Y_RATIO*3)
+
+    DASHBOARD_HEIGHT = 600
+    DASHBOARD_WIDTH = int(DASHBOARD_HEIGHT*X_TO_Y_RATIO*2)
+
+
+
     desc = "Step 8 - Image Algebra (Record): Proceed"
     record_r_matrices = uiv.yes_no_quit(desc)
     satisfied_with_run = False
@@ -40,6 +54,8 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
             while continue_stream:
                 stream.frame_count += 1
                 stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
+                current_r_frame += 1
+                print("Current R Frame: {}".format(current_r_frame))
 
                 x_a, y_a = stream.static_center_a
                 x_b, y_b = stream.static_center_b
@@ -151,10 +167,11 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 DASHBOARD = np.concatenate((A_ON_B, ALGEBRA), axis=1)
                 dash_height, dash_width, dash_channels = DASHBOARD.shape
 
-                if dash_width > 2000:
-                    scale_factor = float(float(2000) / float(dash_width))
-                    DASHBOARD = cv2.resize(DASHBOARD, (int(dash_width * scale_factor), int(dash_height * scale_factor)))
-
+                # if dash_width > 2000:
+                # scale_factor = float(float(2000) / float(dash_width))
+                # DASHBOARD = cv2.resize(DASHBOARD, (int(dash_width * scale_factor), int(dash_height * scale_factor)))
+                scale_factor = float(float(2000) / float(dash_width))
+                DASHBOARD = cv2.resize(DASHBOARD, (DASHBOARD_WIDTH, DASHBOARD_HEIGHT))
                 cv2.imshow("Dashboard", DASHBOARD)
 
                 R_MATRIX = np.divide(minus_, plus_)
@@ -200,8 +217,11 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 R_VALUES = np.array(R_VALUES)
                 VALUES_W_HIST = np.concatenate((R_VALUES * (2 ** 8), np.array(stream.R_HIST)), axis=1)
 
-                cv2.imshow("R_MATRIX", np.concatenate(
-                    (VALUES_W_HIST, np.array(DISPLAYABLE_R_MATRIX * (2 ** 8), dtype='uint16')), axis=1))
+                R_VIS = np.concatenate(
+                    (VALUES_W_HIST, np.array(DISPLAYABLE_R_MATRIX * (2 ** 8), dtype='uint16')), axis=1)
+
+                R_VIS_RESCALED = cv2.resize(R_VIS, (R_VIS_WIDTH, R_VIS_HEIGHT))
+                cv2.imshow("R_MATRIX", R_VIS_RESCALED)
 
                 continue_stream = stream.keep_streaming()
                 if continue_stream is False:

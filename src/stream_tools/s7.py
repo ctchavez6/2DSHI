@@ -40,8 +40,21 @@ sixteen_bit_max = (2 ** 16) - 1
 twelve_bit_max = (2 ** 12) - 1
 eight_bit_max = (2 ** 8) - 1
 
+
+
+
 def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                histograms_r, lines_r, figs_r):
+
+    X_TO_Y_RATIO = stream.static_sigmas_x/stream.static_sigmas_y
+
+    R_VIS_HEIGHT = 500
+    R_VIS_WIDTH = int(R_VIS_HEIGHT*X_TO_Y_RATIO*3)
+
+    DASHBOARD_HEIGHT = 600
+    DASHBOARD_WIDTH = int(DASHBOARD_HEIGHT*X_TO_Y_RATIO*2)
+
+
     last_frame = False
 
     desc = "Step 7 - Commence Image Algebra (Free Stream):"
@@ -177,9 +190,11 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         ALGEBRA = np.concatenate((PLUS_WITH_HISTOGRAM, MINUS_WITH_HISTOGRAM), axis=0)
         DASHBOARD = np.concatenate((A_ON_B, ALGEBRA), axis=1)
         dash_height, dash_width, dash_channels = DASHBOARD.shape
-        if dash_width > 2000:
-            scale_factor = float(float(2000) / float(dash_width))
-            DASHBOARD = cv2.resize(DASHBOARD, (int(dash_width * scale_factor), int(dash_height * scale_factor)))
+        #if dash_width > 2000:
+            #scale_factor = float(float(2000) / float(dash_width))
+            #DASHBOARD = cv2.resize(DASHBOARD, (int(dash_width * scale_factor), int(dash_height * scale_factor)))
+        scale_factor = float(float(2000) / float(dash_width))
+        DASHBOARD = cv2.resize(DASHBOARD, (DASHBOARD_WIDTH, DASHBOARD_HEIGHT))
         cv2.imshow("Dashboard", DASHBOARD)
 
         R_MATRIX = np.divide(minus_, plus_)
@@ -218,8 +233,10 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         R_VALUES = np.array(R_VALUES)
         VALUES_W_HIST = np.concatenate((R_VALUES * (2 ** 8), np.array(R_HIST)), axis=1)
 
-        cv2.imshow("R_MATRIX",
-                   np.concatenate((VALUES_W_HIST, np.array(DISPLAYABLE_R_MATRIX * (2 ** 8), dtype='uint16')), axis=1))
+        cv2.imshow("R_MATRIX", cv2.resize(
+                   np.concatenate((VALUES_W_HIST, np.array(DISPLAYABLE_R_MATRIX * (2 ** 8), dtype='uint16')), axis=1)
+                   , (R_VIS_WIDTH, R_VIS_HEIGHT))
+                   )
 
         if last_frame:
             continue_stream = True
