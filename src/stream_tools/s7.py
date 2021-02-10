@@ -62,8 +62,11 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
     print("You have entered step 7")
     s7_frame_count = 1
     frames_we_went_through = 0
+    r_subsection_pixel_vals = None
 
     while continue_stream != last_frame:
+        r_subsection_pixel_vals = np.array(list())
+
         if last_frame:
             app.stop_streaming_override = False
 
@@ -116,7 +119,7 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
                          int(y_b - n_sigma * stream.static_sigmas_y): int(y_b + n_sigma * stream.static_sigmas_y + 1),
                          int(x_b - n_sigma * stream.static_sigmas_x): int(x_b + n_sigma * stream.static_sigmas_x + 1)]
 
-        if s7_frame_count == 0:
+        if s7_frame_count == 1:
             print("stream.static_sigmas_y", stream.static_sigmas_y)
             print("stream.static_sigmas_x", stream.static_sigmas_x)
             print("stream.roi_a.shape", stream.roi_a.shape)
@@ -189,17 +192,18 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
 
         ALGEBRA = np.concatenate((PLUS_WITH_HISTOGRAM, MINUS_WITH_HISTOGRAM), axis=0)
         DASHBOARD = np.concatenate((A_ON_B, ALGEBRA), axis=1)
-        dash_height, dash_width, dash_channels = DASHBOARD.shape
-        #if dash_width > 2000:
-            #scale_factor = float(float(2000) / float(dash_width))
-            #DASHBOARD = cv2.resize(DASHBOARD, (int(dash_width * scale_factor), int(dash_height * scale_factor)))
-        scale_factor = float(float(2000) / float(dash_width))
         DASHBOARD = cv2.resize(DASHBOARD, (DASHBOARD_WIDTH, DASHBOARD_HEIGHT))
         cv2.imshow("Dashboard", DASHBOARD)
 
         R_MATRIX = np.divide(minus_, plus_)
-        nan_mean = np.nanmean(R_MATRIX.flatten())
-        nan_st_dev = np.nanstd(R_MATRIX.flatten())
+        h_R_MATRIX = R_MATRIX.shape[0]
+        w_R_MATRIX = R_MATRIX.shape[1]
+        R_MATRIX_CENTER = int(w_R_MATRIX/2), int(h_R_MATRIX/2)
+
+
+
+        #nan_mean = np.nanmean(R_MATRIX.flatten())
+        #nan_st_dev = np.nanstd(R_MATRIX.flatten())
 
         DISPLAYABLE_R_MATRIX = np.zeros((R_MATRIX.shape[0], R_MATRIX.shape[1], 3), dtype=np.uint8)
         DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX < 0.00, abs(R_MATRIX * (2 ** 8 - 1)), 0)
@@ -207,6 +211,66 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
 
         DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX > 0.00, abs(R_MATRIX * (2 ** 8 - 1)),
                                                  DISPLAYABLE_R_MATRIX[:, :, 2])
+
+        sigma_x_div_5 = int(stream.static_sigmas_x / 5)
+        sigma_y_div_5 = int(stream.static_sigmas_y / 5)
+        angle = 0
+        startAngle = 0
+        endAngle = 360
+        axesLength = (sigma_x_div_5, sigma_y_div_5)
+        # Red color in BGR
+        color = (255, 255, 255)
+        # Line thickness of 5 px
+        thickness = -1
+        image = cv2.ellipse(DISPLAYABLE_R_MATRIX.copy(), R_MATRIX_CENTER, axesLength,
+                            angle, startAngle, endAngle, color, thickness)
+
+        blk_image = np.zeros([h_R_MATRIX, w_R_MATRIX, 3])
+        backup = blk_image.copy()
+        blk_image2 = cv2.ellipse(blk_image.copy(), R_MATRIX_CENTER, axesLength,
+                            angle, startAngle, endAngle, color, thickness)
+        # Displaying the image
+        #cv2.imshow("R_VALS_TEST", image)
+        #cv2.imshow("TEST2",blk_image2 )
+        # Here is where you can obtain the coordinate you are looking for
+
+
+
+
+        if s7_frame_count == 1:
+            print("R_MATRIX_SHAPE: ", R_MATRIX.shape)
+            print("blk_image2_SHAPE: ", blk_image2.shape)
+            print("R_MATRIX_CENTER: ", R_MATRIX_CENTER)
+
+            print("stream.static_sigmas_x / 5: ", sigma_x_div_5)
+            print("stream.static_sigmas_y / 5: ", sigma_y_div_5)
+
+
+        combined = blk_image2[:, :, 0] + blk_image2[:, :, 1] + blk_image2[:, :, 2]
+        rows, cols = np.where(combined > 0)
+
+        if s7_frame_count == 1:
+            print("i, j, val")
+
+        for i, j in zip(rows, cols):
+            r_subsection_pixel_vals = np.append(r_subsection_pixel_vals, R_MATRIX[i, j])
+
+            #backup[i, j, 0] = 0
+            #backup[i, j, 1] = 255
+            #backup[i, j, 0] = 0
+
+
+            #if s7_frame_count == 1:
+                #print(i, j, R_MATRIX[i, j])
+
+        nan_mean = np.nanmean(r_subsection_pixel_vals)
+        nan_st_dev = np.nanstd(r_subsection_pixel_vals.flatten())
+        #cv2.imshow("TEST3", backup)
+
+            #print(np.where(combined > 0))
+
+            #cv2.imshow("R_Values_To_Calc", )
+
 
         dr_height, dr_width, dr_channels = DISPLAYABLE_R_MATRIX.shape
 
