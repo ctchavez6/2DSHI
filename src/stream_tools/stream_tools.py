@@ -15,7 +15,7 @@ eight_bit_max = (2 ** 8) - 1
 
 class Stream:
     def __init__(self, fb=-1, save_imgs=False):
-        self.continuous = False
+        self.continuous = True
         self.single_shot = False if self.continuous else True
         self.tkapp = None
 

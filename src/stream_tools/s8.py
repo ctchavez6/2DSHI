@@ -40,35 +40,37 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
             while continue_stream:
                 stream.frame_count += 1
                 stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
-                current_r_frame += 1
-                print("Current R Frame: {}".format(current_r_frame))
 
                 x_a, y_a = stream.static_center_a
                 x_b, y_b = stream.static_center_b
 
+                # We initially set the LIMITS of the stream to 3 sigma
+                # This is done so that if Stream Breaks when trying to show 3 sigma, we know something might be wrong?
                 n_sigma = 3
 
+                # Using array indexing to only keep relevant pixels
                 stream.roi_a = stream.current_frame_a[
-                             y_a - n_sigma * stream.static_sigmas_y: y_a + n_sigma * stream.static_sigmas_y + n_sigma,
-                             x_a - n_sigma * stream.static_sigmas_x: x_a + n_sigma * stream.static_sigmas_x + n_sigma]
+                            y_a - n_sigma * stream.static_sigmas_y: y_a + n_sigma * stream.static_sigmas_y + n_sigma,
+                            x_a - n_sigma * stream.static_sigmas_x: x_a + n_sigma * stream.static_sigmas_x + n_sigma]
 
                 stream.roi_b = stream.current_frame_b[
-                             y_b - n_sigma * stream.static_sigmas_y: y_b + n_sigma * stream.static_sigmas_y + n_sigma,
-                             x_b - n_sigma * stream.static_sigmas_x: x_b + n_sigma * stream.static_sigmas_x + n_sigma]
+                            y_b - n_sigma * stream.static_sigmas_y: y_b + n_sigma * stream.static_sigmas_y + n_sigma,
+                            x_b - n_sigma * stream.static_sigmas_x: x_b + n_sigma * stream.static_sigmas_x + n_sigma]
 
-
-                #roi_a, b_double_prime = stream.grab_frames(warp_matrix=stream.warp_matrix)
-
-
-                if stream.warp_matrix_2 is not None:
-                    roi_a, b_double_prime = stream.grab_frames2(stream.roi_a.copy(), stream.roi_b.copy(),
-                                                              stream.warp_matrix_2.copy())
+                """
+                if stream.warp_matrix_2 is None:
+                    roi_a = stream.roi_a
+                    b_double_prime = stream.roi_b
                 else:
-                    roi_a, b_double_prime = stream.grab_frames2(stream.roi_a.copy(), stream.roi_b.copy(),
-                                                              stream.warp_matrix.copy())
-
-
+                    roi_a, b_double_prime = stream.grab_frames2(stream.roi_a.copy(), stream.roi_b.copy(), stream.warp_matrix_2.copy())
+                
                 CENTER_B_DP = int(b_double_prime.shape[1] * 0.5), int(b_double_prime.shape[0] * 0.5)
+
+                """
+                roi_a = stream.roi_a
+                b_double_prime = stream.roi_b
+                CENTER_B_DP = int(b_double_prime.shape[1] * 0.5), int(b_double_prime.shape[0] * 0.5)
+
 
                 x_a, y_a = CENTER_B_DP
                 x_b, y_b = CENTER_B_DP

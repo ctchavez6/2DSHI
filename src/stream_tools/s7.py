@@ -67,7 +67,7 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         #print("\tapp.stop_streaming_override: ", app.stop_streaming_override)
 
         stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
-
+        
         x_a, y_a = stream.static_center_a
         x_b, y_b = stream.static_center_b
 
@@ -84,16 +84,7 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
                      y_b - n_sigma * stream.static_sigmas_y: y_b + n_sigma * stream.static_sigmas_y + n_sigma,
                      x_b - n_sigma * stream.static_sigmas_x: x_b + n_sigma * stream.static_sigmas_x + n_sigma]
 
-        """
-        if stream.warp_matrix_2 is None:
-            roi_a = stream.roi_a
-            b_double_prime = stream.roi_b
-        else:
-            roi_a, b_double_prime = stream.grab_frames2(stream.roi_a.copy(), stream.roi_b.copy(), stream.warp_matrix_2.copy())
-        
-        CENTER_B_DP = int(b_double_prime.shape[1] * 0.5), int(b_double_prime.shape[0] * 0.5)
 
-        """
         roi_a = stream.roi_a
         b_double_prime = stream.roi_b
         CENTER_B_DP = int(b_double_prime.shape[1] * 0.5), int(b_double_prime.shape[0] * 0.5)
@@ -247,8 +238,6 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         s7_frame_count += 1
         stream.R_HIST = R_HIST
         frames_we_went_through += 1
-
-
 
     cv2.destroyAllWindows()
     print("We completed this many frames: ", frames_we_went_through)
