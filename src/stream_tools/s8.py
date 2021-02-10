@@ -29,6 +29,7 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
     DASHBOARD_HEIGHT = 600
     DASHBOARD_WIDTH = int(DASHBOARD_HEIGHT*X_TO_Y_RATIO*2)
 
+    last_frame = False
 
 
     desc = "Step 8 - Image Algebra (Record): Proceed"
@@ -76,34 +77,35 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
 
 
                 roi_a = stream.roi_a
-                b_double_prime = stream.roi_b
-                CENTER_B_DP = int(b_double_prime.shape[1] * 0.5), int(b_double_prime.shape[0] * 0.5)
+                CENTER_B_DP = int(stream.roi_b.shape[1] * 0.5), int(stream.roi_b.shape[0] * 0.5)
 
 
                 x_a, y_a = CENTER_B_DP
                 x_b, y_b = CENTER_B_DP
                 n_sigma = app.foo
-
-                stream.a_frames.append(roi_a)
-                stream.b_prime_frames.append(b_double_prime)
-                stream.a_images.append(roi_a)
-                stream.b_prime_images.append(b_double_prime)
+                h_offset = app.horizontal_offset
+                v_offset = app.vertical_offset
 
                 stream.roi_a = stream.roi_a[
-                             int(y_a - n_sigma * stream.static_sigmas_y): int(
-                                 y_a + n_sigma * stream.static_sigmas_y + 1),
-                             int(x_a - n_sigma * stream.static_sigmas_x): int(
-                                 x_a + n_sigma * stream.static_sigmas_x + 1)]
+                               int(v_offset + y_a - n_sigma * stream.static_sigmas_y):
+                               int(v_offset + y_a + n_sigma * stream.static_sigmas_y + 1),
+                               int(h_offset + x_a - n_sigma * stream.static_sigmas_x):
+                               int(h_offset + x_a + n_sigma * stream.static_sigmas_x + 1)]
 
-                b_double_prime = b_double_prime[
-                                 int(y_b - n_sigma * stream.static_sigmas_y): int(
-                                     y_b + n_sigma * stream.static_sigmas_y + 1),
-                                 int(x_b - n_sigma * stream.static_sigmas_x): int(
-                                     x_b + n_sigma * stream.static_sigmas_x + 1)]
+                stream.roi_b = stream.roi_b[
+                               int(v_offset + y_b - n_sigma * stream.static_sigmas_y):
+                               int(v_offset + y_b + n_sigma * stream.static_sigmas_y + 1),
+                               int(h_offset + x_b - n_sigma * stream.static_sigmas_x):
+                               int(h_offset + x_b + n_sigma * stream.static_sigmas_x + 1)]
 
-                stream.roi_b = b_double_prime
-                h = b_double_prime.shape[0]
-                w = b_double_prime.shape[1]
+                stream.a_frames.append(roi_a)
+                stream.b_prime_frames.append(stream.roi_b)
+                stream.a_images.append(roi_a)
+                stream.b_prime_images.append(stream.roi_b)
+
+
+                h = stream.roi_b.shape[0]
+                w = stream.roi_b.shape[1]
 
                 hgs.update_histogram(histograms, lines, "a", 4096, stream.roi_a)
                 hgs.update_histogram(histograms, lines, "b", 4096, stream.roi_b)
@@ -297,5 +299,19 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
         if record_r_matrices is False:
             satisfied_with_run = True
             continue_stream = False
+
+        if last_frame:
+            continue_stream = True
+        else:
+            continue_stream = stream.keep_streaming(one_by_one=True)
+
+        if not continue_stream:
+            if last_frame:
+                pass
+            else:
+                if app is not None:
+                    app.callback()
+
+                cv2.destroyAllWindows()
     cv2.destroyAllWindows()
     tk_app.attempt_to_quit(app)

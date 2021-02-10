@@ -92,6 +92,7 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         n_sigma = 3
 
         # Using array indexing to only keep relevant pixels
+
         stream.roi_a = stream.current_frame_a[
                      y_a - n_sigma * stream.static_sigmas_y: y_a + n_sigma * stream.static_sigmas_y + n_sigma,
                      x_a - n_sigma * stream.static_sigmas_x: x_a + n_sigma * stream.static_sigmas_x + n_sigma]
@@ -101,22 +102,26 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
                      x_b - n_sigma * stream.static_sigmas_x: x_b + n_sigma * stream.static_sigmas_x + n_sigma]
 
 
-        roi_a = stream.roi_a
-        b_double_prime = stream.roi_b
-        CENTER_B_DP = int(b_double_prime.shape[1] * 0.5), int(b_double_prime.shape[0] * 0.5)
-
+        CENTER_B_DP = int(stream.roi_b.shape[1] * 0.5), int(stream.roi_b.shape[0] * 0.5)
 
         x_a, y_a = CENTER_B_DP
         x_b, y_b = CENTER_B_DP
         n_sigma = app.foo
 
-        stream.roi_a = stream.roi_a[
-                     int(y_a - n_sigma * stream.static_sigmas_y): int(y_a + n_sigma * stream.static_sigmas_y + 1),
-                     int(x_a - n_sigma * stream.static_sigmas_x): int(x_a + n_sigma * stream.static_sigmas_x + 1)]
+        h_offset = app.horizontal_offset
+        v_offset = app.vertical_offset
 
-        stream.roi_b = b_double_prime[
-                         int(y_b - n_sigma * stream.static_sigmas_y): int(y_b + n_sigma * stream.static_sigmas_y + 1),
-                         int(x_b - n_sigma * stream.static_sigmas_x): int(x_b + n_sigma * stream.static_sigmas_x + 1)]
+        stream.roi_a = stream.roi_a[
+                       int(v_offset + y_a - n_sigma * stream.static_sigmas_y):
+                       int(v_offset + y_a + n_sigma * stream.static_sigmas_y + 1),
+                       int(h_offset + x_a - n_sigma * stream.static_sigmas_x):
+                       int(h_offset + x_a + n_sigma * stream.static_sigmas_x + 1)]
+
+        stream.roi_b = stream.roi_b[
+                       int(v_offset + y_b - n_sigma * stream.static_sigmas_y):
+                       int(v_offset + y_b + n_sigma * stream.static_sigmas_y + 1),
+                       int(h_offset + x_b - n_sigma * stream.static_sigmas_x):
+                       int(h_offset + x_b + n_sigma * stream.static_sigmas_x + 1)]
 
         if s7_frame_count == 1:
             print("stream.static_sigmas_y", stream.static_sigmas_y)
@@ -283,8 +288,9 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
             if last_frame:
                 pass
             else:
-                if app is not None:
-                    app.callback()
+                pass
+                #if app is not None:
+                    #app.callback()
 
                 cv2.destroyAllWindows()
 
