@@ -109,7 +109,6 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         x_a, y_a = CENTER_B_DP
         x_b, y_b = CENTER_B_DP
         n_sigma = app.foo
-        #n_sigma = 0.75 #app.foo
 
         stream.roi_a = stream.roi_a[
                      int(y_a - n_sigma * stream.static_sigmas_y): int(y_a + n_sigma * stream.static_sigmas_y + 1),
@@ -200,8 +199,6 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         w_R_MATRIX = R_MATRIX.shape[1]
         R_MATRIX_CENTER = int(w_R_MATRIX/2), int(h_R_MATRIX/2)
 
-
-
         #nan_mean = np.nanmean(R_MATRIX.flatten())
         #nan_st_dev = np.nanstd(R_MATRIX.flatten())
 
@@ -212,21 +209,20 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX > 0.00, abs(R_MATRIX * (2 ** 8 - 1)),
                                                  DISPLAYABLE_R_MATRIX[:, :, 2])
 
-        sigma_x_div_5 = int(stream.static_sigmas_x / 5)
-        sigma_y_div_5 = int(stream.static_sigmas_y / 5)
+        sigma_x_div = int(stream.static_sigmas_x * app.sub_sigma)
+        sigma_y_div = int(stream.static_sigmas_y * app.sub_sigma)
         angle = 0
         startAngle = 0
         endAngle = 360
-        axesLength = (sigma_x_div_5, sigma_y_div_5)
+        axesLength = (sigma_x_div, sigma_y_div)
         # Red color in BGR
         color = (255, 255, 255)
         # Line thickness of 5 px
         thickness = -1
         image = cv2.ellipse(DISPLAYABLE_R_MATRIX.copy(), R_MATRIX_CENTER, axesLength,
-                            angle, startAngle, endAngle, color, thickness)
+                            angle, startAngle, endAngle, color, 1)
 
         blk_image = np.zeros([h_R_MATRIX, w_R_MATRIX, 3])
-        backup = blk_image.copy()
         blk_image2 = cv2.ellipse(blk_image.copy(), R_MATRIX_CENTER, axesLength,
                             angle, startAngle, endAngle, color, thickness)
         # Displaying the image
@@ -236,41 +232,15 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
 
 
 
-
-        if s7_frame_count == 1:
-            print("R_MATRIX_SHAPE: ", R_MATRIX.shape)
-            print("blk_image2_SHAPE: ", blk_image2.shape)
-            print("R_MATRIX_CENTER: ", R_MATRIX_CENTER)
-
-            print("stream.static_sigmas_x / 5: ", sigma_x_div_5)
-            print("stream.static_sigmas_y / 5: ", sigma_y_div_5)
-
-
         combined = blk_image2[:, :, 0] + blk_image2[:, :, 1] + blk_image2[:, :, 2]
         rows, cols = np.where(combined > 0)
-
-        if s7_frame_count == 1:
-            print("i, j, val")
 
         for i, j in zip(rows, cols):
             r_subsection_pixel_vals = np.append(r_subsection_pixel_vals, R_MATRIX[i, j])
 
-            #backup[i, j, 0] = 0
-            #backup[i, j, 1] = 255
-            #backup[i, j, 0] = 0
-
-
-            #if s7_frame_count == 1:
-                #print(i, j, R_MATRIX[i, j])
 
         nan_mean = np.nanmean(r_subsection_pixel_vals)
         nan_st_dev = np.nanstd(r_subsection_pixel_vals.flatten())
-        #cv2.imshow("TEST3", backup)
-
-            #print(np.where(combined > 0))
-
-            #cv2.imshow("R_Values_To_Calc", )
-
 
         dr_height, dr_width, dr_channels = DISPLAYABLE_R_MATRIX.shape
 
@@ -296,9 +266,11 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         draw.text((x, y), message, fill=color, font=font)
         R_VALUES = np.array(R_VALUES)
         VALUES_W_HIST = np.concatenate((R_VALUES * (2 ** 8), np.array(R_HIST)), axis=1)
-
+        R_MATRIX_DISPLAYABLE_FINAL = image
+        #R_MATRIX_DISPLAYABLE_FINAL = np.array(DISPLAYABLE_R_MATRIX * (2 ** 8), dtype='uint16')
+        R_MATRIX_DISPLAYABLE_FINAL = np.array(R_MATRIX_DISPLAYABLE_FINAL * (2 ** 8), dtype='uint16')
         cv2.imshow("R_MATRIX", cv2.resize(
-                   np.concatenate((VALUES_W_HIST, np.array(DISPLAYABLE_R_MATRIX * (2 ** 8), dtype='uint16')), axis=1)
+                   np.concatenate((VALUES_W_HIST, R_MATRIX_DISPLAYABLE_FINAL), axis=1)
                    , (R_VIS_WIDTH, R_VIS_HEIGHT))
                    )
 

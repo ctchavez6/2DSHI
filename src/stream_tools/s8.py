@@ -36,6 +36,7 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
     satisfied_with_run = False
 
     while satisfied_with_run is False:
+        r_subsection_pixel_vals = np.array(list())
 
         current_r_frame = 0
         stream.stats = list()
@@ -73,16 +74,7 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                             y_b - n_sigma * stream.static_sigmas_y: y_b + n_sigma * stream.static_sigmas_y + n_sigma,
                             x_b - n_sigma * stream.static_sigmas_x: x_b + n_sigma * stream.static_sigmas_x + n_sigma]
 
-                """
-                if stream.warp_matrix_2 is None:
-                    roi_a = stream.roi_a
-                    b_double_prime = stream.roi_b
-                else:
-                    roi_a, b_double_prime = stream.grab_frames2(stream.roi_a.copy(), stream.roi_b.copy(), stream.warp_matrix_2.copy())
-                
-                CENTER_B_DP = int(b_double_prime.shape[1] * 0.5), int(b_double_prime.shape[0] * 0.5)
 
-                """
                 roi_a = stream.roi_a
                 b_double_prime = stream.roi_b
                 CENTER_B_DP = int(b_double_prime.shape[1] * 0.5), int(b_double_prime.shape[0] * 0.5)
@@ -175,9 +167,41 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 cv2.imshow("Dashboard", DASHBOARD)
 
                 R_MATRIX = np.divide(minus_, plus_)
+                h_R_MATRIX = R_MATRIX.shape[0]
+                w_R_MATRIX = R_MATRIX.shape[1]
+                R_MATRIX_CENTER = int(w_R_MATRIX / 2), int(h_R_MATRIX / 2)
+
+                sigma_x_div = int(stream.static_sigmas_x * app.sub_sigma)
+                sigma_y_div = int(stream.static_sigmas_y * app.sub_sigma)
+
+                angle = 0
+                startAngle = 0
+                endAngle = 360
+                axesLength = (sigma_x_div, sigma_y_div)
+                # Red color in BGR
+                color = (255, 255, 255)
+                # Line thickness of 5 px
+                thickness = -1
+                blk_image = np.zeros([h_R_MATRIX, w_R_MATRIX, 3])
+                blk_image2 = cv2.ellipse(blk_image.copy(), R_MATRIX_CENTER, axesLength,
+                                         angle, startAngle, endAngle, color, thickness)
+                # Displaying the image
+                # cv2.imshow("R_VALS_TEST", image)
+                # cv2.imshow("TEST2",blk_image2 )
+                # Here is where you can obtain the coordinate you are looking for
+
+                combined = blk_image2[:, :, 0] + blk_image2[:, :, 1] + blk_image2[:, :, 2]
+                rows, cols = np.where(combined > 0)
+
+                for i, j in zip(rows, cols):
+                    r_subsection_pixel_vals = np.append(r_subsection_pixel_vals, R_MATRIX[i, j])
+
+                R_MATRIX = np.divide(minus_, plus_)
                 stream.r_frames.append(R_MATRIX)
-                nan_mean = np.nanmean(R_MATRIX.flatten())
-                nan_st_dev = np.nanstd(R_MATRIX.flatten())
+                #nan_mean = np.nanmean(R_MATRIX.flatten())
+                #nan_st_dev = np.nanstd(R_MATRIX.flatten())
+                nan_mean = np.nanmean(r_subsection_pixel_vals)
+                nan_st_dev = np.nanstd(r_subsection_pixel_vals.flatten())
                 stream.stats.append([len(stream.r_frames), nan_mean, nan_st_dev])
 
                 DISPLAYABLE_R_MATRIX = np.zeros((R_MATRIX.shape[0], R_MATRIX.shape[1], 3), dtype=np.uint8)
@@ -186,6 +210,10 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
 
                 DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX > 0.00, abs(R_MATRIX * (2 ** 8 - 1)),
                                                          DISPLAYABLE_R_MATRIX[:, :, 2])
+
+
+                image = cv2.ellipse(DISPLAYABLE_R_MATRIX.copy(), R_MATRIX_CENTER, axesLength,
+                                    angle, startAngle, endAngle, color, 1)
 
                 dr_height, dr_width, dr_channels = DISPLAYABLE_R_MATRIX.shape
 
@@ -215,14 +243,15 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 color = 'rgb(0, 0, 0)'  # black color
                 draw.text((x, y), message, fill=color, font=font)
                 R_VALUES = np.array(R_VALUES)
+
                 VALUES_W_HIST = np.concatenate((R_VALUES * (2 ** 8), np.array(stream.R_HIST)), axis=1)
-
-                R_VIS = np.concatenate(
-                    (VALUES_W_HIST, np.array(DISPLAYABLE_R_MATRIX * (2 ** 8), dtype='uint16')), axis=1)
-
-                R_VIS_RESCALED = cv2.resize(R_VIS, (R_VIS_WIDTH, R_VIS_HEIGHT))
-                cv2.imshow("R_MATRIX", R_VIS_RESCALED)
-
+                R_MATRIX_DISPLAYABLE_FINAL = image
+                # R_MATRIX_DISPLAYABLE_FINAL = np.array(DISPLAYABLE_R_MATRIX * (2 ** 8), dtype='uint16')
+                R_MATRIX_DISPLAYABLE_FINAL = np.array(R_MATRIX_DISPLAYABLE_FINAL * (2 ** 8), dtype='uint16')
+                cv2.imshow("R_MATRIX", cv2.resize(
+                    np.concatenate((VALUES_W_HIST, R_MATRIX_DISPLAYABLE_FINAL), axis=1)
+                    , (R_VIS_WIDTH, R_VIS_HEIGHT))
+                           )
                 continue_stream = stream.keep_streaming()
                 if continue_stream is False:
                     satisfied_with_range = False

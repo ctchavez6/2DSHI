@@ -10,6 +10,7 @@ class App(threading.Thread):
         self.at_front = False
         self.is_toggle_pressed_down = False
         self.stop_streaming_override = False
+        self.sub_sigma = 0.20
 
     def callback(self):
         self.root.quit()
@@ -19,6 +20,9 @@ class App(threading.Thread):
 
     def scale_onChange(self, value):
         self.foo = float(value)
+
+    def scale_onChange_b(self, value):
+        self.sub_sigma = float(value)
 
     def toggle(self):
         if self.stop_streaming_override is True:
@@ -37,9 +41,15 @@ class App(threading.Thread):
 
         label = tk.Label(self.root, text="Sigma")
         label.pack()
-
         tk.Scale(from_=1.00, to=2.50, tickinterval=0.0001, resolution = 0.25, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange).pack()
+
         tk.Button(text="Toggle", width=12, relief="raised", command=self.toggle).pack()
+
+        label2 = tk.Label(self.root, text="Sub Sigma")
+        label2.pack()
+        tk.Scale(from_=0.20, to=1.0, tickinterval=0.0001, resolution = 0.20, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange_b).pack()
+
+
         self.root.mainloop()
 
     def bring_to_front(self):
