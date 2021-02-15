@@ -13,6 +13,20 @@ def valid_input(input, options, feedback=True):
         return False
     return True
 
+def valid_input_conseq_ints(msg, options, feedback=True):
+    input_ = input()
+    stripped_input = input_.strip()
+    if len(stripped_input) < 1:
+        print("Please enter one of the following options: ", options)
+        print("Or q to quit the program")
+        return False
+    if stripped_input[0] == "q":
+        sys.exit()
+    if int(stripped_input[0]) not in options:
+        print("Please enter one of the following options: ", options)
+        return False
+    return True
+
 def yes_no_quit(preceding_msg, specify_options=True, app=None):
     """
     Returns:
@@ -28,12 +42,20 @@ def yes_no_quit(preceding_msg, specify_options=True, app=None):
 
     if user_input[0] == "q":
         if app is not None:
-            app.destroy()
+            try:
+                app.kill_app()
+                app.bring_to_front()
+                app.destroy()
+                app.callback()
+            except Exception:
+                pass
         sys.exit()
     elif user_input[0] == "y":
         return True
     elif user_input[0] == "n":
         return False
+
+
 
 
 def display_dict_values(d):

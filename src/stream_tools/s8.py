@@ -7,8 +7,6 @@ from . import histograms as hgs
 import cv2
 from experiment_set_up import user_input_validation as uiv
 from . import App as tk_app
-from . import s7
-
 
 y_n_msg = "Proceed? (y/n): "
 sixteen_bit_max = (2 ** 16) - 1
@@ -29,15 +27,17 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
     DASHBOARD_HEIGHT = 600
     DASHBOARD_WIDTH = int(DASHBOARD_HEIGHT*X_TO_Y_RATIO*2)
 
-    last_frame = False
 
+    last_frame = False
 
     desc = "Step 8 - Image Algebra (Record): Proceed"
     record_r_matrices = uiv.yes_no_quit(desc)
+    print("You have entered step 7")
+    s8_frame_count = 1
+    r_subsection_pixel_vals = None
     satisfied_with_run = False
 
     while satisfied_with_run is False:
-        r_subsection_pixel_vals = np.array(list())
 
         current_r_frame = 0
         stream.stats = list()
@@ -54,6 +54,8 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
         if record_r_matrices is True:
             continue_stream = True
             while continue_stream:
+                r_subsection_pixel_vals = np.array(list())
+
                 stream.frame_count += 1
                 stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
                 current_r_frame += 1
@@ -169,13 +171,24 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 cv2.imshow("Dashboard", DASHBOARD)
 
                 R_MATRIX = np.divide(minus_, plus_)
+                stream.r_frames.append(R_MATRIX)
+
                 h_R_MATRIX = R_MATRIX.shape[0]
                 w_R_MATRIX = R_MATRIX.shape[1]
                 R_MATRIX_CENTER = int(w_R_MATRIX / 2), int(h_R_MATRIX / 2)
 
+                # nan_mean = np.nanmean(R_MATRIX.flatten())
+                # nan_st_dev = np.nanstd(R_MATRIX.flatten())
+
+                DISPLAYABLE_R_MATRIX = np.zeros((R_MATRIX.shape[0], R_MATRIX.shape[1], 3), dtype=np.uint8)
+                DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX < 0.00, abs(R_MATRIX * (2 ** 8 - 1)), 0)
+                DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX < 0.00, abs(R_MATRIX * (2 ** 8 - 1)), 0)
+
+                DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX > 0.00, abs(R_MATRIX * (2 ** 8 - 1)),
+                                                         DISPLAYABLE_R_MATRIX[:, :, 2])
+
                 sigma_x_div = int(stream.static_sigmas_x * app.sub_sigma)
                 sigma_y_div = int(stream.static_sigmas_y * app.sub_sigma)
-
                 angle = 0
                 startAngle = 0
                 endAngle = 360
@@ -184,6 +197,9 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 color = (255, 255, 255)
                 # Line thickness of 5 px
                 thickness = -1
+                image = cv2.ellipse(DISPLAYABLE_R_MATRIX.copy(), R_MATRIX_CENTER, axesLength,
+                                    angle, startAngle, endAngle, color, 1)
+
                 blk_image = np.zeros([h_R_MATRIX, w_R_MATRIX, 3])
                 blk_image2 = cv2.ellipse(blk_image.copy(), R_MATRIX_CENTER, axesLength,
                                          angle, startAngle, endAngle, color, thickness)
@@ -195,15 +211,17 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 combined = blk_image2[:, :, 0] + blk_image2[:, :, 1] + blk_image2[:, :, 2]
                 rows, cols = np.where(combined > 0)
 
+                #if s8_frame_count == 1:
+                    #print("i, j, val")
+
                 for i, j in zip(rows, cols):
                     r_subsection_pixel_vals = np.append(r_subsection_pixel_vals, R_MATRIX[i, j])
+                    #if s8_frame_count == 1:
+                        #print(i, j, R_MATRIX[i, j])
 
-                R_MATRIX = np.divide(minus_, plus_)
-                stream.r_frames.append(R_MATRIX)
-                #nan_mean = np.nanmean(R_MATRIX.flatten())
-                #nan_st_dev = np.nanstd(R_MATRIX.flatten())
                 nan_mean = np.nanmean(r_subsection_pixel_vals)
-                nan_st_dev = np.nanstd(r_subsection_pixel_vals.flatten())
+                nan_st_dev = np.nanstd(r_subsection_pixel_vals)
+
                 stream.stats.append([len(stream.r_frames), nan_mean, nan_st_dev])
 
                 DISPLAYABLE_R_MATRIX = np.zeros((R_MATRIX.shape[0], R_MATRIX.shape[1], 3), dtype=np.uint8)
@@ -255,6 +273,7 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                     , (R_VIS_WIDTH, R_VIS_HEIGHT))
                            )
                 continue_stream = stream.keep_streaming()
+                s8_frame_count += 1
                 if continue_stream is False:
                     satisfied_with_range = False
                     while satisfied_with_range is False:
@@ -265,8 +284,42 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                         averages = list()
                         sigmas = list()
 
+                        strt_frame_msg = "Start at frame: "
+                        end_frame_msg = "End at frame: "
+
+
                         starting_frame = int(input("Start at frame: "))
                         end_frame = int(input("End at frame: "))
+
+                        if (not starting_frame >= 1) or (not starting_frame <= current_r_frame):
+                            print("Start frame must be between {0} and {1}".format(1, current_r_frame))
+                            val_start = False
+                        else:
+                            val_start = True
+
+                        if (not end_frame >= starting_frame) or (not end_frame >= 1) \
+                                or not (end_frame <= current_r_frame):
+                            print("End frame must be between {0} and {1}".format(starting_frame, current_r_frame))
+                            val_end = False
+                        else:
+                            val_end = True
+
+                        while val_start is False or val_end is False:
+                            starting_frame = int(input("Start at frame: "))
+                            end_frame = int(input("End at frame: "))
+
+                            if (not starting_frame >= 1) or (not starting_frame <= current_r_frame):
+                                print("Start frame must be between {0} and {1}".format(1, current_r_frame))
+                                val_start = False
+                            else:
+                                val_start = True
+
+                            if (not end_frame >= starting_frame) or (not end_frame >= 1) \
+                                    or not (end_frame <= current_r_frame):
+                                print("End frame must be between {0} and {1}".format(max(starting_frame, 1), current_r_frame))
+                                val_end = False
+                            else:
+                                val_end = True
 
                         # for i in range(1, len(stats)):
                         for i in range(starting_frame, end_frame + 1):
@@ -288,14 +341,14 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                         cv2.imshow('R Mean Plot', plot_img)
                         cv2.waitKey(60000)
                         cv2.destroyAllWindows()
-                        range_satisfaction_input = input("Are you satisfied with this range? (y/n): ")
-                        if range_satisfaction_input.lower() == "y":
+                        range_satisfaction_input = uiv.yes_no_quit("Are you satisfied with this range?", app=app)
+                        #range_satisfaction_input = input("Are you satisfied with this range? (y/n): ")
+                        if range_satisfaction_input:
                             satisfied_with_range = True
                             stream.start_writing_at = starting_frame
                             stream.end_writing_at = end_frame
-                    satisfaction_input = input("Are you satisfied with this run? (y/n): ")
-                    if satisfaction_input.lower() == 'y':
-                        satisfied_with_run = True
+                    #satisfaction_input = input("Are you satisfied with this run? (y/n): ")
+                    satisfaction_input = uiv.yes_no_quit("Are you satisfied with this run? ", app=app)
         if record_r_matrices is False:
             satisfied_with_run = True
             continue_stream = False
@@ -313,5 +366,8 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                     app.callback()
 
                 cv2.destroyAllWindows()
+
+        s8_frame_count += 1
+
     cv2.destroyAllWindows()
     tk_app.attempt_to_quit(app)

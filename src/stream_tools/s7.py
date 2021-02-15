@@ -54,7 +54,6 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
     DASHBOARD_HEIGHT = 600
     DASHBOARD_WIDTH = int(DASHBOARD_HEIGHT*X_TO_Y_RATIO*2)
 
-
     last_frame = False
 
     desc = "Step 7 - Commence Image Algebra (Free Stream):"
@@ -73,14 +72,8 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         stream.frame_count += 1
 
         if stream.single_shot:
-
             print("Trigger for frame {0}".format(s7_frame_count))
             print("(If LAST FRAME, hit Toggle Button, THEN Trigger")
-        #print("Step 7 Frame Count: ", s7_frame_count)
-        #print("beginning")
-        #print("\tcontinue_stream: ", continue_stream)
-        #print("\tlast_frame: ", last_frame)
-        #print("\tapp.stop_streaming_override: ", app.stop_streaming_override)
 
         stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
         
@@ -122,12 +115,6 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
                        int(v_offset + y_b + n_sigma * stream.static_sigmas_y + 1),
                        int(h_offset + x_b - n_sigma * stream.static_sigmas_x):
                        int(h_offset + x_b + n_sigma * stream.static_sigmas_x + 1)]
-
-        if s7_frame_count == 1:
-            print("stream.static_sigmas_y", stream.static_sigmas_y)
-            print("stream.static_sigmas_x", stream.static_sigmas_x)
-            print("stream.roi_a.shape", stream.roi_a.shape)
-            print("stream.roi_b.shape", stream.roi_b.shape)
 
 
         h = stream.roi_b.shape[0]
@@ -230,22 +217,17 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         blk_image = np.zeros([h_R_MATRIX, w_R_MATRIX, 3])
         blk_image2 = cv2.ellipse(blk_image.copy(), R_MATRIX_CENTER, axesLength,
                             angle, startAngle, endAngle, color, thickness)
-        # Displaying the image
-        #cv2.imshow("R_VALS_TEST", image)
-        #cv2.imshow("TEST2",blk_image2 )
-        # Here is where you can obtain the coordinate you are looking for
-
-
 
         combined = blk_image2[:, :, 0] + blk_image2[:, :, 1] + blk_image2[:, :, 2]
         rows, cols = np.where(combined > 0)
+
 
         for i, j in zip(rows, cols):
             r_subsection_pixel_vals = np.append(r_subsection_pixel_vals, R_MATRIX[i, j])
 
 
         nan_mean = np.nanmean(r_subsection_pixel_vals)
-        nan_st_dev = np.nanstd(r_subsection_pixel_vals.flatten())
+        nan_st_dev = np.nanstd(r_subsection_pixel_vals)
 
         dr_height, dr_width, dr_channels = DISPLAYABLE_R_MATRIX.shape
 

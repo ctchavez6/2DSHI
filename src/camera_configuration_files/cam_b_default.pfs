@@ -14,7 +14,7 @@ BinningHorizontal	1
 BinningVerticalMode	Sum
 BinningVertical	1
 ReverseX	1
-ReverseY	0
+ReverseY	1
 PixelFormat	Mono12p
 TestImageSelector	Off
 GainSelector	All
