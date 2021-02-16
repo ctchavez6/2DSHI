@@ -1,6 +1,7 @@
 import os
 import sys
 from tkinter.filedialog import askopenfilename
+import matplotlib.pyplot as plt
 
 import numpy as np
 import pandas as pd
@@ -57,3 +58,5 @@ value_v = float(result.values['v'])
 trunc1 = f"{value_alpha:.3f}"
 trunc2 = f"{value_v:.3f}"
 print("alpha:",trunc1,"v",trunc2)
+result.plot()
+plt.show()
