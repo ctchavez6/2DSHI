@@ -257,7 +257,7 @@ class Stream:
         """
         if self.continuous:
             try:
-                timeout_ms = 120000
+                timeout_ms = 1200000
                 grab_result_a = self.cam_a.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
                 grab_result_b = self.cam_b.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
 

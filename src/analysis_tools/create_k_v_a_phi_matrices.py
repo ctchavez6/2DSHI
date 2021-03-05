@@ -32,6 +32,10 @@ filename_R_background = askopenfilename(title='Pick an R_Background') # show an 
 filename_sh_R_background = filename_R_background.split("/")[-1][:-4]
 
 
+print("R_Min: {}".format(filename_R_Min))
+print("R_Max: {}".format(filename_R_Max))
+print("R_sample: {}".format(filename_R_Min))
+print("R_background: {}".format(filename_R_Max))
 #print("filename_sh_R_Min: {}".format(filename_sh_R_Min))
 #print("filename_sh_R_Max: {}".format(filename_sh_R_Max))
 
@@ -45,8 +49,7 @@ run_directory_parent = os.path.abspath(os.path.join(run_directory, os.pardir))
 rmin_rmax_no_nans_directory = os.path.join(run_directory_parent, str(run_directory.split("/")[-1]) + "_noNANs")
 
 
-print("R_Min: {}".format(filename_R_Min))
-print("R_Max: {}".format(filename_R_Max))
+
 
 
 user_input_2 = input("Are your R_Min and R_Max values in the same directory? (y/n)  ")

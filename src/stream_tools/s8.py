@@ -14,8 +14,6 @@ twelve_bit_max = (2 ** 12) - 1
 eight_bit_max = (2 ** 8) - 1
 
 
-
-
 def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                histograms_r, lines_r, figs_r):
 
@@ -26,7 +24,6 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
 
     DASHBOARD_HEIGHT = 600
     DASHBOARD_WIDTH = int(DASHBOARD_HEIGHT*X_TO_Y_RATIO*2)
-
 
     last_frame = False
 
@@ -342,19 +339,18 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                         cv2.waitKey(60000)
                         cv2.destroyAllWindows()
                         range_satisfaction_input = uiv.yes_no_quit("Are you satisfied with this range?", app=app)
-                        #range_satisfaction_input = input("Are you satisfied with this range? (y/n): ")
-                        if range_satisfaction_input:
+                        if range_satisfaction_input is True:
                             satisfied_with_range = True
                             stream.start_writing_at = starting_frame
                             stream.end_writing_at = end_frame
-                    #satisfaction_input = input("Are you satisfied with this run? (y/n): ")
-                    satisfaction_input = uiv.yes_no_quit("Are you satisfied with this run? ", app=app)
+            satisfied_with_run = uiv.yes_no_quit("Are you satisfied with this run? ", app=app)
+
+
+
         if record_r_matrices is False:
             satisfied_with_run = True
             continue_stream = False
 
-        if last_frame:
-            continue_stream = True
         else:
             continue_stream = stream.keep_streaming(one_by_one=True)
 
@@ -362,8 +358,9 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
             if last_frame:
                 pass
             else:
-                if app is not None:
-                    app.callback()
+                pass
+                #if app is not None:
+                    #app.callback()
 
                 cv2.destroyAllWindows()
 

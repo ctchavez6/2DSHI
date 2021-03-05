@@ -19,7 +19,6 @@ class App(threading.Thread):
         self.vertical_offset = 0
 
 
-
     def callback(self):
         self.root.quit()
 

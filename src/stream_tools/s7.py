@@ -4,6 +4,7 @@ from image_processing import bit_depth_conversion as bdc
 from . import histograms as hgs
 from PIL import Image, ImageDraw, ImageFont
 from experiment_set_up import user_input_validation as uiv
+import os, csv
 
 """
 
@@ -154,7 +155,57 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         minus_ = np.zeros(stream.roi_a.shape, dtype='int16')
         minus_ = np.add(minus_, stream.roi_a)
         minus_ = np.add(minus_, stream.roi_b * (-1))
-        # print("Lowest pixel in the minus spectrum: {}".format(np.min(minus_.flatten())))
+
+        # Start Saturation Flag Code
+
+        num_tot_pixels = plus_.shape[0] * plus_.shape[1]
+
+        bool_mask_gt_max = np.where(plus_ > twelve_bit_max)
+        vals_over_4095 = plus_[bool_mask_gt_max]
+        count_vals_over_4095 = vals_over_4095.size
+
+        bool_mask_lt_zero = np.where(minus_ < 0)
+        vals_less_than_zero = minus_[bool_mask_lt_zero]
+        count_vals_lt_zero = vals_less_than_zero.size
+
+        bool_mask_apb_zero = np.where(plus_ == 0)
+        vals_equal_to_zero = plus_[bool_mask_apb_zero]
+        count_nans = vals_equal_to_zero.size
+
+        """
+        if s7_frame_count == 1:
+            print("Outputting First S7 Frames (ROIs) for A, B, A+B, and A-B (as CSVs)")
+
+
+            print("roi_shape: ", stream.roi_a.shape)
+            print("tot_num_pixels: ", num_tot_pixels)
+            print("vals_over_4095:\n", vals_over_4095)
+            print("count_vals_over_4095: ", count_vals_over_4095)
+
+            cwd = os.getcwd()
+            print("CSVs will be saved to {0}".format(cwd))
+            roi_a_path = os.path.join(cwd, "roi_a.csv")
+            roi_b_path = os.path.join(cwd, "roi_b.csv")
+            roi_a_plus_b_path = os.path.join(cwd, "roi_a+b.csv")
+            roi_a_minus_b_path = os.path.join(cwd, "roi_a-b.csv")
+
+            d = {
+                roi_a_path: stream.roi_a,
+                roi_b_path: stream.roi_b,
+                roi_a_plus_b_path: plus_,
+                roi_a_minus_b_path: minus_
+            }
+
+            for csv_path in d:
+                array = d[csv_path]
+                #print(csv_path, array.shape)
+                with open(csv_path, "w+", newline='') as my_csv:
+                    csvWriter = csv.writer(my_csv, delimiter=',')
+                    csvWriter.writerows(array.tolist())
+        """
+        # End Saturation Flag Code
+
+
 
         hgs.update_histogram(histograms_alg, lines_alg, "plus", 4096, plus_, plus=True)
         hgs.update_histogram(histograms_alg, lines_alg, "minus", 4096, minus_, minus=True)
@@ -246,7 +297,13 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         (x, y) = (50, 50)
         message = "R Matrix Values\n"
         message = message + "Average: {0:.4f}".format(nan_mean) + "\n"
-        message = message + "Sigma: {0:.4f}".format(nan_st_dev)
+        message = message + "Sigma: {0:.4f}".format(nan_st_dev) + "\n\n"
+
+        message = message + "A+B Sat:  {0:.2f}%".format((count_vals_over_4095/num_tot_pixels)*100) + "\n"
+        message = message + "A-B USat:  {0:.2f}%".format((count_vals_lt_zero/num_tot_pixels)*100) + "\n"
+        message = message + "NaNs:  {0:.2f}%".format((count_nans/num_tot_pixels)*100) + "\n"
+
+
 
         # Mean: {0:.4f}\n".format(nan_mean, 2.000*float(stream.frame_count))
         color = 'rgb(0, 0, 0)'  # black color
