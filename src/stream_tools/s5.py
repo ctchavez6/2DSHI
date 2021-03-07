@@ -74,7 +74,7 @@ def step_five(stream, continue_stream, autoload_roi=False):
                 img_12bit[int(center_[1]) + int(stream.sigma_a_y * n_sigma), :] = 4095
                 img_12bit[int(center_[1]) - int(stream.sigma_a_y * n_sigma), :] = 4095
 
-                if stream.frame_count % 10 == 0:
+                if stream.frame_count % 15 == 0:
                     print("\tA  - Sigma X, Sigma Y - {}".format((int(stream.sigma_a_x), int(stream.sigma_a_y))))
 
             for img_12bit in [stream.current_frame_b]:  # TODO: OPTIMIZE, SHOULD NOT BE ITERATING THROUGH LIST OF ONE
@@ -89,7 +89,7 @@ def step_five(stream, continue_stream, autoload_roi=False):
                 img_12bit[int(center_[1]) + int(stream.sigma_b_y * n_sigma), :] = 4095
                 img_12bit[int(center_[1]) - int(stream.sigma_b_y * n_sigma), :] = 4095
 
-                if stream.frame_count % 10 == 0:
+                if stream.frame_count % 15 == 0:
                     print("\tB  - Sigma X, Sigma Y - {}".format((int(stream.sigma_b_x), int(stream.sigma_b_y))))
 
             a_as_16bit = bdc.to_16_bit(stream.current_frame_a)

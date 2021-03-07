@@ -17,6 +17,7 @@ eight_bit_max = (2 ** 8) - 1
 def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                histograms_r, lines_r, figs_r):
 
+    app.disable_sigma_slider()
     X_TO_Y_RATIO = stream.static_sigmas_x/stream.static_sigmas_y
 
     R_VIS_HEIGHT = 500
@@ -29,7 +30,6 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
 
     desc = "Step 8 - Image Algebra (Record): Proceed"
     record_r_matrices = uiv.yes_no_quit(desc)
-    print("You have entered step 7")
     s8_frame_count = 1
     r_subsection_pixel_vals = None
     satisfied_with_run = False
@@ -45,6 +45,10 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
         stream.a_images = list()
         stream.b_prime_images = list()
 
+        stream.s8_full_a_frames = list()
+        stream.s8_full_a_frames = list()
+
+
         stream.stats.append(["Frame", "Avg_R", "Sigma_R"])
 
         # r_matrix_limit = int(input("R Matrix Frame Break: "))
@@ -54,7 +58,8 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 r_subsection_pixel_vals = np.array(list())
 
                 stream.frame_count += 1
-                stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
+                stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix, s8=True)
+
                 current_r_frame += 1
                 print("Current R Frame: {}".format(current_r_frame))
 
@@ -82,8 +87,11 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 x_a, y_a = CENTER_B_DP
                 x_b, y_b = CENTER_B_DP
                 n_sigma = app.foo
-                h_offset = app.horizontal_offset
-                v_offset = app.vertical_offset
+                h_offset = stream.h_offset
+                v_offset = stream.v_offset
+
+                #stream.h_offset = h_offset
+                #stream.v_offset = v_offset
 
                 stream.roi_a = stream.roi_a[
                                int(v_offset + y_a - n_sigma * stream.static_sigmas_y):
@@ -97,10 +105,10 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                                int(h_offset + x_b - n_sigma * stream.static_sigmas_x):
                                int(h_offset + x_b + n_sigma * stream.static_sigmas_x + 1)]
 
-                stream.a_frames.append(roi_a)
-                stream.b_prime_frames.append(stream.roi_b)
-                stream.a_images.append(roi_a)
-                stream.b_prime_images.append(stream.roi_b)
+                #stream.a_frames.append(stream.current_frame_a)
+                #stream.b_prime_frames.append(stream.roi_b)
+                #stream.a_images.append(roi_a)
+                #stream.b_prime_images.append(stream.roi_b)
 
 
                 h = stream.roi_b.shape[0]
@@ -160,9 +168,6 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 DASHBOARD = np.concatenate((A_ON_B, ALGEBRA), axis=1)
                 dash_height, dash_width, dash_channels = DASHBOARD.shape
 
-                # if dash_width > 2000:
-                # scale_factor = float(float(2000) / float(dash_width))
-                # DASHBOARD = cv2.resize(DASHBOARD, (int(dash_width * scale_factor), int(dash_height * scale_factor)))
                 scale_factor = float(float(2000) / float(dash_width))
                 DASHBOARD = cv2.resize(DASHBOARD, (DASHBOARD_WIDTH, DASHBOARD_HEIGHT))
                 cv2.imshow("Dashboard", DASHBOARD)
@@ -174,8 +179,6 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 w_R_MATRIX = R_MATRIX.shape[1]
                 R_MATRIX_CENTER = int(w_R_MATRIX / 2), int(h_R_MATRIX / 2)
 
-                # nan_mean = np.nanmean(R_MATRIX.flatten())
-                # nan_st_dev = np.nanstd(R_MATRIX.flatten())
 
                 DISPLAYABLE_R_MATRIX = np.zeros((R_MATRIX.shape[0], R_MATRIX.shape[1], 3), dtype=np.uint8)
                 DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX < 0.00, abs(R_MATRIX * (2 ** 8 - 1)), 0)
@@ -200,16 +203,9 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 blk_image = np.zeros([h_R_MATRIX, w_R_MATRIX, 3])
                 blk_image2 = cv2.ellipse(blk_image.copy(), R_MATRIX_CENTER, axesLength,
                                          angle, startAngle, endAngle, color, thickness)
-                # Displaying the image
-                # cv2.imshow("R_VALS_TEST", image)
-                # cv2.imshow("TEST2",blk_image2 )
-                # Here is where you can obtain the coordinate you are looking for
 
                 combined = blk_image2[:, :, 0] + blk_image2[:, :, 1] + blk_image2[:, :, 2]
                 rows, cols = np.where(combined > 0)
-
-                #if s8_frame_count == 1:
-                    #print("i, j, val")
 
                 for i, j in zip(rows, cols):
                     r_subsection_pixel_vals = np.append(r_subsection_pixel_vals, R_MATRIX[i, j])
@@ -250,11 +246,16 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 # the image object as background
 
                 draw = ImageDraw.Draw(R_VALUES)
-                font = ImageFont.truetype('arial.ttf', size=30)
+                font = ImageFont.truetype('arial.ttf', size=int(20*n_sigma))
                 (x, y) = (50, 50)
                 message = "R Matrix Values\n"
                 message = message + "Average: {0:.4f}".format(nan_mean) + "\n"
                 message = message + "Sigma: {0:.4f}".format(nan_st_dev)
+
+                px_to_mm = 5.86*(10**(-3))
+                message = message + "Shape (px): {0}, {1}".format(h_R_MATRIX, w_R_MATRIX) + "\n"
+                message = message + "Shape (mm):  {0:.2f},  {1:.2f}".format(h_R_MATRIX * px_to_mm,
+                                                                            w_R_MATRIX * px_to_mm) + "\n"
 
                 # Mean: {0:.4f}\n".format(nan_mean, 2.000*float(stream.frame_count))
                 color = 'rgb(0, 0, 0)'  # black color
@@ -324,6 +325,10 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                             averages.append(stream.stats[i][1])
                             sigmas.append(stream.stats[i][2])
 
+                            #stream.s8_full_a_frames_to_save.append(stream.s8_full_a_frames[i])
+                            #stream.s8_full_b_frames_to_save.append(stream.s8_full_b_frames[i])
+
+
                         ax1.errorbar(frames, averages, yerr=sigmas, c='b', capsize=5)
                         ax1.set_xlabel('Frame')
                         ax1.set_ylabel('R (Mean)')
@@ -346,7 +351,6 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
             satisfied_with_run = uiv.yes_no_quit("Are you satisfied with this run? ", app=app)
 
 
-
         if record_r_matrices is False:
             satisfied_with_run = True
             continue_stream = False
@@ -359,8 +363,6 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 pass
             else:
                 pass
-                #if app is not None:
-                    #app.callback()
 
                 cv2.destroyAllWindows()
 

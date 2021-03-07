@@ -9,6 +9,8 @@ from . import histograms as hgs
 from . import s1, s2, s3, s4, s5, s6, s7, s8, s9, s10
 from experiment_set_up import user_input_validation as uiv
 from . import store_params as sp
+from experiment_set_up import find_previous_run as fpr
+
 
 twelve_bit_max = (2 ** 12) - 1
 eight_bit_max = (2 ** 8) - 1
@@ -78,6 +80,18 @@ class Stream:
         self.max_pixel_a = None
         self.max_pixel_b = None
 
+        self.s8_full_a_frames = list()
+        self.s8_full_b_frames = list()
+
+        self.s8_full_a_frames_to_save = list()
+        self.s8_full_b_frames_to_save = list()
+
+        self.h_offset = None
+        self.v_offset = None
+
+        self.n_sigma = None
+        self.prv_run_dir = None
+        #previous_run_directory = fpr.get_latest_run_direc(path_override=True, path_to_exclude=stream_object)
 
     def get_12bit_a_frames(self):
         return self.a_frames
@@ -190,17 +204,6 @@ class Stream:
         self.all_cams = instant_camera_array
 
     def keep_streaming(self, one_by_one=False):
-        """
-        if cv2.waitKey(1) & 0xFF == ord(self.break_key):
-            return False
-        if not self.all_cams.IsGrabbing():
-            return False
-        if (not one_by_one) and not self.all_cams.IsGrabbing():
-            return False
-        if one_by_one and not self.all_cams.IsGrabbing():
-            return True
-        return True
-        """
         if self.continuous:
             if cv2.waitKey(1) & 0xFF == ord(self.break_key):
                 return False
@@ -229,32 +232,7 @@ class Stream:
         return (x_a, y_a), (x_b, y_b)
 
 
-    def grab_frames(self, warp_matrix=None):
-        """
-        try:
-            timeout_ms = 120000
-            grab_result_a = self.cam_a.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
-            grab_result_b = self.cam_b.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
-
-            if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
-                a, b = grab_result_a.GetArray(), grab_result_b.GetArray()
-                grab_result_a.Release()
-                grab_result_b.Release()
-                if self.save_imgs:
-                    self.a_frames.append(a)
-                    self.b_frames.append(b)
-
-                if warp_matrix is None:
-                    return a, b
-                else:
-                    b1_shape = b.shape[1], b.shape[0]
-                    b_prime = cv2.warpAffine(b, warp_matrix, b1_shape, flags=cv2.WARP_INVERSE_MAP)
-                    self.b_prime_frames.append(b_prime)
-                    return a, b_prime
-        except Exception as e:
-            traceback.print_exc()
-            raise e
-        """
+    def grab_frames(self, warp_matrix=None, s8=False):
         if self.continuous:
             try:
                 timeout_ms = 1200000
@@ -265,9 +243,10 @@ class Stream:
                     a, b = grab_result_a.GetArray(), grab_result_b.GetArray()
                     grab_result_a.Release()
                     grab_result_b.Release()
-                    if self.save_imgs:
-                        self.a_frames.append(a)
-                        self.b_frames.append(b)
+
+                    if s8:
+                        self.s8_full_a_frames.append(a)
+                        self.s8_full_b_frames.append(b)
 
                     if warp_matrix is None:
                         return a, b
@@ -291,9 +270,10 @@ class Stream:
                     a, b = grab_result_a.GetArray(), grab_result_b.GetArray()
                     grab_result_a.Release()
                     grab_result_b.Release()
-                    if self.save_imgs:
-                        self.a_frames.append(a)
-                        self.b_frames.append(b)
+
+                    if s8:
+                        self.s8_full_a_frames.append(a)
+                        self.s8_full_b_frames.append(b)
 
                     if warp_matrix is None:
                         return a, b
@@ -408,7 +388,6 @@ class Stream:
         print("self.single_shot: ", self.single_shot)
 
 
-
         tlFactory = pylon.TlFactory.GetInstance()
         devices = tlFactory.EnumerateDevices()
         if len(devices) == 0:
@@ -427,12 +406,9 @@ class Stream:
 
         continue_stream = False
         run_folder = os.path.join("D:", "\\" + self.current_run)
-
+        self.prv_run_dir = fpr.get_latest_run_direc(path_override=True, path_to_exclude=self.current_run)
         if self.jump_level <= 1:
             s1.step_one(self, histogram, continue_stream)
-        #else:
-            #pass
-            #self.current_frame_a, self.current_frame_b = self.grab_frames()
 
         if self.jump_level <= 2:
             s2.step_two(self, continue_stream)
@@ -463,12 +439,9 @@ class Stream:
 
         if self.jump_level <= 6:
             s6.step_six_a(self, continue_stream)
-            #s6.step_six_b(self, continue_stream, app)
-            #s6.step_six_c(self, continue_stream)
-        #else:
-            #s6.load_wm2_if_present(self)
-        sp.store_warp_matrices(self, run_folder)
-        app = tk_app.App()
+
+        #sp.store_warp_matrices(self, run_folder)
+        app = tk_app.App(self)
         self.tkapp = app
         figs, histograms, lines = hgs.initialize_histograms_rois()
         figs_alg, histograms_alg, lines_alg = hgs.initialize_histograms_algebra()
@@ -484,6 +457,9 @@ class Stream:
             s7.step_seven(self, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                    histograms_r, lines_r, figs_r)
 
+            sp.store_n_sigma(self, run_folder)
+            sp.store_offsets(self, run_folder)
+
         self.stats = list()
         self.a_frames = list()
         self.b_prime_frames = list()
@@ -496,8 +472,8 @@ class Stream:
                histograms_r, lines_r, figs_r)
 
         if self.jump_level <= 9:
-            s9.step_nine(self, self.start_writing_at, self.end_writing_at, run_folder, self.a_images, self.a_frames,
-                         self.b_prime_images, self.b_prime_frames, self.stats)
+            s9.step_nine(self, self.start_writing_at, self.end_writing_at, run_folder, self.a_images, self.s8_full_a_frames,
+                         self.b_prime_images, self.s8_full_b_frames, self.stats)
 
         if self.all_cams.IsGrabbing():
             self.all_cams.StopGrabbing()

@@ -59,7 +59,6 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
 
     desc = "Step 7 - Commence Image Algebra (Free Stream):"
     continue_stream = uiv.yes_no_quit(desc)
-    print("You have entered step 7")
     s7_frame_count = 1
     frames_we_went_through = 0
     r_subsection_pixel_vals = None
@@ -100,10 +99,16 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
 
         x_a, y_a = CENTER_B_DP
         x_b, y_b = CENTER_B_DP
+
         n_sigma = app.foo
 
         h_offset = app.horizontal_offset
         v_offset = app.vertical_offset
+
+        stream.h_offset = h_offset
+        stream.v_offset = v_offset
+        stream.n_sigma = n_sigma
+
 
         stream.roi_a = stream.roi_a[
                        int(v_offset + y_a - n_sigma * stream.static_sigmas_y):
@@ -151,7 +156,8 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
 
         A_ON_B = np.concatenate((ROI_A_WITH_HISTOGRAM, ROI_B_WITH_HISTOGRAM), axis=0)
 
-        plus_ = cv2.add(stream.roi_a, stream.roi_b)
+        #plus_ = cv2.add(stream.roi_a, stream.roi_b)
+        plus_ = np.add(stream.roi_a, stream.roi_b)
         minus_ = np.zeros(stream.roi_a.shape, dtype='int16')
         minus_ = np.add(minus_, stream.roi_a)
         minus_ = np.add(minus_, stream.roi_b * (-1))
@@ -171,39 +177,6 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         bool_mask_apb_zero = np.where(plus_ == 0)
         vals_equal_to_zero = plus_[bool_mask_apb_zero]
         count_nans = vals_equal_to_zero.size
-
-        """
-        if s7_frame_count == 1:
-            print("Outputting First S7 Frames (ROIs) for A, B, A+B, and A-B (as CSVs)")
-
-
-            print("roi_shape: ", stream.roi_a.shape)
-            print("tot_num_pixels: ", num_tot_pixels)
-            print("vals_over_4095:\n", vals_over_4095)
-            print("count_vals_over_4095: ", count_vals_over_4095)
-
-            cwd = os.getcwd()
-            print("CSVs will be saved to {0}".format(cwd))
-            roi_a_path = os.path.join(cwd, "roi_a.csv")
-            roi_b_path = os.path.join(cwd, "roi_b.csv")
-            roi_a_plus_b_path = os.path.join(cwd, "roi_a+b.csv")
-            roi_a_minus_b_path = os.path.join(cwd, "roi_a-b.csv")
-
-            d = {
-                roi_a_path: stream.roi_a,
-                roi_b_path: stream.roi_b,
-                roi_a_plus_b_path: plus_,
-                roi_a_minus_b_path: minus_
-            }
-
-            for csv_path in d:
-                array = d[csv_path]
-                #print(csv_path, array.shape)
-                with open(csv_path, "w+", newline='') as my_csv:
-                    csvWriter = csv.writer(my_csv, delimiter=',')
-                    csvWriter.writerows(array.tolist())
-        """
-        # End Saturation Flag Code
 
 
 
@@ -290,10 +263,13 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         hist_img_r = bdc.to_16_bit(cv2.resize(hist_img_r, (w, h), interpolation=cv2.INTER_AREA), 8)
         R_HIST = (cv2.cvtColor(hist_img_r, cv2.COLOR_RGB2BGR))
 
+
+
         R_VALUES = Image.new('RGB', (dr_width, dr_height), (eight_bit_max, eight_bit_max, eight_bit_max))
 
+
         draw = ImageDraw.Draw(R_VALUES)
-        font = ImageFont.truetype('arial.ttf', size=30)
+        font = ImageFont.truetype('arial.ttf', size=int(20*n_sigma))
         (x, y) = (50, 50)
         message = "R Matrix Values\n"
         message = message + "Average: {0:.4f}".format(nan_mean) + "\n"
@@ -303,16 +279,20 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         message = message + "A-B USat:  {0:.2f}%".format((count_vals_lt_zero/num_tot_pixels)*100) + "\n"
         message = message + "NaNs:  {0:.2f}%".format((count_nans/num_tot_pixels)*100) + "\n"
 
+        px_to_mm = 5.86 * (10 ** (-3))
+        message = message + "Shape (px): {0}, {1}".format(h_R_MATRIX, w_R_MATRIX) + "\n"
+        message = message + "Shape (mm):  {0:.2f},  {1:.2f}".format(h_R_MATRIX*px_to_mm, w_R_MATRIX*px_to_mm) + "\n"
 
 
-        # Mean: {0:.4f}\n".format(nan_mean, 2.000*float(stream.frame_count))
+
         color = 'rgb(0, 0, 0)'  # black color
         draw.text((x, y), message, fill=color, font=font)
         R_VALUES = np.array(R_VALUES)
         VALUES_W_HIST = np.concatenate((R_VALUES * (2 ** 8), np.array(R_HIST)), axis=1)
         R_MATRIX_DISPLAYABLE_FINAL = image
-        #R_MATRIX_DISPLAYABLE_FINAL = np.array(DISPLAYABLE_R_MATRIX * (2 ** 8), dtype='uint16')
         R_MATRIX_DISPLAYABLE_FINAL = np.array(R_MATRIX_DISPLAYABLE_FINAL * (2 ** 8), dtype='uint16')
+
+
         cv2.imshow("R_MATRIX", cv2.resize(
                    np.concatenate((VALUES_W_HIST, R_MATRIX_DISPLAYABLE_FINAL), axis=1)
                    , (R_VIS_WIDTH, R_VIS_HEIGHT))
@@ -336,6 +316,10 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         s7_frame_count += 1
         stream.R_HIST = R_HIST
         frames_we_went_through += 1
+
+
+
+
 
     cv2.destroyAllWindows()
     print("We completed this many frames: ", frames_we_went_through)

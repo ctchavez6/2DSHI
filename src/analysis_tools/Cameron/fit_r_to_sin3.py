@@ -31,23 +31,23 @@ r_values = df.loc[:, 'Avg_R'].values
 
 
 
-def theoretical_calibration_curve(x, alpha, v, p, q):
+def theoretical_calibration_curve(x, alpha, v, p, q, c):
     numerator = alpha + (v * np.sin((p*x) + q))
     denominator = 1 + (alpha * v * np.sin((p*x) + q))
-    return numerator/denominator
+    return c + (numerator/denominator)
 
 
 def theoretical_calibration_curve_presets(x, p, q):
-    preset_alpha = -0.091
-    preset_v = 0.98
+    preset_alpha = .04
+    preset_v = 0.90
 
     numerator = preset_alpha + (preset_v * np.sin((p*x) + q))
     denominator = 1 + (preset_alpha * preset_v * np.sin((p*x) + q))
     return numerator/denominator
 
 model = Model(theoretical_calibration_curve, independent_vars=['x'])
-arb_alpha = -0.091
-arb_v = 0.98
+arb_alpha = 0.04
+arb_v = 0.92
 arb_p = 0.075
 arb_q = 5.
 

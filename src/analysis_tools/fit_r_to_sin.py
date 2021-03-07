@@ -46,19 +46,8 @@ def theoretical_calibration_curve_presets(x, p, q):
 
 popt, pcov = curve_fit(theoretical_calibration_curve_presets, frame_index, r_values)
 
-print("popt", type(popt))
-print(popt)
-print("\n")
-print("pcov", type(pcov))
-print(pcov)
-print("\n")
-
 p = popt[0]
 q = popt[1]
-
-
-print("p: ", p)
-print("q: ", q)
 
 
 plt.plot(frame_index, r_values, 'o', color='black')
