@@ -51,7 +51,6 @@ rmin_rmax_no_nans_directory = os.path.join(run_directory_parent, str(run_directo
 
 
 
-
 user_input_2 = input("Are your R_Min and R_Max values in the same directory? (y/n)  ")
 if user_input_2.lower() == "y":
     cal_phase_dir = os.path.join(run_directory, "calibration")

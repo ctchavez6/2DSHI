@@ -6,6 +6,7 @@ import os
 import pickle
 from experiment_set_up import find_previous_run as fpr
 from experiment_set_up import user_input_validation as uiv
+from exceptions import  coregistration_exceptions as cre
 
 
 def step_five(stream, continue_stream, autoload_roi=False):
@@ -98,10 +99,8 @@ def step_five(stream, continue_stream, autoload_roi=False):
             cv2.imshow("A", a_as_16bit)
             cv2.imshow("B Prime", b_as_16bit)
 
-        except Exception as e:
-            print("Exception Occurred")
-            traceback.print_exc()
-            raise e
+        except IndexError:
+            raise cre.InvalidROIException()
 
         continue_stream = stream.keep_streaming()
 

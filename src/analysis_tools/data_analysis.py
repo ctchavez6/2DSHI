@@ -394,7 +394,7 @@ def vertically_stack_all_these_images(parent_folder, paths_to_images):
     list_ = [np.asarray(i.resize(min_shape)) for i in imgs]
     imgs_comb = np.vstack(list_)
     imgs_comb = PIL.Image.fromarray(imgs_comb)
-    imgs_comb.save(os.path.join(parent_folder, 'R_Values_Over_Horizontal_Lineout.png'))
+    imgs_comb.save(os.path.join(parent_folder, 'Values_Over_Horizontal_Lineout.png'))
 
 def delete_all_sub_images(paths_to_images):
     for path in paths_to_images:
