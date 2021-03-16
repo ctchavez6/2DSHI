@@ -51,7 +51,6 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
 
         stream.stats.append(["Frame", "Avg_R", "Sigma_R"])
 
-        # r_matrix_limit = int(input("R Matrix Frame Break: "))
         if record_r_matrices is True:
             continue_stream = True
             while continue_stream:
@@ -104,8 +103,6 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                                int(v_offset + y_b + n_sigma * stream.static_sigmas_y + 1),
                                int(h_offset + x_b - n_sigma * stream.static_sigmas_x):
                                int(h_offset + x_b + n_sigma * stream.static_sigmas_x + 1)]
-
-
 
                 h = stream.roi_b.shape[0]
                 w = stream.roi_b.shape[1]

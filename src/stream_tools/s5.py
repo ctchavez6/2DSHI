@@ -63,6 +63,7 @@ def step_five(stream, continue_stream, autoload_roi=False):
     s5_frame_count = 0
     step_description = "Step 5 - Define Regions of Interest"
     find_rois_ = uiv.yes_no_quit(step_description)
+    failed_frame_count = 0
 
     if find_rois_ is True:
         continue_stream = True
@@ -77,7 +78,7 @@ def step_five(stream, continue_stream, autoload_roi=False):
         try:
             max_n_sigma = 1
             for n_sigma in n_sigmas_to_attempt:  # , , 1.75, 2.00, 2.50]:
-                print("Attempting n_sigma = ", n_sigma)
+                #print("Attempting n_sigma = ", n_sigma)
                 attempt_successful = True
                 stream.mu_x, stream.sigma_a_x, stream.amp_x = fgp.get_gaus_boundaries_x(stream.current_frame_a,
                                                                                         stream.static_center_a)
@@ -121,26 +122,40 @@ def step_five(stream, continue_stream, autoload_roi=False):
 
             s5_frame_count += 1
             continue_stream = stream.keep_streaming()
+        except cre.BeamNotGaussianException:
+            a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
+            b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
+            cv2.imshow("A", a_as_16bit)
+            cv2.imshow("B Prime", b_as_16bit)
+            continue_stream = stream.keep_streaming()
+
         except Exception as e:
             print("Exception Occurred On n_sigma = ", n_sigma)
+
             if last_successful_index > -1:
                 print("Last Successful n_sigma = ", max_n_sigma)
-                continue_stream = False
             elif last_successful_index == -1:
                 print("The Script can not display an ROI due to an over sized sigma.\n"
                       "Please either reduce your beam size or overall brightness")
-                raise e
+                failed_frame_count += 1
+                print("Failed Frame Count: ", failed_frame_count)
+                if failed_frame_count >= 50:
+                    raise e
+
 
         # if stream.frame_count % 15 == 0:
         # print("\tB  - Sigma X, Sigma Y - {}".format((int(stream.sigma_b_x), int(stream.sigma_b_y))))
 
         if continue_stream is False:
+            if int(max(stream.sigma_a_x, stream.sigma_b_x)) < 50 or int(max(stream.sigma_a_y, stream.sigma_b_y)) < 50:
+                raise cre.ROITooSmallException()
+
             stream.static_sigmas_x = int(max(stream.sigma_a_x, stream.sigma_b_x))
             stream.static_sigmas_y = int(max(stream.sigma_a_y, stream.sigma_b_y))
 
             print("static sigma x: ", stream.static_sigmas_x)
             print("static sigma y: ", stream.static_sigmas_y)
 
-        print("max_n_sigma: ", n_sigmas_to_attempt[last_successful_index])
+        #print("max_n_sigma: ", n_sigmas_to_attempt[last_successful_index])
         stream.max_n_sigma = n_sigmas_to_attempt[last_successful_index]
     cv2.destroyAllWindows()

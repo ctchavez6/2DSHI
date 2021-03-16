@@ -405,42 +405,59 @@ class Stream:
         if self.continuous:
             self.all_cams.StartGrabbing(pylon.GrabStrategy_LatestImageOnly, pylon.GrabLoop_ProvidedByUser)
 
+        calibration_success = False
         continue_stream = False
         run_folder = os.path.join("D:", "\\" + self.current_run)
         self.prv_run_dir = fpr.get_latest_run_direc(path_override=True, path_to_exclude=self.current_run)
-        if self.jump_level <= 1:
-            s1.step_one(self, histogram, continue_stream)
 
-        if self.jump_level <= 2:
-            s2.step_two(self, continue_stream)
-        else:
-            s2.step_two(self, continue_stream, autoload_prev_wm1=True)
-        sp.store_warp_matrices(self, run_folder)
+        while calibration_success is not True:
+            try:
+                if self.jump_level <= 1:
+                    s1.step_one(self, histogram, continue_stream)
 
-        if self.jump_level <= 3:
-            s3.step_three(self, continue_stream)
-        else:
-            s3.step_three(self, continue_stream, autoload=True)
-        sp.store_brightest_pixels(self, run_folder)
+                if self.jump_level <= 2:
+                    s2.step_two(self, continue_stream)
+                else:
+                    s2.step_two(self, continue_stream, autoload_prev_wm1=True)
+                sp.store_warp_matrices(self, run_folder)
 
-        if self.warp_matrix is None:
-            self.jump_level = 10
+                if self.jump_level <= 3:
+                    s3.step_three(self, continue_stream)
+                else:
+                    s3.step_three(self, continue_stream, autoload=True)
+                sp.store_brightest_pixels(self, run_folder)
 
-        if self.jump_level <= 4:
-            s4.step_four(self)
-        else:
-            s4.step_four(self, autoload_prev_static_centers=True)
-        sp.store_static_centers(self, run_folder)
+                if self.warp_matrix is None:
+                    self.jump_level = 10
 
-        if self.jump_level <= 5:
-            s5.step_five(self, continue_stream)
-        else:
-            s5.step_five(self, continue_stream, autoload_roi=True)
-        sp.store_static_sigmas(self, run_folder)
-        sp.store_max_n_sigma(self, run_folder)
+                if self.jump_level <= 4:
+                    s4.step_four(self)
+                else:
+                    s4.step_four(self, autoload_prev_static_centers=True)
+                sp.store_static_centers(self, run_folder)
 
-        if self.jump_level <= 6:
-            s6.step_six_a(self, continue_stream)
+                if self.jump_level <= 5:
+                    s5.step_five(self, continue_stream)
+                else:
+                    s5.step_five(self, continue_stream, autoload_roi=True)
+                sp.store_static_sigmas(self, run_folder)
+                sp.store_max_n_sigma(self, run_folder)
+
+                if self.jump_level <= 6:
+                    s6.step_six_a(self, continue_stream)
+
+                calibration_success = True
+
+
+            except Exception as e:
+                print("Exception occurred somewhere along the script")
+                raise e
+                """
+                retry_calibration = uiv.yes_no_quit("Calibration Failed: Retry?")
+                if retry_calibration is not True:
+                    print("Okay: Exiting program.")
+                    sys.exit(0)
+                """
 
         #sp.store_warp_matrices(self, run_folder)
         app = tk_app.App(self)
