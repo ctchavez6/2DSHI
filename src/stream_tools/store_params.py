@@ -49,6 +49,12 @@ def store_static_centers(stream, run_folder):
             with open(os.path.join(run_folder, 'static_center_b.p'), 'wb') as fp:
                 pickle.dump(stream.static_center_b, fp, protocol=pickle.HIGHEST_PROTOCOL)
 
+def store_max_n_sigma(stream, run_folder):
+    if stream.max_n_sigma is not None:
+        print("\tWriting max n_sigma to file")
+        with open(os.path.join(run_folder, 'max_n_sigma.p'), 'wb') as fp:
+            pickle.dump(stream.max_n_sigma, fp, protocol=pickle.HIGHEST_PROTOCOL)
+
 
 def store_static_sigmas(stream, run_folder):
     if stream.static_sigmas_x is not None or stream.static_sigmas_y is not None:

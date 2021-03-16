@@ -62,6 +62,9 @@ def step_six_a(stream, continue_stream):
         cv2.imshow("ROI B Prime", bdc.to_16_bit(stream.roi_b))
         continue_stream = stream.keep_streaming()
 
+    print("End of step 6")
+    print("Shape stream.roi_a", stream.roi_a.shape)
+    print("Shape stream.roi_b", stream.roi_b.shape)
     cv2.destroyAllWindows()
 
 

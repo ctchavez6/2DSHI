@@ -105,10 +105,6 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                                int(h_offset + x_b - n_sigma * stream.static_sigmas_x):
                                int(h_offset + x_b + n_sigma * stream.static_sigmas_x + 1)]
 
-                #stream.a_frames.append(stream.current_frame_a)
-                #stream.b_prime_frames.append(stream.roi_b)
-                #stream.a_images.append(roi_a)
-                #stream.b_prime_images.append(stream.roi_b)
 
 
                 h = stream.roi_b.shape[0]

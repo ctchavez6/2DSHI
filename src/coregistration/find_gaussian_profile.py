@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from PIL import Image
 
+from exceptions import  coregistration_exceptions as cre
 
 def gaussian_distribution(x, mu, sigma, coefficient):
     """
@@ -264,13 +265,15 @@ def get_gaus_boundaries_x(image, coords_of_max):
     indices = np.arange(0, len(lineout))
     # print("Maximum has a value of image[xm, ym], which is: ", image[xm, ym])
 
-    p_initial = [image[int(xm), int(ym)] * 1.0, 960.00, 5.0, 0.0]
+    try:
+        p_initial = [image[int(xm), int(ym)] * 1.0, 960.00, 5.0, 0.0]
+        popt, pcov = curve_fit(gauss, indices, lineout, p0=p_initial)
 
-    popt, pcov = curve_fit(gauss, indices, lineout, p0=p_initial)
-
-    amp, mu, sigma = popt[0], popt[1], popt[2]
-    offset = popt[3]
-    return int(mu), int(sigma), int(amp)
+        amp, mu, sigma = popt[0], popt[1], popt[2]
+        offset = popt[3]
+        return int(mu), int(sigma), int(amp)
+    except RuntimeError:
+        raise cre.BeamNotGaussianException("The Beam lacks a Gaussian Profile (Horizontal)")
 
 
 def get_gaus_boundaries_y(image, coords_of_max):
@@ -286,11 +289,14 @@ def get_gaus_boundaries_y(image, coords_of_max):
 
     indices = np.arange(0, len(lineout))  # 0 to 1199
 
-    popt, pcov = curve_fit(gauss, indices, lineout, p0=p_initial)
+    try:
+        popt, pcov = curve_fit(gauss, indices, lineout, p0=p_initial)
 
-    amp, mu, sigma, offset = popt[0], popt[1], popt[2], popt[3]
+        amp, mu, sigma, offset = popt[0], popt[1], popt[2], popt[3]
 
-    return mu, sigma, amp
+        return mu, sigma, amp
+    except RuntimeError:
+        raise cre.BeamNotGaussianException("The Beam lacks a Gaussian Profile (Vertical)")
 
 
 def save_img(filename, directory, image, sixteen_bit=True):

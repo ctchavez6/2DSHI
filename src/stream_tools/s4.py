@@ -34,6 +34,10 @@ def step_four(stream, autoload_prev_static_centers=False):
 
     if set_centers_ is True:
         continue_stream = True
+
+        if stream.current_frame_a is None or stream.current_frame_b is None:
+            stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
+
         a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
         b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
 
@@ -78,4 +82,7 @@ def step_four(stream, autoload_prev_static_centers=False):
         cv2.imshow("B Prime", b_as_16bit)
         continue_stream = stream.keep_streaming()
 
+    print("End of step 4")
+    print("stream.static_center_a", stream.static_center_a)
+    print("stream.static_center_b", stream.static_center_b)
     cv2.destroyAllWindows()

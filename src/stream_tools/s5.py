@@ -8,6 +8,8 @@ from experiment_set_up import find_previous_run as fpr
 from experiment_set_up import user_input_validation as uiv
 from exceptions import  coregistration_exceptions as cre
 
+cam_frame_height_pixels = 1200
+cam_frame_width_pixels = 1920
 
 def step_five(stream, continue_stream, autoload_roi=False):
     """
@@ -40,16 +42,25 @@ def step_five(stream, continue_stream, autoload_roi=False):
     prev_sigma_y_path = os.path.join(previous_run_directory, "static_sigma_y.p")
     prev_sigma_y_exist = os.path.exists(prev_sigma_y_path)
 
-    if autoload_roi and prev_sigma_x_exist and prev_sigma_y_exist:
+    prev_max_n_sigma_path = os.path.join(previous_run_directory, "max_n_sigma.p")
+    prev_max_n_sigma_exists = os.path.exists(prev_max_n_sigma_path)
+
+
+    if autoload_roi and prev_sigma_x_exist and prev_sigma_y_exist and prev_max_n_sigma_exists:
         with open(prev_sigma_x_path, 'rb') as fp:
             stream.static_sigmas_x = pickle.load(fp)
 
         with open(prev_sigma_y_path, 'rb') as fp:
             stream.static_sigmas_y = pickle.load(fp)
 
+        with open(prev_max_n_sigma_path, 'rb') as fp:
+            stream.max_n_sigma = pickle.load(fp)
+
         cv2.destroyAllWindows()
         return
 
+    max_n_sigma = 0
+    s5_frame_count = 0
     step_description = "Step 5 - Define Regions of Interest"
     find_rois_ = uiv.yes_no_quit(step_description)
 
@@ -60,38 +71,47 @@ def step_five(stream, continue_stream, autoload_roi=False):
         stream.frame_count += 1
         stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
 
+        #n_sigma = 1
+        n_sigmas_to_attempt = [1, 1.25, 1.50, 1.75] #
+        last_successful_index = -1
         try:
-            for img_12bit in [stream.current_frame_a]:  # TODO: OPTIMIZE, SHOULD NOT BE ITERATING THROUGH LIST OF ONE
-                center_ = stream.static_center_a
+            max_n_sigma = 1
+            for n_sigma in n_sigmas_to_attempt:  # , , 1.75, 2.00, 2.50]:
+                print("Attempting n_sigma = ", n_sigma)
+                attempt_successful = True
+                stream.mu_x, stream.sigma_a_x, stream.amp_x = fgp.get_gaus_boundaries_x(stream.current_frame_a,
+                                                                                        stream.static_center_a)
+                stream.mu_y, stream.sigma_a_y, stream.amp_y = fgp.get_gaus_boundaries_y(stream.current_frame_a,
+                                                                                        stream.static_center_a)
 
-                n_sigma = 1
+                stream.mu_x, stream.sigma_b_x, stream.amp_x = fgp.get_gaus_boundaries_x(stream.current_frame_b,
+                                                                                        stream.static_center_b)
+                stream.mu_y, stream.sigma_b_y, stream.amp_y = fgp.get_gaus_boundaries_y(stream.current_frame_b,
+                                                                                        stream.static_center_b)
 
-                stream.mu_x, stream.sigma_a_x, stream.amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
-                stream.mu_y, stream.sigma_a_y, stream.amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
+                if int(stream.static_center_a[1]) + int(stream.sigma_a_y * n_sigma) > cam_frame_height_pixels:
+                    attempt_successful = False
+                if int(stream.static_center_b[1]) + int(stream.sigma_b_y * n_sigma) > cam_frame_height_pixels:
+                    attempt_successful = False
 
-                img_12bit[:, int(center_[0]) + int(stream.sigma_a_x * n_sigma)] = 4095
-                img_12bit[:, int(center_[0]) - int(stream.sigma_a_x * n_sigma)] = 4095
+                if int(stream.static_center_a[0]) + int(stream.sigma_a_x * n_sigma) > cam_frame_width_pixels:
+                    attempt_successful = False
+                if int(stream.static_center_b[0]) + int(stream.sigma_b_x * n_sigma) > cam_frame_width_pixels:
+                    attempt_successful = False
 
-                img_12bit[int(center_[1]) + int(stream.sigma_a_y * n_sigma), :] = 4095
-                img_12bit[int(center_[1]) - int(stream.sigma_a_y * n_sigma), :] = 4095
+                if attempt_successful:
+                    stream.current_frame_a[:, int(stream.static_center_a[0]) + int(stream.sigma_a_x * n_sigma)] = 4095
+                    stream.current_frame_a[:, int(stream.static_center_a[0]) - int(stream.sigma_a_x * n_sigma)] = 4095
+                    stream.current_frame_a[int(stream.static_center_a[1]) + int(stream.sigma_a_y * n_sigma), :] = 4095
+                    stream.current_frame_a[int(stream.static_center_a[1]) - int(stream.sigma_a_y * n_sigma), :] = 4095
 
-                if stream.frame_count % 15 == 0:
-                    print("\tA  - Sigma X, Sigma Y - {}".format((int(stream.sigma_a_x), int(stream.sigma_a_y))))
+                    stream.current_frame_b[:, int(stream.static_center_b[0]) + int(stream.sigma_b_x * n_sigma)] = 4095
+                    stream.current_frame_b[:, int(stream.static_center_b[0]) - int(stream.sigma_b_x * n_sigma)] = 4095
+                    stream.current_frame_b[int(stream.static_center_b[1]) + int(stream.sigma_b_y * n_sigma), :] = 4095
+                    stream.current_frame_b[int(stream.static_center_b[1]) - int(stream.sigma_b_y * n_sigma), :] = 4095
 
-            for img_12bit in [stream.current_frame_b]:  # TODO: OPTIMIZE, SHOULD NOT BE ITERATING THROUGH LIST OF ONE
-                center_ = stream.static_center_b
+                    last_successful_index += 1
 
-                stream.mu_x, stream.sigma_b_x, stream.amp_x = fgp.get_gaus_boundaries_x(img_12bit, center_)
-                stream.mu_y, stream.sigma_b_y, stream.amp_y = fgp.get_gaus_boundaries_y(img_12bit, center_)
-
-                img_12bit[:, int(center_[0]) + int(stream.sigma_b_x * n_sigma)] = 4095
-                img_12bit[:, int(center_[0]) - int(stream.sigma_b_x * n_sigma)] = 4095
-
-                img_12bit[int(center_[1]) + int(stream.sigma_b_y * n_sigma), :] = 4095
-                img_12bit[int(center_[1]) - int(stream.sigma_b_y * n_sigma), :] = 4095
-
-                if stream.frame_count % 15 == 0:
-                    print("\tB  - Sigma X, Sigma Y - {}".format((int(stream.sigma_b_x), int(stream.sigma_b_y))))
 
             a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
             b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
@@ -99,13 +119,28 @@ def step_five(stream, continue_stream, autoload_roi=False):
             cv2.imshow("A", a_as_16bit)
             cv2.imshow("B Prime", b_as_16bit)
 
-        except IndexError:
-            raise cre.InvalidROIException()
+            s5_frame_count += 1
+            continue_stream = stream.keep_streaming()
+        except Exception as e:
+            print("Exception Occurred On n_sigma = ", n_sigma)
+            if last_successful_index > -1:
+                print("Last Successful n_sigma = ", max_n_sigma)
+                continue_stream = False
+            elif last_successful_index == -1:
+                print("The Script can not display an ROI due to an over sized sigma.\n"
+                      "Please either reduce your beam size or overall brightness")
+                raise e
 
-        continue_stream = stream.keep_streaming()
+        # if stream.frame_count % 15 == 0:
+        # print("\tB  - Sigma X, Sigma Y - {}".format((int(stream.sigma_b_x), int(stream.sigma_b_y))))
 
         if continue_stream is False:
             stream.static_sigmas_x = int(max(stream.sigma_a_x, stream.sigma_b_x))
             stream.static_sigmas_y = int(max(stream.sigma_a_y, stream.sigma_b_y))
 
+            print("static sigma x: ", stream.static_sigmas_x)
+            print("static sigma y: ", stream.static_sigmas_y)
+
+        print("max_n_sigma: ", n_sigmas_to_attempt[last_successful_index])
+        stream.max_n_sigma = n_sigmas_to_attempt[last_successful_index]
     cv2.destroyAllWindows()

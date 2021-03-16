@@ -9,13 +9,8 @@ class App(threading.Thread):
 
     def __init__(self, stream_object=None):
         threading.Thread.__init__(self)
-        print("")
 
-        print("stream_object.prv_run_dir: ", stream_object.prv_run_dir)
-        print("stream_object.prv_run_dir: ", stream_object.prv_run_dir)
-        print("stream_object.prv_run_dir: ", stream_object.prv_run_dir)
-        print("stream_object.prv_run_dir: ", stream_object.prv_run_dir)
-
+        self.slider_maximum = stream_object.max_n_sigma
         prev_n_sigma_path = os.path.join(stream_object.prv_run_dir, "n_sigma.p")
         prev_n_sigma_exists = os.path.exists(prev_n_sigma_path)
 
@@ -112,7 +107,18 @@ class App(threading.Thread):
         label = tk.Label(self.root, text="Sigma")
         label.pack()
 
-        self.sigma_slider = tk.Scale(from_=1.00, to=2.50, tickinterval=0.0001, resolution = 0.25, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange)
+        print("App.run() -> slider max is : ", self.slider_maximum)
+
+        if self.slider_maximum > 1.00:
+            self.sigma_slider = tk.Scale(from_=1.00, to=self.slider_maximum, tickinterval=0.0001, resolution = 0.25, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange)
+
+
+        else:
+            self.sigma_slider = tk.Scale(from_=1.00, to=1.00, tickinterval=0.0001, resolution = 0.25, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange)
+            #self.sigma_slider = tk.Scale(from_=1.00, to=2.50, tickinterval=0.0001, resolution = 0.25, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange)
+            #self.sigma_slider.set(self.foo)
+            #self.sigma_slider.pack()
+
         self.sigma_slider.set(self.foo)
         self.sigma_slider.pack()
 
