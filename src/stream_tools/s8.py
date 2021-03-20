@@ -89,9 +89,6 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                 h_offset = stream.h_offset
                 v_offset = stream.v_offset
 
-                #stream.h_offset = h_offset
-                #stream.v_offset = v_offset
-
                 stream.roi_a = stream.roi_a[
                                int(v_offset + y_a - n_sigma * stream.static_sigmas_y):
                                int(v_offset + y_a + n_sigma * stream.static_sigmas_y + 1),
@@ -202,8 +199,6 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
 
                 for i, j in zip(rows, cols):
                     r_subsection_pixel_vals = np.append(r_subsection_pixel_vals, R_MATRIX[i, j])
-                    #if s8_frame_count == 1:
-                        #print(i, j, R_MATRIX[i, j])
 
                 nan_mean = np.nanmean(r_subsection_pixel_vals)
                 nan_st_dev = np.nanstd(r_subsection_pixel_vals)
@@ -275,10 +270,6 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                         averages = list()
                         sigmas = list()
 
-                        strt_frame_msg = "Start at frame: "
-                        end_frame_msg = "End at frame: "
-
-
                         starting_frame = int(input("Start at frame: "))
                         end_frame = int(input("End at frame: "))
 
@@ -317,9 +308,6 @@ def step_eight(stream, run_folder, app, figs, histograms, lines, histograms_alg,
                             frames.append(stream.stats[i][0])
                             averages.append(stream.stats[i][1])
                             sigmas.append(stream.stats[i][2])
-
-                            #stream.s8_full_a_frames_to_save.append(stream.s8_full_a_frames[i])
-                            #stream.s8_full_b_frames_to_save.append(stream.s8_full_b_frames[i])
 
 
                         ax1.errorbar(frames, averages, yerr=sigmas, c='b', capsize=5)

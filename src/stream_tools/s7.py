@@ -257,10 +257,7 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         hist_img_r = bdc.to_16_bit(cv2.resize(hist_img_r, (w, h), interpolation=cv2.INTER_AREA), 8)
         R_HIST = (cv2.cvtColor(hist_img_r, cv2.COLOR_RGB2BGR))
 
-
-
         R_VALUES = Image.new('RGB', (dr_width, dr_height), (eight_bit_max, eight_bit_max, eight_bit_max))
-
 
         draw = ImageDraw.Draw(R_VALUES)
         font = ImageFont.truetype('arial.ttf', size=int(20*n_sigma))
@@ -276,8 +273,6 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
         px_to_mm = 5.86 * (10 ** (-3))
         message = message + "Shape (px): {0}, {1}".format(h_R_MATRIX, w_R_MATRIX) + "\n"
         message = message + "Shape (mm):  {0:.2f},  {1:.2f}".format(h_R_MATRIX*px_to_mm, w_R_MATRIX*px_to_mm) + "\n"
-
-
 
         color = 'rgb(0, 0, 0)'  # black color
         draw.text((x, y), message, fill=color, font=font)
@@ -302,17 +297,12 @@ def step_seven(stream, app, figs, histograms, lines, histograms_alg, lines_alg, 
                 pass
             else:
                 pass
-                #if app is not None:
-                    #app.callback()
 
                 cv2.destroyAllWindows()
 
         s7_frame_count += 1
         stream.R_HIST = R_HIST
         frames_we_went_through += 1
-
-
-
 
 
     cv2.destroyAllWindows()
