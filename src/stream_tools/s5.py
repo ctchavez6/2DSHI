@@ -73,7 +73,7 @@ def step_five(stream, continue_stream, autoload_roi=False):
         stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
 
         #n_sigma = 1
-        n_sigmas_to_attempt = [1, 1.25, 1.50, 1.75] #
+        n_sigmas_to_attempt = [1, 1.25, 1.50, 1.75, 2.0, 2.25, 2.5] #
         last_successful_index = -1
         try:
             max_n_sigma = 1

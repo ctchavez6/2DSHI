@@ -28,7 +28,8 @@ R_MATRIX = values_r_sample
 
 run_directory = os.path.abspath(os.path.join(filename_R_sample, os.pardir))
 
-angle = 10
+angle = 90
+
 data = rotate(R_MATRIX, angle)
 
 plt.imshow(data)
