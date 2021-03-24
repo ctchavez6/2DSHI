@@ -6,10 +6,11 @@ from coregistration import find_gaussian_profile as fgp
 import os, sys
 from . import App as tk_app
 from . import histograms as hgs
-from . import s1, s2, s3, s4, s5, s6, s7, s8, s9, s10
+from . import s1, s2, s3, s4, s5, s6, s7, s8, s9
 from experiment_set_up import user_input_validation as uiv
 from . import store_params as sp
 from experiment_set_up import find_previous_run as fpr
+from constants import STEP_DESCRIPTIONS as sd
 
 
 twelve_bit_max = (2 ** 12) - 1
@@ -146,7 +147,7 @@ class Stream:
         level_descriptions = {
             1: "Step 1 : Stream Raw Camera Feed",
             2: "Step 2 : Co-Register with Euclidean Transform",
-            3: "Step 3 : Find Brightest Pixel Locations",
+            3: sd.S03_DESC.value, #"Step 3 : Find Brightest Pixel Locations",
             4: "Step 4 : Set Gaussian-Based Static Centers",
             5: "Step 5 : Define Regions of Interest",
             6: "Step 6 : Close in on ROI & Re-Co Register",
@@ -422,29 +423,23 @@ class Stream:
                 sp.store_warp_matrices(self, run_folder)
 
                 if self.jump_level <= 3:
-                    s3.step_three(self, continue_stream)
+                    s3.step_three(self)
                 else:
-                    s3.step_three(self, continue_stream, autoload=True)
-                sp.store_brightest_pixels(self, run_folder)
+                    s3.step_three(self, autoload_prev_static_centers=True)
+                sp.store_static_centers(self, run_folder)
 
                 if self.warp_matrix is None:
                     self.jump_level = 10
 
                 if self.jump_level <= 4:
-                    s4.step_four(self)
+                    s4.step_four(self, continue_stream)
                 else:
-                    s4.step_four(self, autoload_prev_static_centers=True)
-                sp.store_static_centers(self, run_folder)
-
-                if self.jump_level <= 5:
-                    s5.step_five(self, continue_stream)
-                else:
-                    s5.step_five(self, continue_stream, autoload_roi=True)
+                    s4.step_four(self, continue_stream, autoload_roi=True)
                 sp.store_static_sigmas(self, run_folder)
                 sp.store_max_n_sigma(self, run_folder)
 
-                if self.jump_level <= 6:
-                    s6.step_six_a(self, continue_stream)
+                if self.jump_level <= 5:
+                    s5.step_five(self, continue_stream)
 
                 calibration_success = True
 
@@ -466,14 +461,14 @@ class Stream:
         figs_alg, histograms_alg, lines_alg = hgs.initialize_histograms_algebra()
         figs_r, histograms_r, lines_r = hgs.initialize_histograms_r()
 
-        step = 7
+        step = 6
 
         if self.static_center_a is None or self.static_center_b is None:
             print("Regions of Interest not defined: Exiting Program")
             sys.exit(0)
 
         if self.jump_level <= step:
-            s7.step_seven(self, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
+            s6.step_six(self, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                    histograms_r, lines_r, figs_r)
 
             sp.store_n_sigma(self, run_folder)
@@ -486,14 +481,14 @@ class Stream:
         self.a_images = list()
         self.b_prime_images = list()
 
-        if self.jump_level <= 8:
-            s8.step_eight(self, run_folder, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
+        if self.jump_level <= 7:
+            s7.step_seven(self, run_folder, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                histograms_r, lines_r, figs_r)
 
-        if self.jump_level <= 9:
-            s9.step_nine(self, self.start_writing_at, self.end_writing_at, run_folder, self.a_images, self.s8_full_a_frames,
+        if self.jump_level <= 8:
+            s8.step_eight(self, self.start_writing_at, self.end_writing_at, run_folder, self.a_images, self.s8_full_a_frames,
                          self.b_prime_images, self.s8_full_b_frames, self.stats)
 
         if self.all_cams.IsGrabbing():
             self.all_cams.StopGrabbing()
-        s10.step_ten(run_folder)
+        s9.step_nine(run_folder)

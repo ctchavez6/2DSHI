@@ -1,69 +1,79 @@
-from coregistration import find_gaussian_profile as fgp
 from image_processing import bit_depth_conversion as bdc
-import cv2
-import traceback
+from coregistration import img_characterization as ic
+import numpy as np
 import os
-import pickle
+import cv2
 from experiment_set_up import find_previous_run as fpr
 from experiment_set_up import user_input_validation as uiv
-from exceptions import  coregistration_exceptions as cre
 
-cam_frame_height_pixels = 1200
-cam_frame_width_pixels = 1920
 
-def step_five(stream, continue_stream, autoload_roi=False):
+def load_wm2_if_present(stream):
     """
-    This step finds the Regions of interest of both images.
-    The Regions of Interest are comprised of:
-        Sigma_X: Standard deviation of beam's gaussian profile in the horizontal direction
-        Sigma_Y: Standard deviation of beam's gaussian profile in the vertical direction
-        Static Center A: The coordinates of the Gaussian Peak for Camera A
-        Static Center B: The coordinates of the Gaussian Peak for Camera B
-
-         _ _ _ _ _ _ _ _ _
-        |                 |
-        |                 |
-        |    (x_a,y_a)    | 2*sigma_y
-        |                 |
-        |                 |
-         _ _ _ _ _ _ _ _ _
-             2*sigma_x
+    If a second Warp Matrix was created during the previous run, this function may be used to call and load it into the
+    current run.
 
     Args:
-        stream (Stream): Instance of stream class currently connected to cameras
-        continue_stream (bool): Should camera keep streaming. TODO: CHECK IF THIS CAN JUST EXIST IN S5 NAMESPACE
+        stream (Stream): Instance of a Stream object currently connected to cameras A and B.
 
     """
     previous_run_directory = fpr.get_latest_run_direc(path_override=True, path_to_exclude=stream.current_run)
 
-    prev_sigma_x_path = os.path.join(previous_run_directory, "static_sigma_x.p")
-    prev_sigma_x_exist = os.path.exists(prev_sigma_x_path)
+    prev_wp2_path = os.path.join(previous_run_directory, "wm1.npy")
+    prev_wp2_exist = os.path.exists(prev_wp2_path)
 
-    prev_sigma_y_path = os.path.join(previous_run_directory, "static_sigma_y.p")
-    prev_sigma_y_exist = os.path.exists(prev_sigma_y_path)
-
-    prev_max_n_sigma_path = os.path.join(previous_run_directory, "max_n_sigma.p")
-    prev_max_n_sigma_exists = os.path.exists(prev_max_n_sigma_path)
-
-
-    if autoload_roi and prev_sigma_x_exist and prev_sigma_y_exist and prev_max_n_sigma_exists:
-        with open(prev_sigma_x_path, 'rb') as fp:
-            stream.static_sigmas_x = pickle.load(fp)
-
-        with open(prev_sigma_y_path, 'rb') as fp:
-            stream.static_sigmas_y = pickle.load(fp)
-
-        with open(prev_max_n_sigma_path, 'rb') as fp:
-            stream.max_n_sigma = pickle.load(fp)
-
+    if prev_wp2_exist:
+        stream.warp_matrix = np.load(prev_wp2_path)
         cv2.destroyAllWindows()
         return
+# TODO: ADD FUNCTION STEP 6 THAT AUTOMATICALLY GOES THROUGH 6A-6C SO THAT MAIN AND STREAM TOOLS LOOK CLEANER
 
-    max_n_sigma = 0
-    s5_frame_count = 0
-    step_description = "Step 5 - Define Regions of Interest"
-    find_rois_ = uiv.yes_no_quit(step_description)
-    failed_frame_count = 0
+def step_five(stream, continue_stream):
+    """
+    During Step 5 the ROI is shown, but you can still see the rest of the image. Here we are able to only show pixels
+    that fall inside our regions of interest.
+
+    """
+    desc = "Step 5 - Close in on ROI?"
+    close_in = uiv.yes_no_quit(desc)
+
+    if close_in is True:
+        continue_stream = True
+
+    while continue_stream:
+        stream.frame_count += 1
+        stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
+
+        x_a, y_a = stream.static_center_a
+        x_b, y_b = stream.static_center_b
+
+        n_sigma = 1
+
+        stream.roi_a = stream.current_frame_a[
+                     y_a - n_sigma * stream.static_sigmas_y: y_a + n_sigma * stream.static_sigmas_y + 1,
+                     x_a - n_sigma * stream.static_sigmas_x: x_a + n_sigma * stream.static_sigmas_x + 1
+                     ]
+
+        stream.roi_b = stream.current_frame_b[
+                     y_b - n_sigma * stream.static_sigmas_y: y_b + n_sigma * stream.static_sigmas_y + 1,
+                     x_b - n_sigma * stream.static_sigmas_x: x_b + n_sigma * stream.static_sigmas_x + 1
+                     ]
+
+        cv2.imshow("ROI A", bdc.to_16_bit(stream.roi_a))
+        cv2.imshow("ROI B Prime", bdc.to_16_bit(stream.roi_b))
+        continue_stream = stream.keep_streaming()
+
+    cv2.destroyAllWindows()
+
+
+def step_six_b(stream, continue_stream, app):
+    """
+    Now our images are much smaller (Started at 800x1200 pixels and are now down to maybe 300x300 depending on beam
+    intensity), we might be able to get a better co-registration by searching for a new Euclidean Transform. At this
+    step, user will have a choice whether or not they want a second warp matrix or to proceed with just the initial.
+
+    """
+    desc = "Step 6B - Re-Coregister?"
+    find_rois_ = uiv.yes_no_quit(desc)
 
     if find_rois_ is True:
         continue_stream = True
@@ -72,90 +82,103 @@ def step_five(stream, continue_stream, autoload_roi=False):
         stream.frame_count += 1
         stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
 
-        #n_sigma = 1
-        n_sigmas_to_attempt = [1, 1.25, 1.50, 1.75, 2.0, 2.25, 2.5]
-        last_successful_index = -1
+        x_a, y_a = stream.static_center_a
+        x_b, y_b = stream.static_center_b
+
+        n_sigma = app.foo
         try:
-            max_n_sigma = 1
-            for n_sigma in n_sigmas_to_attempt:  # , , 1.75, 2.00, 2.50]:
-                #print("Attempting n_sigma = ", n_sigma)
-                attempt_successful = True
-                stream.mu_x, stream.sigma_a_x, stream.amp_x = fgp.get_gaus_boundaries_x(stream.current_frame_a,
-                                                                                        stream.static_center_a)
-                stream.mu_y, stream.sigma_a_y, stream.amp_y = fgp.get_gaus_boundaries_y(stream.current_frame_a,
-                                                                                        stream.static_center_a)
+            stream.roi_a = stream.current_frame_a[
+                         y_a - n_sigma * stream.static_sigmas_y: y_a + n_sigma * stream.static_sigmas_y + 1,
+                         x_a - n_sigma * stream.static_sigmas_x: x_a + n_sigma * stream.static_sigmas_x + 1
+                         ]
 
-                stream.mu_x, stream.sigma_b_x, stream.amp_x = fgp.get_gaus_boundaries_x(stream.current_frame_b,
-                                                                                        stream.static_center_b)
-                stream.mu_y, stream.sigma_b_y, stream.amp_y = fgp.get_gaus_boundaries_y(stream.current_frame_b,
-                                                                                        stream.static_center_b)
-
-                if int(stream.static_center_a[1]) + int(stream.sigma_a_y * n_sigma) > cam_frame_height_pixels:
-                    attempt_successful = False
-                if int(stream.static_center_b[1]) + int(stream.sigma_b_y * n_sigma) > cam_frame_height_pixels:
-                    attempt_successful = False
-
-                if int(stream.static_center_a[0]) + int(stream.sigma_a_x * n_sigma) > cam_frame_width_pixels:
-                    attempt_successful = False
-                if int(stream.static_center_b[0]) + int(stream.sigma_b_x * n_sigma) > cam_frame_width_pixels:
-                    attempt_successful = False
-
-                if attempt_successful:
-                    stream.current_frame_a[:, int(stream.static_center_a[0]) + int(stream.sigma_a_x * n_sigma)] = 4095
-                    stream.current_frame_a[:, int(stream.static_center_a[0]) - int(stream.sigma_a_x * n_sigma)] = 4095
-                    stream.current_frame_a[int(stream.static_center_a[1]) + int(stream.sigma_a_y * n_sigma), :] = 4095
-                    stream.current_frame_a[int(stream.static_center_a[1]) - int(stream.sigma_a_y * n_sigma), :] = 4095
-
-                    stream.current_frame_b[:, int(stream.static_center_b[0]) + int(stream.sigma_b_x * n_sigma)] = 4095
-                    stream.current_frame_b[:, int(stream.static_center_b[0]) - int(stream.sigma_b_x * n_sigma)] = 4095
-                    stream.current_frame_b[int(stream.static_center_b[1]) + int(stream.sigma_b_y * n_sigma), :] = 4095
-                    stream.current_frame_b[int(stream.static_center_b[1]) - int(stream.sigma_b_y * n_sigma), :] = 4095
-
-                    last_successful_index += 1
-
-
-            a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
-            b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
-
-            cv2.imshow("A", a_as_16bit)
-            cv2.imshow("B Prime", b_as_16bit)
-
-            s5_frame_count += 1
-            continue_stream = stream.keep_streaming()
-        except cre.BeamNotGaussianException:
-            a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
-            b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
-            cv2.imshow("A", a_as_16bit)
-            cv2.imshow("B Prime", b_as_16bit)
-            continue_stream = stream.keep_streaming()
-
+            stream.roi_b = stream.current_frame_b[
+                         y_b - n_sigma * stream.static_sigmas_y: y_b + n_sigma * stream.static_sigmas_y + 1,
+                         x_b - n_sigma * stream.static_sigmas_x: x_b + n_sigma * stream.static_sigmas_x + 1
+                         ]
         except Exception as e:
-            print("Exception Occurred On n_sigma = ", n_sigma)
+            print("Error occurred trying to set warp matrices")
+            print("Please verify validity of following variables:")
+            potential_error_vars = {
+                "x_a": x_a,
+                "y_a": y_a,
+                "n_sigma": n_sigma,
+                "stream.static_sigmas_y": stream.static_sigmas_y,
+                "stream.static_sigmas_x": stream.static_sigmas_x,
+            }
 
-            if last_successful_index > -1:
-                print("Last Successful n_sigma = ", max_n_sigma)
-            elif last_successful_index == -1:
-                print("The Script can not display an ROI due to an over sized sigma.\n"
-                      "Please either reduce your beam size or overall brightness")
-                failed_frame_count += 1
-                print("Failed Frame Count: ", failed_frame_count)
-                if failed_frame_count >= 50:
-                    raise e
+            for var in potential_error_vars:
+                print(var, type(potential_error_vars[var]), var)
 
+            raise e
 
-        # if stream.frame_count % 15 == 0:
-        # print("\tB  - Sigma X, Sigma Y - {}".format((int(stream.sigma_b_x), int(stream.sigma_b_y))))
+        roi_a_8bit = bdc.to_8_bit(stream.roi_a)
+        roi_b_8bit = bdc.to_8_bit(stream.roi_b)
+        warp_2_ = ic.get_euclidean_transform_matrix(roi_a_8bit, roi_b_8bit)
+        stream.warp_matrix_2 = warp_2_
 
-        if continue_stream is False:
-            if int(max(stream.sigma_a_x, stream.sigma_b_x)) < 50 or int(max(stream.sigma_a_y, stream.sigma_b_y)) < 50:
-                raise cre.ROITooSmallException()
+        a, b, tx = warp_2_[0][0], warp_2_[0][1], warp_2_[0][2]
+        c, d, ty = warp_2_[1][0], warp_2_[1][1], warp_2_[1][2]
 
-            stream.static_sigmas_x = int(max(stream.sigma_a_x, stream.sigma_b_x))
-            stream.static_sigmas_y = int(max(stream.sigma_a_y, stream.sigma_b_y))
+        # TODO: ADD A PARAMETER THAT MAKES PRINTING OPTIONAL
 
-            print("static sigma x: ", stream.static_sigmas_x)
-            print("static sigma y: ", stream.static_sigmas_y)
+        print("\tTranslation X:{}".format(tx))
+        print("\tTranslation Y:{}\n".format(ty))
 
-        #print("max_n_sigma: ", n_sigmas_to_attempt[last_successful_index])
-        stream.max_n_sigma = n_sigmas_to_attempt[last_successful_index]
+        scale_x = np.sign(a) * (np.sqrt(a ** 2 + b ** 2))
+        scale_y = np.sign(d) * (np.sqrt(c ** 2 + d ** 2))
+
+        print("\tScale X:{}".format(scale_x))
+        print("\tScale Y:{}\n".format(scale_y))
+
+        phi = np.arctan2(-1.0 * b, a)
+        print("\tPhi Y (rad):{}".format(phi))
+        print("\tPhi Y (deg):{}\n".format(np.degrees(phi)))
+        continue_stream = False
+
+    cv2.destroyAllWindows()
+
+def step_six_c(stream, continue_stream):
+    """
+    Here we may display the newly re-co-registered images
+
+    """
+    desc = "Step 6C - Display Re-Coregistered Images ?"
+    display_new = uiv.yes_no_quit(desc)
+
+    if display_new is True:
+        continue_stream = True
+
+    cv2.destroyAllWindows()
+
+    while continue_stream:
+        stream.frame_count += 1
+        stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
+
+        x_a, y_a = stream.static_center_a
+        x_b, y_b = stream.static_center_b
+
+        n_sigma = 3.0
+
+        stream.roi_a = stream.current_frame_a[
+                     int(y_a - n_sigma * stream.static_sigmas_y): int(y_a + n_sigma * stream.static_sigmas_y) + 1,
+                     int(x_a - n_sigma * stream.static_sigmas_x): int(x_a + n_sigma * stream.static_sigmas_x) + 1]
+
+        stream.roi_b = stream.current_frame_b[
+                     int(y_b - n_sigma * stream.static_sigmas_y): int(y_b + n_sigma * stream.static_sigmas_y) + 1,
+                     int(x_b - n_sigma * stream.static_sigmas_x): int(x_b + n_sigma * stream.static_sigmas_x) + 1]
+
+        cv2.imshow("ROI A", bdc.to_16_bit(stream.roi_a))
+        cv2.imshow("ROI B Prime", bdc.to_16_bit(stream.roi_b))
+
+        if stream.warp_matrix_2 is None:
+            roi_a = stream.roi_a  #TODO: ARE WE EVEN USING ROI A HERE?
+            b_double_prime = stream.roi_b
+        else:
+            roi_a, b_double_prime = stream.grab_frames2(stream.roi_a.copy(), stream.roi_b.copy(), stream.warp_matrix_2.copy())
+
+        cv2.imshow("ROI B DOUBLE PRIME", bdc.to_16_bit(b_double_prime))
+
+        continue_stream = stream.keep_streaming()
+
     cv2.destroyAllWindows()

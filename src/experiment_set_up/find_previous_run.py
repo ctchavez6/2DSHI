@@ -97,6 +97,7 @@ def get_highest_jump_level(stream):
     if prev_wp1_exist:
         highest_jump_level = 3
 
+    """
     prev_bpa_path = os.path.join(previous_run_directory, "max_pixel_a.p")
     prev_bpa_exist = os.path.exists(prev_bpa_path)
 
@@ -107,6 +108,7 @@ def get_highest_jump_level(stream):
         highest_jump_level = 4
     else:
         return highest_jump_level
+    """
 
     prev_sca_path = os.path.join(previous_run_directory, "static_center_a.p")
     prev_sca_exist = os.path.exists(prev_sca_path)
@@ -114,8 +116,8 @@ def get_highest_jump_level(stream):
     prev_scb_path = os.path.join(previous_run_directory, "static_center_b.p")
     prev_scb_exist = os.path.exists(prev_scb_path)
 
-    if highest_jump_level == 4 and (prev_sca_exist and prev_scb_exist):
-        highest_jump_level = 5
+    if highest_jump_level == 3 and (prev_sca_exist and prev_scb_exist):
+        highest_jump_level = 4
     else:
         return highest_jump_level
 
@@ -125,14 +127,14 @@ def get_highest_jump_level(stream):
     prev_sigma_y_path = os.path.join(previous_run_directory, "static_sigma_y.p")
     prev_sigma_y_exist = os.path.exists(prev_sigma_y_path)
 
-    if highest_jump_level == 5 and (prev_sigma_x_exist and prev_sigma_y_exist):
-        highest_jump_level = 6
+    if highest_jump_level == 4 and (prev_sigma_x_exist and prev_sigma_y_exist):
+        highest_jump_level = 5
 
     prev_wp2_path = os.path.join(previous_run_directory, "wm2.npy")
     prev_wp2_exist = os.path.exists(prev_wp2_path)
 
-    if highest_jump_level == 6 and (prev_wp2_exist or prev_wp1_exist):
-        highest_jump_level = 7
+    if highest_jump_level == 5 and (prev_wp2_exist or prev_wp1_exist):
+        highest_jump_level = 6
 
     return highest_jump_level
 

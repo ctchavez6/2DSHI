@@ -1,5 +1,6 @@
 import cv2
 from experiment_set_up import user_input_validation as uiv
+from constants import STEP_DESCRIPTIONS as sd
 
 def step_one(stream, histogram, continue_stream):
     """
@@ -13,7 +14,8 @@ def step_one(stream, histogram, continue_stream):
     Returns:
         bool: The return value. True for success, False otherwise.
     """
-    step_description = "Step 1 - Stream Raw Camera Feed"
+    step_description = sd.S01_DESC.value
+    #step_description = "Step 1 - Stream Raw Camera Feed"
     start = uiv.yes_no_quit(step_description)  # Grabs user input for whether or not they want to proceed w/ Step 1.
     display_stream = True if start is True else False
 
