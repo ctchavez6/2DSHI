@@ -6,12 +6,11 @@ import cv2
 import os
 from experiment_set_up import user_input_validation as uiv
 from constants import STEP_DESCRIPTIONS as sd
+import matplotlib as plt
 from matplotlib import pyplot
 import matplotlib.ticker as plticker
 
 eight_bit_max = (2 ** 8) - 1
-twelve_bit_max = (2 ** 12) - 1
-
 y_n_msg = "Proceed? (y/n): "
 
 
@@ -34,58 +33,24 @@ def step_three(stream, autoload_prev_static_centers=False):
         cv2.destroyAllWindows()
         return
 
-
-    step_description = "S3 FREESTREAM GRIDLINES"
-    freestream_ = uiv.yes_no_quit(step_description)
-
-    if freestream_ is True:
-        continue_stream = True
-
-        while continue_stream:
-            stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
-
-
-
-            y_gridlines = [99, 199, 299, 399,499,599,699,799,899,999,1099,1199,1299,1399,1499,1599,1699,1799,1899]
-            x_gridlines = [99, 199, 299, 399,499,599,699,799,899,999,1099,1199]
-
-            for cam_frame in [stream.current_frame_a, stream.current_frame_b]:
-                for x_gridlines_index in x_gridlines:
-                    cam_frame[x_gridlines_index, :] = twelve_bit_max
-                for y_gridlines_index in y_gridlines:
-                    cam_frame[:, y_gridlines_index] = twelve_bit_max
-
-            a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
-            b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
-
-            cv2.imshow("A-GL", a_as_16bit)
-            cv2.imshow("B Prime -GL", b_as_16bit)
-            continue_stream = stream.keep_streaming()
-
-        cv2.destroyAllWindows()
-    cv2.destroyAllWindows()
-
-        #here is where we find the static centers in a new run by looking for the brightest pixel
-
-
-
-
     step_description = sd.S03_DESC.value
     set_centers_ = uiv.yes_no_quit(step_description)
 
     if set_centers_ is True:
         continue_stream = True
 
+        #add lineouts to be able to find center more easily
+
         if stream.current_frame_a is None or stream.current_frame_b is None:
             stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
+
         #here is where we find the static centers in a new run by looking for the brightest pixel
 
         a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
         b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
 
-        max_pixel_a, max_pixel_b = stream.find_centers(a_as_16bit, b_as_16bit)
-        print(max_pixel_a,max_pixel_b)
-        #max_pixel_a, max_pixel_b = input("enter coordinates of the center of the object as '(ax,ay),(bx,by)'")
+        max_pixel_a, max_pixel_b = input("enter coordinates of the center of the object as '(ax,ay),(bx,by)'")
+        #max_pixel_a, max_pixel_b = stream.find_centers(a_as_16bit, b_as_16bit)
 
         stream.mu_a_x, stream.sigma_a_x, stream.amp_a_x = fgp.get_gaus_boundaries_x(stream.current_frame_a, max_pixel_a)
         stream.mu_a_y, stream.sigma_a_y, stream.amp_a_y = fgp.get_gaus_boundaries_y(stream.current_frame_a, max_pixel_a)
@@ -104,52 +69,42 @@ def step_three(stream, autoload_prev_static_centers=False):
         print("\t\tB Prime (Overwritten to A): {}".format(stream.static_center_a))
 
         option = input("Would you like to use the \n\tcalculated gaussian center (y) "
-                       "\n\tor the overwritten gaussian center (n)  "
-                       "\n\tor a user input(new):")
+                       "\n\tor the overwritten gaussian center (n):  ")
 
         if option == "y":
             stream.static_center_b = (int(stream.mu_b_x), int(stream.mu_b_y))  # Picking A
         elif option == "n":
             stream.static_center_b = stream.static_center_a
-        elif option =="new":
-            stream.static_center_a = int(input("ax: ")), int(input("ay: "))
-            stream.static_center_b = int(input("bx: ")), int(input("by: "))
-
-
 
     else:
         continue_stream = False
         stream.jump_level = 10
 
     while continue_stream:
+        #here is where we can add the lineouts per image
         stream.frame_count += 1
-
-
-
+        stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
         a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
         b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
+        my_dpi = 200
 
-        """""
-        This is all new to try to make grids on a visible cam a and cam b 
-        """""
-        # continue_stream = stream.keep_streaming()
-        # my_dpi = 200
+        fig = pyplot.figure(figsize=(float(stream.current_frame_a.size[0]) / my_dpi, float(stream.current_frame_a.size[1]) / my_dpi), dpi=my_dpi)
+        ax = fig.add_subplot(111)
+        # Set the gridding interval: here we use the major tick interval
+        myInterval = 300.
+        loc = plticker.MultipleLocator(base=myInterval)
+        ax.xaxis.set_major_locator(loc)
+        ax.yaxis.set_major_locator(loc)
+
+        # Add the grid
+        ax.grid(which='major', axis='both', linestyle='-', color='g')
         #
-        # fig = pyplot.figure(
-        #     figsize=(float(stream.current_frame_a.size[0]) / my_dpi, float(stream.current_frame_a.size[1]) / my_dpi),
-        #     dpi=my_dpi)
-        # ax = fig.add_subplot(111)
-        # # Set the gridding interval: here we use the major tick interval
-        # myInterval = 300.
-        # loc = plticker.MultipleLocator(base=myInterval)
-        # ax.xaxis.set_major_locator(loc)
-        # ax.yaxis.set_major_locator(loc)
-        #
-        # # Add the grid
-        # ax.grid(which='major', axis='both', linestyle='-', color='g')
-        # #
-        # # # Add the image
-        # # ax.imshow(image)
+        # # Add the image
+        # ax.imshow(image)
+
+        # Find number of gridsquares in x and y direction
+        nx = abs(int(float(ax.get_xlim()[1] - ax.get_xlim()[0]) / float(myInterval)))
+        ny = abs(int(float(ax.get_ylim()[1] - ax.get_ylim()[0]) / float(myInterval)))
 
         a_as_16bit = cv2.circle(a_as_16bit, stream.static_center_a, 10, (0, eight_bit_max, 0), 2)
         b_as_16bit = cv2.circle(b_as_16bit, stream.static_center_b, 10, (0, eight_bit_max, 0), 2)

@@ -6,6 +6,7 @@ import cv2
 from experiment_set_up import find_previous_run as fpr
 from experiment_set_up import user_input_validation as uiv
 
+from constants import STEP_DESCRIPTIONS as sd
 
 def load_wm2_if_present(stream):
     """
@@ -33,7 +34,7 @@ def step_five(stream, continue_stream):
     that fall inside our regions of interest.
 
     """
-    desc = "Step 5 - Close in on ROI?"
+    desc = sd.S05_DESC.value
     close_in = uiv.yes_no_quit(desc)
 
     if close_in is True:

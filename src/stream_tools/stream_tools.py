@@ -141,17 +141,14 @@ class Stream:
         self.warp_matrix_2 = w
 
     def offer_to_jump(self, highest_possible_jump):
-        desc = "Would you like to use the previous parameters to JUMP to a specific step?"
-        offer = uiv.yes_no_quit(desc)
-        #offer = input("Would you like to use the previous parameters to JUMP to a specific step? (y/n): ")
+        offer = uiv.yes_no_quit(sd.OFFER_TO_JUMP.value)
         level_descriptions = {
-            1: "Step 1 : Stream Raw Camera Feed",
-            2: "Step 2 : Co-Register with Euclidean Transform",
-            3: sd.S03_DESC.value, #"Step 3 : Find Brightest Pixel Locations",
-            4: "Step 4 : Set Gaussian-Based Static Centers",
-            5: "Step 5 : Define Regions of Interest",
-            6: "Step 6 : Close in on ROI & Re-Co Register",
-            7: "Step 7 : Commence Image Algebra (Free Stream)"
+            1: sd.S01_DESC.value,
+            2: sd.S02_DESC_NO_PREV_WARP_MATRIX.value,
+            3: sd.S03_DESC.value,
+            4: sd.S04_DESC.value,
+            5: sd.S05_DESC.value,
+            6: sd.S06_DESC.value
         }
 
         options = set()
@@ -162,10 +159,10 @@ class Stream:
                     print(level_descriptions[i])
                     options.add(str(i))
 
-            jump_level_input = input("Which level would you like to jump to?  ")
+            jump_level_input = input(sd.WHICH_LEVEL.value)
 
             while not uiv.valid_input(jump_level_input, options):
-                jump_level_input = input("Which level would you like to jump to?  ")
+                jump_level_input = input(sd.WHICH_LEVEL.value)
 
             self.jump_level = int(jump_level_input)
 
@@ -443,18 +440,16 @@ class Stream:
 
                 calibration_success = True
 
-
             except Exception as e:
                 print("Exception occurred somewhere along the script")
                 raise e
                 """
-                retry_calibration = uiv.yes_no_quit("Calibration Failed: Retry?")
+                retry_calibration = uiv.yes_no_quit(sd.RETRY_CALIBRATION.value)
                 if retry_calibration is not True:
                     print("Okay: Exiting program.")
                     sys.exit(0)
                 """
 
-        #sp.store_warp_matrices(self, run_folder)
         app = tk_app.App(self)
         self.tkapp = app
         figs, histograms, lines = hgs.initialize_histograms_rois()

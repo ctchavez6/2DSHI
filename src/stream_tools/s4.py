@@ -7,6 +7,7 @@ import pickle
 from experiment_set_up import find_previous_run as fpr
 from experiment_set_up import user_input_validation as uiv
 from exceptions import  coregistration_exceptions as cre
+from constants import STEP_DESCRIPTIONS as sd
 
 cam_frame_height_pixels = 1200
 cam_frame_width_pixels = 1920
@@ -61,7 +62,7 @@ def step_four(stream, continue_stream, autoload_roi=False):
 
     max_n_sigma = 0
     s5_frame_count = 0
-    step_description = "Step 4 - Define Regions of Interest"
+    step_description = sd.S04_DESC.value
     find_rois_ = uiv.yes_no_quit(step_description)
     failed_frame_count = 0
 
@@ -150,8 +151,10 @@ def step_four(stream, continue_stream, autoload_roi=False):
             if int(max(stream.sigma_a_x, stream.sigma_b_x)) < 50 or int(max(stream.sigma_a_y, stream.sigma_b_y)) < 50:
                 raise cre.ROITooSmallException()
 
-            stream.static_sigmas_x = int(max(stream.sigma_a_x, stream.sigma_b_x))
-            stream.static_sigmas_y = int(max(stream.sigma_a_y, stream.sigma_b_y))
+            # stream.static_sigmas_x = int(max(stream.sigma_a_x, stream.sigma_b_x))
+            # stream.static_sigmas_y = int(max(stream.sigma_a_y, stream.sigma_b_y))
+            stream.static_sigmas_x = int(input("sigma a: "))
+            stream.static_sigmas_y = int(input("sigma b: "))
 
             print("static sigma x: ", stream.static_sigmas_x)
             print("static sigma y: ", stream.static_sigmas_y)

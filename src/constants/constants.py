@@ -8,6 +8,9 @@ class CONSTANTS(Enum):
     EPSILON = sys.float_info.epsilon  # Smallest possible difference
 
 class STEP_DESCRIPTIONS(Enum):
+    OFFER_TO_JUMP = "Would you like to use the previous parameters to JUMP to a specific step?"
+    WHICH_LEVEL = "Which level would you like to jump to?  "
+
     S01_DESC = "Step 1 - Stream Raw Camera Feed"
     S02_DESC_PREV_WARP_MATRIX = "Step 2 - You created a Warp Matrix 1 last run. Would you like to use it?"
     S02_DESC_NO_PREV_WARP_MATRIX = "Step 2 - New Co-Registration with with Euclidean Transform"
@@ -18,3 +21,5 @@ class STEP_DESCRIPTIONS(Enum):
     S07_DESC = "Step 7 - Image Algebra (Record): Proceed"
     S08_DESC = "Step 8 - Write Recorded R Frame(s) to File(s)?"
     S09_DESC = "Step 9 - Write some notes to a file?"
+
+    RETRY_CALIBRATION = "Calibration Failed: Retry?"

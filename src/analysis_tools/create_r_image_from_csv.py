@@ -28,7 +28,7 @@ run_directory = os.path.abspath(os.path.join(filename_R_sample, os.pardir))
 
 print("R: {}".format(filename_R_sample))
 
-
+#user_input_2 = 'y'
 user_input_2 = input("Save in the same directory? (y/n)  ")
 if user_input_2.lower() == "y":
     cal_phase_dir = os.path.join(run_directory, "calibration_and_phase")

@@ -13,22 +13,19 @@ warnings.filterwarnings('ignore', r'All-NaN (slice|axis) encountered')
 
 start_dir = os.getcwd()
 quit_string = "\nTo quit, type 'q' or 'quit', then press Enter: "
-print("Welcome to create r matrix from csv.py")
-user_input = input("To proceed and select R Min & R Max, press Enter." + quit_string)
+user_input = input("To proceed, press Enter. " + quit_string)
 
 if user_input.lower() in ["quit", "q"]:
     sys.exit()
 
 
-filename_R_sample = askopenfilename(title='Pick an R_Sample') # show an "Open" dialog box and return the path to the selected file
+filename_R_sample = askopenfilename(title='Pick an Phi Image (csv)') # show an "Open" dialog box and return the path to the selected file
 filename_sh_R_sample = filename_R_sample.split("/")[-1][:-4]
-
-
 
 run_directory = os.path.abspath(os.path.join(filename_R_sample, os.pardir))
 
 
-print("R: {}".format(filename_R_sample))
+print("Phi: {}".format(filename_R_sample))
 
 
 user_input_2 = "y" #input("Save in the same directory? (y/n)  ")
@@ -56,16 +53,20 @@ with warnings.catch_warnings():
 
     # DISPLAYABLE_R_MATRIX[a, b, c] where a = y pixel index, b = x pixel index, and c = channel (R=0, G=1, B=2)
 
-    DISPLAYABLE_R_MATRIX[:, :, 0] = np.where(R_MATRIX < 0.00, abs(R_MATRIX * (2 ** 8 - 1)), 0)
-    DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX < 0.00, abs(R_MATRIX * (2 ** 8 - 1)), 0)
+    # Line below, takes all the pixels in Chanel 0 (if RGB, then Red Channel) that have value of less than 0
+    # and multiplies them by 4095. For example, an R=1 Pixel, would be fully red, so the red channel is set to to
+    # 4095, if the pixel is at coordinates (600, 960) this first line would make that pixel value = (4095, 0, 0)
+    # Where R Matrix is NOT negative, use zero
+    DISPLAYABLE_R_MATRIX[:, :, 0] = np.where(R_MATRIX < 0.00, abs(int(np.pi/2)*R_MATRIX * (2 ** 8 - 1)), 0)
 
-
-    DISPLAYABLE_R_MATRIX[:, :, 0] = np.where(R_MATRIX > 0.00, abs(R_MATRIX * (2 ** 8 - 1)),
-                                             DISPLAYABLE_R_MATRIX[:, :, 0])
+    # Line below, same thing but for green channel
+    DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX < 0.00, abs(int(np.pi/2)*R_MATRIX * (2 ** 8 - 1)), 0)
+    # Line below, where R matrix
+    DISPLAYABLE_R_MATRIX[:, :, 0] = np.where(R_MATRIX > 0.00, abs(int(np.pi/2)*R_MATRIX * (2 ** 8 - 1)), DISPLAYABLE_R_MATRIX[:, :, 0])
 
 
 image = Image.fromarray(DISPLAYABLE_R_MATRIX.astype('uint8'), 'RGB')
-image.save(filename_R_sample.replace(".csv", ".png"))
+image.save(filename_R_sample.replace(".csv", "_spiral_img.png"))
 #a16 = bdc.to_16_bit(image)
 #im.save_img(filename_sh_R_sample.replace(".csv", ".tiff"), cal_phase_dir, a16)
 
@@ -75,8 +76,8 @@ spiral = np.asarray(DISPLAYABLE_R_MATRIX[:, :, :])
 # This are the deltas of the spiral path from the center of the spiral
 y = []
 x = []
-points = 3000
-num_of_pi = 20
+points = 300
+num_of_pi = 0
 
 # for the m= 1 VPP with 100 um
 # vertical_offset = 35 #int(input("Please enter vertical offset: ")) * -1
@@ -88,10 +89,10 @@ num_of_pi = 20
 vertical_offset = 5 #int(input("Please enter vertical offset: ")) * -1
 horizontal_offset = 15  #int(input("Please enter horizontal offset: "))
 
-for theta in np.linspace(0, num_of_pi*np.pi, num=points):
-    r = -1*((0.25*theta)**2.5)
-    x.append(int(r*np.cos(theta)))
-    y.append(int(r*np.sin(theta)))
+for theta in np.linspace(0, 300, num=points):
+    r = theta
+    x.append(int(r))
+    y.append(0)
 
 
 
@@ -137,7 +138,7 @@ spiral_image.save(filename_R_sample.replace(".csv", "_spiral.png"))
 fig = plt.figure()
 plt.plot(data_point_indices, r_values)
 plt.title("Phi_Values_Over_Spiral\nNum Points = {}".format(len(data_point_indices)))
-plt.savefig("R_Values_Over_Spiral.png")
+plt.savefig("Phi_Values_Over_Spiral.png")
 #print("List of x's")
 #print(x)
 #print("List of y's")

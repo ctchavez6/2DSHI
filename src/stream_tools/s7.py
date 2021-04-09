@@ -7,6 +7,7 @@ from . import histograms as hgs
 import cv2
 from experiment_set_up import user_input_validation as uiv
 from . import App as tk_app
+from constants import STEP_DESCRIPTIONS as sd
 
 y_n_msg = "Proceed? (y/n): "
 sixteen_bit_max = (2 ** 16) - 1
@@ -28,7 +29,7 @@ def step_seven(stream, run_folder, app, figs, histograms, lines, histograms_alg,
 
     last_frame = False
 
-    desc = "Step 7 - Image Algebra (Record): Proceed"
+    desc = sd.S07_DESC.value
     record_r_matrices = uiv.yes_no_quit(desc)
     s8_frame_count = 1
     r_subsection_pixel_vals = None

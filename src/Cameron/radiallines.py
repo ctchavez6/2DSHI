@@ -442,21 +442,11 @@ def generate_images_from_R_matrix(R_MATRIX, csv_filename, shape_params, user_sha
         width = spiral.shape[1]
         center_x = int(width / 2)
         center_y = int(height / 2)
-        length = center_x
         # This are the deltas of the spiral path from the center of the spiral
-        num_lines = r_star_options["num_lines"]
-        line_angle = list()
-
-        for i in range(num_lines):
-            angle = i*2*np.pi/num_lines
-            j = i + 1
-            line_angle.append(int(angle))
-            print("Line {} will be at = {}".format(j, int(angle)))
 
         #x_offset, y_offset = [int(x) for x in input("Enter x_offset y_offset (no comma): ").split()]
         x_offset = shape_params["x_offset"]
         y_offset = shape_params["y_offset"]
-
         counter = 0
         for line in shape_params["number of lines"]:
             print("Doing analysis on line = {}".format(line))
@@ -529,7 +519,6 @@ def generate_images_from_R_matrix(R_MATRIX, csv_filename, shape_params, user_sha
                 if 0 <= center_y + delta_y + vertical_offset <= (height-1) and 0 <= center_x + delta_x + horizontal_offset <= (width-1):
                     spiral_coords_y.append(center_y + delta_y + vertical_offset)
                     spiral_coords_x.append(center_x + delta_x + horizontal_offset)
-
 
             for (delta_y, delta_x) in zip(marker_y, marker_x):
                 if 0 <= center_y + delta_y + vertical_offset <= (

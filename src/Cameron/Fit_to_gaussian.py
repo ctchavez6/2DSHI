@@ -44,13 +44,15 @@ waist = params[0]/(np.e)**2
 def find_roots(x,y):
     s = np.abs(np.diff(np.sign(y))).astype(bool)
     return x[:-1][s] + np.diff(x)[s]/(np.abs(y[1:][s]/y[:-1][s])+1)
-
-z = find_roots(x,y-waist)
+fit = gaus(x,params[0],params[1],params[2])
+z = find_roots(x,fit-waist)
 #print(z)
-print("Diameter is: ", (z[1]-z[0])*5.86*10**-3,"mm")
+
 plt.figure(figsize = (6,4))
 plt.scatter(x,y,label = 'gaussian')
-plt.plot(x,gaus(x,params[0],params[1],params[2]),c='red')
+plt.plot(x,fit,c='red')
 plt.plot(z, np.zeros(len(z))+waist, marker="o", ls="", ms=4, color= 'orange')
+plt.savefig(str(input("name: "))+".png")
 plt.show()
-plt
+print("Diameter is: ", (z[1]-z[0]), "pixels")
+

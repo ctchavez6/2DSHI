@@ -5,6 +5,7 @@ from . import histograms as hgs
 from PIL import Image, ImageDraw, ImageFont
 from experiment_set_up import user_input_validation as uiv
 import os, csv
+from constants import STEP_DESCRIPTIONS as sd
 
 """
 
@@ -15,7 +16,7 @@ import os, csv
 |                                                      |
 |                      - - - -                         |
 |                    /        \\                       | 800
-|                   |   Beam   |                       |
+|                   |  ( x, y)   |                       |
 |                   \\  - - - /                        |
 |                                                      |
 |                                                      |
@@ -57,7 +58,7 @@ def step_six(stream, app, figs, histograms, lines, histograms_alg, lines_alg, fi
 
     last_frame = False
 
-    desc = "Step 6 - Commence Image Algebra (Free Stream):"
+    desc = sd.S06_DESC.value
     continue_stream = uiv.yes_no_quit(desc)
     s7_frame_count = 1
     frames_we_went_through = 0
