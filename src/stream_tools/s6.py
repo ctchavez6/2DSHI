@@ -226,8 +226,9 @@ def step_six(stream, app, figs, histograms, lines, histograms_alg, lines_alg, fi
         DISPLAYABLE_R_MATRIX[:, :, 2] = np.where(R_MATRIX > 0.00, abs(R_MATRIX * (2 ** 8 - 1)),
                                                  DISPLAYABLE_R_MATRIX[:, :, 2])
 
-        sigma_x_div = int(stream.static_sigmas_x * app.sub_sigma)
-        sigma_y_div = int(stream.static_sigmas_y * app.sub_sigma)
+        mult_factor = 0.5
+        sigma_x_div = int(stream.static_sigmas_x * app.sub_sigma * mult_factor)
+        sigma_y_div = int(stream.static_sigmas_y * app.sub_sigma * mult_factor)
         angle = 0
         startAngle = 0
         endAngle = 360

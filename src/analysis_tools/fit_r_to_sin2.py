@@ -36,20 +36,12 @@ def theoretical_calibration_curve(x, alpha, v, p, q):
     denominator = 1 + (alpha * v * np.sin((p*x) + q))
     return numerator/denominator
 
-
-def theoretical_calibration_curve_presets(x, p, q):
-    preset_alpha = -0.091
-    preset_v = 0.98
-
-    numerator = preset_alpha + (preset_v * np.sin((p*x) + q))
-    denominator = 1 + (preset_alpha * preset_v * np.sin((p*x) + q))
-    return numerator/denominator
-
 model = Model(theoretical_calibration_curve, independent_vars=['x'])
-arb_alpha = 0.091
-arb_v = .98
-arb_p = .0075
-arb_q = 2.5
+arb_alpha = .1
+arb_v = .96
+arb_p = 2*np.pi*(1/70)
+arb_q = np.pi
+
 
 
 result = model.fit(r_values, x=frame_index, alpha=arb_alpha, v=arb_v, p=arb_p, q=arb_q)
@@ -58,5 +50,8 @@ value_v = float(result.values['v'])
 trunc1 = f"{value_alpha:.3f}"
 trunc2 = f"{value_v:.3f}"
 print("alpha:",trunc1,"v:",trunc2)
+print(result.values['alpha'])
+print(result.values['p'])
+print(result.values['q'])
 result.plot()
 plt.show()

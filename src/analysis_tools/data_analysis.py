@@ -14,7 +14,7 @@ from PIL import Image
 
 shape_choices = dict()
 shape_choices[1] = "Circle"
-shape_choices[2] = "Spiral" # For now, not needed
+shape_choices[2] = "Spiral"  # For now, not needed
 shape_choices[3] = "Horizontal Lines"
 shape_choices[4] = "radial star"
 user_choice = None
@@ -26,12 +26,12 @@ circle_options["radii"] = []
 
 h_lines_options = dict()
 h_lines_options["num_lines"] = 1
-#h_lines_options["y_locations"] = []
+# h_lines_options["y_locations"] = []
 
 r_star_options = dict()
-r_star_options["num_lines"] = 0
-r_star_options["x_offset"] = 1
-r_star_options["y_offset"] = 2
+r_star_options[0] = "num_lines"
+r_star_options[1] = "x_offset"
+r_star_options[2] = "y_offset"
 
 old_err_state = np.seterr(divide='raise')
 ignored_states = np.seterr(**old_err_state)
@@ -40,9 +40,11 @@ warnings.filterwarnings('ignore', r'All-NaN (slice|axis) encountered')
 start_dir = os.getcwd()
 plot_paths = list()
 
+
 def does_setup_file_exist(directory_to_check):
     assumed_path = os.path.join(directory_to_check, "data_analysis_parameters.txt")
     return path.exists(assumed_path)
+
 
 def get_analysis_parameters(csv_files_parent_directory):
     params_as_a_string = ""
@@ -62,6 +64,13 @@ def get_analysis_parameters(csv_files_parent_directory):
                 if parameter.startswith("num_lines"):
                     value = split_by_tabs[1].strip()
                     h_lines_options["num_lines"] = int(value)
+                    r_star_options["num_lines"] = int(value)
+                if parameter.startswith("x_offset"):
+                    value = split_by_tabs[1].strip()
+                    r_star_options["x_offset"] = int(value)
+                if parameter.startswith("y_offset"):
+                    value = split_by_tabs[1].strip()
+                    r_star_options["y_offset"] = int(value)
 
             elif parameter.startswith("radii"):
                 value = split_by_tabs[1:]
@@ -72,6 +81,14 @@ def get_analysis_parameters(csv_files_parent_directory):
             elif parameter.startswith("num_lines"):
                 value = split_by_tabs[1].strip()
                 h_lines_options["num_lines"] = int(value)
+                r_star_options["num_lines"] = int(value)
+            elif parameter.startswith("x_offset"):
+                value = split_by_tabs[1].strip()
+                r_star_options["x_offset"] = int(value)
+            elif parameter.startswith("y_offset"):
+                value = split_by_tabs[1].strip()
+                r_star_options["y_offset"] = int(value)
+
 
 
 
@@ -189,8 +206,11 @@ def get_analysis_parameters(csv_files_parent_directory):
 
 
     return user_choice
+
+
 frame_title = str(input("Enter the legend information for this analyzed configuration: "))
-#this is the one change
+# this is the one change
+
 
 def get_phi_sample():
     print("Welcome to data_analysis.py using phi.csv")
@@ -204,6 +224,7 @@ def get_phi_sample():
     print("R: {}".format(filename_R_sample))
     return filename_R_sample
 
+
 def get_data_directory(phi_csv_directory):
     run_directory = os.path.abspath(os.path.join(phi_csv_directory, os.pardir))
     print("Run Directory: {}".format(run_directory))
@@ -216,6 +237,7 @@ def read_in_csv(path_to_phi_csv):
     values_r_sample = r_sample_csv_file.values
     R_MATRIX = values_r_sample
     return R_MATRIX
+
 
 def generate_images_from_R_matrix(R_MATRIX, csv_filename, shape_params, user_shape_choice):
     data_dictionary = dict()
@@ -410,17 +432,26 @@ def generate_images_from_R_matrix(R_MATRIX, csv_filename, shape_params, user_sha
             plt.savefig(os.path.join(get_data_directory(csv_filename), "R_Values_Over_y={}.png".format(y_location)))
             plot_paths.append(path.join(get_data_directory(csv_filename), "R_Values_Over_y={}.png".format(y_location)))
 
-
-
-
-
-
         pil_img = Image.fromarray(img.astype('uint8'), 'RGB')
         pil_img.save(csv_filename.replace(".csv", "_h_lines.png"))
         dataset = pd.DataFrame(data_dictionary)
         dataset.to_csv(os.path.join(get_data_directory(csv_filename), "lineouts_by_h_line.csv"), index=False)
 
     if user_shape_choice == 4:
+        num_lines = list()
+        angles = list()
+        data_dict = dict()
+
+        for i in range(r_star_options["num_lines"]):
+            angles.append(2*np.pi-(i*(2/r_star_options["num_lines"]))*np.pi)
+            num_lines.append(i)
+            data_dict["line={}".format(i)] = list()
+
+        print(num_lines,angles)
+        # num_lines = (0, 1, 2, 3)
+        # angles = (0, np.pi / 2, np.pi, np.pi * (3 / 2))
+        #for num in num_lines:
+
 
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', r'All-NaN (slice|axis) encountered')
@@ -428,150 +459,96 @@ def generate_images_from_R_matrix(R_MATRIX, csv_filename, shape_params, user_sha
             # Initiates an empty array of zeroes, that has the same shape as the CSV file
             DISPLAYABLE_R_MATRIX = np.zeros((R_MATRIX.shape[0], R_MATRIX.shape[1], 3), dtype=np.uint8)
 
-            DISPLAYABLE_R_MATRIX[:, :, 0] = np.where(R_MATRIX < 0.00, abs(R_MATRIX * (2 ** 8 - 1)), 0)
-            DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX < 0.00, abs(R_MATRIX * (2 ** 8 - 1)), 0)
+            # DISPLAYABLE_R_MATRIX[a, b, c] where a = y pixel index, b = x pixel index, and c = channel (R=0, G=1, B=2)
 
-            DISPLAYABLE_R_MATRIX[:, :, 0] = np.where(R_MATRIX > 0.00, abs(R_MATRIX * (2 ** 8 - 1)),
+            # Line below, takes all the pixels in Chanel 0 (if RGB, then Red Channel) that have value of less than 0
+            # and multiplies them by 4095. For example, an R=1 Pixel, would be fully red, so the red channel is set to to
+            # 4095, if the pixel is at coordinates (600, 960) this first line would make that pixel value = (4095, 0, 0)
+            # Where R Matrix is NOT negative, use zero
+            # less than zero R values need two channels to represent yellow
+            # greater than 0 r values need one channel to represent red
+            DISPLAYABLE_R_MATRIX[:, :, 0] = np.where(R_MATRIX < 0.00, abs(np.sin(R_MATRIX) * (2 ** 8 - 1)), 0)
+
+            # Line below, same thing but for green channel
+            DISPLAYABLE_R_MATRIX[:, :, 1] = np.where(R_MATRIX < 0.00, abs(np.sin(R_MATRIX) * (2 ** 8 - 1)), 0)
+            # Line below, where R matrix
+            DISPLAYABLE_R_MATRIX[:, :, 0] = np.where(R_MATRIX > 0.00, abs(np.sin(R_MATRIX) * (2 ** 8 - 1)),
                                                      DISPLAYABLE_R_MATRIX[:, :, 0])
 
-
         image = Image.fromarray(DISPLAYABLE_R_MATRIX.astype('uint8'), 'RGB')
-        image.save(csv_filename.replace(".csv", ".png"))
+        image.save(csv_filename.replace(".csv", "_spiral_img.png"))
+
         spiral = np.asarray(DISPLAYABLE_R_MATRIX[:, :, :])
         height = spiral.shape[0]
         width = spiral.shape[1]
         center_x = int(width / 2)
         center_y = int(height / 2)
-        length = center_x
+
         # This are the deltas of the spiral path from the center of the spiral
-        num_lines = r_star_options["num_lines"]
-        line_angle = list()
+        y = []
+        x = []
+        vertical_offset = r_star_options["y_offset"]
+        horizontal_offset = r_star_options["x_offset"]
+        # for angle in angles:
+        #     for rad in np.linspace(0, 349, num=points):
+        #         r = rad
+        #         x.append(int(r * np.cos(angle)))
+        #         y.append(int(r * np.sin(angle)))
 
-        for i in range(num_lines):
-            angle = i*2*np.pi/num_lines
-            j = i + 1
-            line_angle.append(int(angle))
-            print("Line {} will be at = {}".format(j, int(angle)))
-
-        #x_offset, y_offset = [int(x) for x in input("Enter x_offset y_offset (no comma): ").split()]
-        x_offset = shape_params["x_offset"]
-        y_offset = shape_params["y_offset"]
-
-        counter = 0
-        for line in shape_params["number of lines"]:
-            print("Doing analysis on line = {}".format(line))
-
-            #radius = circle_params["radii"][0]
-
+        for i in range(len(num_lines)):  # Each iteration of this for loop with be a separate line out
+            num = num_lines[i]
+            print("Doing analysis on line number = {}".format(num))
             y = []
             x = []
+            points = 350
 
-            marker_y = []
-            marker_x = []
+            #Below is where we make the radial line outs for each angle
+            #for angle in angles:
+            angle = angles[i]
+            print("Which corresponds to an angle of = {}".format(angle))
 
-
-            marker_coords_y = []
-            marker_coords_x = []
-
-            points = 500
-            num_of_pi = 2
-
-            #print(x_offset, y_offset)
-
-            # for the m= 1 VPP with 100 um
-            # vertical_offset = 35 #int(input("Please enter vertical offset: ")) * -1
-            # horizontal_offset = -40  #int(input("Please enter horizontal offset: "))
-            # for the m= 1 VPP with noPH
-            # vertical_offset = 15 #int(input("Please enter vertical offset: ")) * -1
-            # horizontal_offset = 50  #int(input("Please enter horizontal offset: "))
-            # for the m=2 VPP with noPH
-            if y_offset :
-                vertical_offset = y_offset
-            else:
-                vertical_offset = 5 #int(input("Please enter vertical offset: ")) * -1
-
-            if x_offset:
-                horizontal_offset = x_offset
-            else:
-                horizontal_offset = 15  #int(input("Please enter horizontal offset: "))
-
-
-            count = 0
-            for theta in np.linspace(0, num_of_pi*np.pi, num=points):
-                count += 1
-                r = int(line)
-                # r = -1*((0.25*theta)**2.5)
-                x.append(int(r*np.cos(theta)))
-                y.append(int(r*np.sin(theta)))
-
-                if count == 1:
-                    num_marker_points = 3000
-                    start_ = 0.9 * r
-                    stop_ = 1.1 * r
-
-                    lin = np.linspace(start_, stop_, num_marker_points)
-                    for r_mod in lin:
-                        marker_x.append(int(r_mod * np.cos(theta)))
-                        marker_y.append(int(r_mod * np.sin(theta)))
-
-
-
-
-            # Remember, first index is y, where 0 is the top and max is at the bottom
-            # Second index is x, goes from left to right
-            # Third index is the channel RGB
+            for rad in np.linspace(0, 349, num=points):
+                r = int(rad)
+                x.append(int(r * np.cos(angle)))
+                y.append(int(r * np.sin(angle)))
 
             spiral_coords_y = []
             spiral_coords_x = []
 
-
+            # Below checks if the points will be on the phi image or not, if they are they are added to spiral_coords
             for (delta_y, delta_x) in zip(y, x):
-                if 0 <= center_y + delta_y + vertical_offset <= (height-1) and 0 <= center_x + delta_x + horizontal_offset <= (width-1):
+                if 0 <= center_y + delta_y + vertical_offset <= (
+                        height - 1) and 0 <= center_x + delta_x + horizontal_offset <= (width - 1):
                     spiral_coords_y.append(center_y + delta_y + vertical_offset)
                     spiral_coords_x.append(center_x + delta_x + horizontal_offset)
 
-
-            for (delta_y, delta_x) in zip(marker_y, marker_x):
-                if 0 <= center_y + delta_y + vertical_offset <= (
-                        height - 1) and 0 <= center_x + delta_x + horizontal_offset <= (width - 1):
-
-                    marker_coords_x.append(center_y + delta_y + vertical_offset)
-                    marker_coords_y.append(center_x + delta_x + horizontal_offset)
-
-
             data_point_indices = []
             r_values = []
-
-            count = 0
+            #below gets the phi image data points that coorespond to the radial line outs and writes it to an arbitrary
+            #number
+            count1 = 0
             for (cord_y, cord_x) in zip(spiral_coords_y, spiral_coords_x):
-                count += 1
+                count1 += 1
+                #print("Count1 = {0}, len(r_values) = {1}".format(count1, len(r_values)))
+
                 spiral[cord_y, cord_x, :] = 255
-                data_point_indices.append(count)
+                data_point_indices.append(count1)
                 r_values.append(R_MATRIX[cord_y, cord_x])
-                data_dictionary["r={}".format(line)].append(R_MATRIX[cord_y, cord_x])
 
 
+            data_dictionary["line={}".format(num)] = r_values
 
-            for (cord_y, cord_x) in zip(marker_coords_y, marker_coords_x):
-                count += 1
-                spiral[cord_y, cord_x, :] = 255
+            #data_dictionary["line={}".format(count1)] = r_values[:]
 
+        for key in data_dictionary:
+            print(key, len(data_dictionary[key]))
 
-            fig = plt.figure()
-            plt.plot(data_point_indices, r_values)
-            plt.title("Phi_Values_Over_Circle\nRadius = {}, Delta_x = {}, Delta_y = {}".format(line, x_offset, y_offset))
-            plt.savefig(os.path.join(get_data_directory(csv_filename), "R_Values_Over_Radius={}.png".format(line)))
-            plot_paths.append(path.join(get_data_directory(csv_filename), "R_Values_Over_Radius={}.png".format(line)))
+        dataset = pd.DataFrame(data_dictionary)
+        dataset.to_csv(os.path.join(get_data_directory(csv_filename), csv_filename.replace(".csv", "_lineouts_by_angle.csv")))
 
 
         spiral_image = Image.fromarray(spiral.astype('uint8'), 'RGB')
-        spiral_image.save(csv_filename.replace(".csv", "_circle.png"))
-
-        dataset = pd.DataFrame(data_dictionary)
-        dataset.to_csv(os.path.join(get_data_directory(csv_filename), "lineouts_by_radius.csv"), index=False)
-
-
-
+        spiral_image.save(csv_filename.replace(".csv", "_spiral.png"))
 
 
 def vertically_stack_all_these_images(parent_folder, paths_to_images):
@@ -584,7 +561,8 @@ def vertically_stack_all_these_images(parent_folder, paths_to_images):
     list_ = [np.asarray(i.resize(min_shape)) for i in imgs]
     imgs_comb = np.vstack(list_)
     imgs_comb = PIL.Image.fromarray(imgs_comb)
-    imgs_comb.save(os.path.join(parent_folder, 'Values_Over_Horizontal_Lineout.png'))
+    imgs_comb.save(os.path.join(parent_folder, 'Values_Over_Lineout.png'))
+
 
 def delete_all_sub_images(paths_to_images):
     for path in paths_to_images:
@@ -607,7 +585,11 @@ elif user_choice == 3:
     generate_images_from_R_matrix(r_array, phi_csv, h_lines_options, user_choice)
     vertically_stack_all_these_images(run_dir, plot_paths)
     delete_all_sub_images(plot_paths)
+elif user_choice ==4:
+    print('Shape: Radial lines')
+    generate_images_from_R_matrix(r_array, phi_csv, r_star_options, user_choice)
+    #vertically_stack_all_these_images(run_dir, plot_paths)
+    delete_all_sub_images(plot_paths)
 else:
     print("No shapes drawn.")
-
 os.chdir(start_dir)
