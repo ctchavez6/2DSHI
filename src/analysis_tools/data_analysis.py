@@ -507,7 +507,7 @@ def generate_images_from_R_matrix(R_MATRIX, csv_filename, shape_params, user_sha
             angle = angles[i]
             print("Which corresponds to an angle of = {}".format(angle))
 
-            for rad in np.linspace(0, 349, num=points):
+            for rad in np.linspace(0, 399, num=points):
                 r = int(rad)
                 x.append(int(r * np.cos(angle)))
                 y.append(int(r * np.sin(angle)))
