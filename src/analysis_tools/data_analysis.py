@@ -485,8 +485,6 @@ def generate_images_from_R_matrix(R_MATRIX, csv_filename, shape_params, user_sha
         center_y = int(height / 2)
 
         # This are the deltas of the spiral path from the center of the spiral
-        y = []
-        x = []
         vertical_offset = r_star_options["y_offset"]
         horizontal_offset = r_star_options["x_offset"]
         # for angle in angles:
@@ -500,14 +498,14 @@ def generate_images_from_R_matrix(R_MATRIX, csv_filename, shape_params, user_sha
             print("Doing analysis on line number = {}".format(num))
             y = []
             x = []
-            points = 350
+            points = 550
 
             #Below is where we make the radial line outs for each angle
             #for angle in angles:
             angle = angles[i]
             print("Which corresponds to an angle of = {}".format(angle))
 
-            for rad in np.linspace(0, 399, num=points):
+            for rad in np.linspace(0, 549, num=points):
                 r = int(rad)
                 x.append(int(r * np.cos(angle)))
                 y.append(int(r * np.sin(angle)))

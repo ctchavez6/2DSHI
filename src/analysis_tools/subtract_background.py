@@ -32,9 +32,10 @@ run_directory = os.path.abspath(os.path.join(filename_R_sample, os.pardir))
 print("(Sample)     R: {}".format(filename_R_sample))
 print("(Background) R: {}".format(filename_R_background))
 
-user_input_2 = input("Save in the same directory? (y/n)  ")
+#user_input_2 = input("Save in the same directory? (y/n)  ")
+user_input_2 = "y"
 if user_input_2.lower() == "y":
-    cal_phase_dir = os.path.join(run_directory, "calibration_and_phase")
+    cal_phase_dir = run_directory
 else:
     cal_phase_dir = askdirectory(title='Pick a directory to save your calibration_and_phase files')
 
@@ -75,7 +76,8 @@ csv_path = os.path.join(cal_phase_dir, "{}".format(phi_SUBTRACTED))
 # my additions
 
 image = Image.fromarray(DISPLAYABLE_R_SUBTRACTED.astype('uint8'), 'RGB')
-image.save('phi_SUBTRACTED.csv'.replace(".csv", ".png"))
+user_input_3 = input("name of file: ")
+image.save(user_input_3 + ".png")
 
 # image.save(new_file.replace(".csv", ".png"))
 

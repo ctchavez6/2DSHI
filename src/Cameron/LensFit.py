@@ -34,46 +34,52 @@ y_data1 = df.loc[:, 'line=0'].values
 y_data2 = df.loc[:, 'line=1'].values
 y_data3 = df.loc[:, 'line=2'].values
 y_data4 = df.loc[:, 'line=3'].values
+n_primary = 1.5195
+n_sh = 1.5066
+lam = 1064
 # x_data = x_data[100:550]
 # y_data1 = y_data1[100:550]
 # y_data2 = y_data2[100:550]
 # y_data3 = y_data3[100:550]
-
 #cut out some of the data
 #x_data = x_data[74:-1]
 #y_data1 = y_data1[74:-1]
 
+
+def lens(delta_y, r):
+    return ((4*np.pi)/lam)*(n_primary-n_sh)*r*(1-np.sqrt(1-(delta_y/r)**2))
+
 def sine(x,a,b,c):
     return a*np.sin(b*x+c)
 
-params1, params_covariance1 = optimize.curve_fit(sine, x_data, y_data1,
-                                               p0=[1.6, .0033, 1.5])
-params2, params_covariance2 = optimize.curve_fit(sine, x_data, y_data2,
-                                               p0=[1.6, .0033, 1.5])
-params3, params_covariance3 = optimize.curve_fit(sine, x_data, y_data3,
-                                               p0=[1.6, .0033, 1.5])
-params4, params_covariance4 = optimize.curve_fit(sine, x_data, y_data4,
-                                               p0=[1.6, .00448, 1.5])
-T1 = np.abs(1/(params1[1]/(2*np.pi)))
-T2 = np.abs(1/(params2[1]/(2*np.pi)))
-T3 = np.abs(1/(params3[1]/(2*np.pi)))
-T4 = np.abs(1/(params4[1]/(2*np.pi)))
+def total(x,a,b,c):
+    a*np.sin(b*x*((4*np.pi)/lam)*(n_primary-n_sh)*r*(1-np.sqrt(1-(x/r)**2))+c)
+
+params1, params_covariance1 = optimize.curve_fit(sine, lens(x_data, 1000000), y_data1,
+                                               p0=[1, .000008, 1.5])
+# params2, params_covariance2 = optimize.curve_fit(lens, x_data, y_data2,
+#                                                p0=[1.6])
+# params3, params_covariance3 = optimize.curve_fit(lens, x_data, y_data3,
+#                                                p0=[1.6])
+# params4, params_covariance4 = optimize.curve_fit(lens, x_data, y_data4,
+#                                                p0=[1.6])
+
 r = 5.86*10**-3
 m = 1/0.246
-print(T1*r*m,T2*r*m,T3*r*m,T4*r*m)
 
 fig, (ax1, ax2, ax3,ax4) = plt.subplots(4, sharex = True)
 
 fig.suptitle('phi sine fit')
 ax1.plot(x_data, sine(x_data, params1[0], params1[1], params1[2]))
 ax1.plot(x_data,y_data1, color = "orange")
-ax2.plot(x_data, sine(x_data, params2[0], params2[1], params2[2]), color = "red")
-ax2.plot(x_data,y_data2, color = "orange")
-ax3.set(ylabel = "Phi(rad)")
-ax3.plot(x_data, sine(x_data, params3[0], params3[1], params3[2]), color = "green")
-ax3.plot(x_data,y_data3, color = "orange")
-ax4.plot(x_data, sine(x_data, params4[0], params4[1], params4[2]))
-ax4.plot(x_data,y_data4, color = "orange")
+print(params1)
+# ax2.plot(x_data, lens(x_data, params2[0]), color = "red")
+# ax2.plot(x_data,y_data2, color = "orange")
+# ax3.set(ylabel = "Phi(rad)")
+# ax3.plot(x_data, lens(x_data, params3[0]), color = "green")
+# ax3.plot(x_data,y_data3, color = "orange")
+# ax4.plot(x_data, lens(x_data, params4[0]))
+# ax4.plot(x_data,y_data4, color = "orange")
 
 
 plt.xlabel("Transverse displacement (mm corrected for mag)")

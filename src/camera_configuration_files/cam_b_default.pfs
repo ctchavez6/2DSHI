@@ -31,7 +31,7 @@ RemoveParameterLimitSelector	Gain
 PgiMode	Off
 ShutterMode	Global
 ExposureMode	Timed
-ExposureTime	50.0
+ExposureTime	40.0
 AcquisitionBurstFrameCount	1
 TriggerSelector	FrameBurstStart
 TriggerMode	Off
@@ -48,7 +48,7 @@ TriggerActivation	RisingEdge
 TriggerSelector	FrameStart
 TriggerActivation	RisingEdge
 TriggerSelector	FrameStart
-TriggerDelay	0
+TriggerDelay	15
 AcquisitionFrameRateEnable	0
 AcquisitionFrameRate	10.00000
 DeviceLinkSelector	0
