@@ -1,11 +1,11 @@
 # Use Tkinter for python 2, tkinter for python 3
 import tkinter as tk
 
-from tools import characterize_calibration_curve as ccc
-from tools import create_k_v_a_phi_matrices as genphi
-from tools import replace_nans as rn
-from tools import gen_phi_from_csv as phi2png
-from tools import gen_line_outs as glo
+from toolsformatt import characterize_calibration_curve as ccc
+from toolsformatt import create_k_v_a_phi_matrices as genphi
+from toolsformatt import replace_nans as rn
+from toolsformatt import gen_phi_from_csv as phi2png
+from toolsformatt import gen_line_outs as glo
 from tkinter.filedialog import askdirectory
 import os
 import csv
