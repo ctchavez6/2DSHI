@@ -203,8 +203,6 @@ def get_analysis_parameters(csv_files_parent_directory):
             params_file = open(os.path.join(csv_files_parent_directory, "data_analysis_parameters.txt"), 'w+')
             params_file.write(params_as_a_string)
             params_file.close()
-
-
     return user_choice
 
 

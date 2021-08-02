@@ -7,6 +7,7 @@ from tkinter.filedialog import askopenfilename
 import numpy as np
 import pandas
 from scipy import ndimage
+from PIL import Image
 
 start_dir = os.getcwd()
 quit_string = "\nTo quit, type 'q' or 'quit', then press Enter: "
@@ -46,5 +47,24 @@ print("Averaged Array will be saved to: {}".format(csv_path))
 with open(csv_path, "w+", newline='') as my_csv:
     csvWriter = csv.writer(my_csv, delimiter=',')
     csvWriter.writerows(result.tolist())
+
+where_are_NaNs = np.isnan(values)
+values[where_are_NaNs] = float(0)
+
+values_sin_phi = np.sin(values)
+
+SIN_PHI_MATRIX = values_sin_phi
+
+
+DISPLAYABLE_PHI_MATRIX = np.zeros((SIN_PHI_MATRIX.shape[0], SIN_PHI_MATRIX.shape[1], 3), dtype=np.uint8)
+DISPLAYABLE_PHI_MATRIX[:, :, 1] = np.where(SIN_PHI_MATRIX < 0.00, abs(SIN_PHI_MATRIX * (2 ** 8 - 1)), 0)
+DISPLAYABLE_PHI_MATRIX[:, :, 0] = np.where(SIN_PHI_MATRIX < 0.00, abs(SIN_PHI_MATRIX * (2 ** 8 - 1)), 0)
+
+DISPLAYABLE_PHI_MATRIX[:, :, 0] = np.where(SIN_PHI_MATRIX > 0.00, abs(SIN_PHI_MATRIX * (2 ** 8 - 1)),
+                                         DISPLAYABLE_PHI_MATRIX[:, :, 0])
+
+
+image = Image.fromarray(DISPLAYABLE_PHI_MATRIX.astype('uint8'), 'RGB')
+image.save(csv_path.replace(".csv", ".png"))
 
 os.chdir(start_dir)
