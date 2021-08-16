@@ -373,7 +373,7 @@ def update_histogram(histogram_dict, lines_dict, identifier, bins, raw_2d_array,
         plus_bins_ = np.asarray(plus_bins_).astype(np.int64)
         ranges = (0, twelve_bit_max * 2)
         ranges = np.asarray(ranges).astype(np.float64)
-        hist_output = hist1d_test(raw_2d_array.flatten(), twelve_bit_max * 2, (ranges[0], ranges[1]-1))
+        hist_output = hist1d_test(raw_2d_array.flatten(), twelve_bit_max * 2, (ranges[0], ranges[1]-1))  #original
         h = hist_output[0]
         x_vals = hist_output[1][:-1]
 

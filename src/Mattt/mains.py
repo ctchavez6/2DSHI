@@ -223,7 +223,6 @@ class MainApplication(tk.Frame):
     #         self.alpha
     #     )
 
-
     def gen_no_nan_files(self):
         _files_ = {
             "r_sample": self.r_sample_full_path,
@@ -249,6 +248,7 @@ class MainApplication(tk.Frame):
             print("Source File: {0}".format(_files_[_file_]))
             print("NoNan Version: {0}\n\n".format(new_full_path))
             rn.replace_nans_in_file(_files_[_file_], save_to=new_full_path)
+            self.no_nan_label.config(text="completed")
 
         # Saving data sources
         _files_["r_matrices_stats"] = self.r_stats_full_path
@@ -257,7 +257,6 @@ class MainApplication(tk.Frame):
             writer = csv.writer(csv_file)
             for key, value in _files_.items():
                 writer.writerow([key, value])
-
 
     def gen_kvaphi_matrices(self):
         self.phi_csv_path, self.phi_minus_bg_csv_path, self.phi_background_csv_path = genphi.generate_kvaphi_matrices(
@@ -349,7 +348,6 @@ class MainApplication(tk.Frame):
         except (FileNotFoundError, FileExistsError):
             self.calibration_directory_label.config(text="Pick a calibration run")
 
-
     def process_radian_values(self):
         plot_paths = list()
         if self.line_out_option_var.get() == "Radial":
@@ -363,8 +361,10 @@ class MainApplication(tk.Frame):
         vertical_offset = 0.
         horizontal_offset = 0.
         files = (self.phi_csv_path, self.phi_background_csv_path)
-        for file in files:
 
+        print("Starting for loop: for file in files")
+        for file in files:
+            print("\tfile: ", file)
             height_phi = int(glo.get_phi_csv_shape(file)[0])
             R_MATRIX = np.asarray(glo.gen_radial_line_outs(file))
             spiral = np.zeros(shape=(height_phi, height_phi))
@@ -377,8 +377,9 @@ class MainApplication(tk.Frame):
                 num_lines_list.append(i)
                 data_dict["line={}".format(i)] = list()
 
-
+            print("\tStarting For Loop: for i in range(int(num_lines)):")
             for i in range(int(num_lines)):
+                print("\tLine: i = ", i)
                 num = num_lines_list[i]
                 y = []
                 x = []
@@ -416,7 +417,11 @@ class MainApplication(tk.Frame):
 
                 fig = plt.figure()
                 plt.plot(data_point_indices, r_values)
-                plt.title("Phi_Values_Over_Lineout\ny = {}".format(i))
+                current_file_distinguisher_test = os.path.basename(os.path.normpath(file))
+                _test, file_extension_test = os.path.splitext(file)
+                current_file_distinguisher_test = current_file_distinguisher_test.replace(file_extension_test, "")
+
+                plt.title("{0}: Phi_Values_Over_Lineout\ny = {1}".format(current_file_distinguisher_test, i))
                 plt.savefig(
                     os.path.join(glo.get_data_directory(file), "{}={}.png".format(file,i)))
                 plot_paths.append(
@@ -427,11 +432,30 @@ class MainApplication(tk.Frame):
 
             # for key in data_dictionary:
             #     print(key, len(data_dictionary[key]))
-            run_dir = self.phi_csv_path
+            #run_dir = self.phi_csv_path  Commented out by IS, I believe this is causing the error
+            run_dir = self.analytics_directory
+            #run_dir = file
+            print("\n\n")
+            print("One of the variables below is causing the error")
+            print("run_dir: ", run_dir)
+            print("plot_paths: ", plot_paths)
+
+            print("Let's check if run_dir exists: ")
+            print("os.path.exists(run_dir) returns: ", os.path.exists(run_dir))
+
+            print("Going to check all the plots in list plot_paths")
+            for p in plot_paths:
+                print("path: ", p)
+                print("exists? ", os.path.exists(p))
             dataset = pd.DataFrame(data_dictionary)
             dataset.to_csv(os.path.join(glo.get_data_directory(file), file.replace(".csv", "_lineouts_by_angle.csv")))
-            glo.vertically_stack_all_these_images(run_dir, plot_paths)
-            glo.delete_all_sub_images(plot_paths)
+            # the problem is defintely in the line below, run dir and plot paths are fine
+            current_file_distinguisher = os.path.basename(os.path.normpath(file))
+            _, file_extension = os.path.splitext(file)
+            current_file_distinguisher = current_file_distinguisher.replace(file_extension, "")
+            print("current_file_distinguisher: ", current_file_distinguisher)
+            glo.vertically_stack_all_these_images(run_dir, plot_paths, current_file_distinguisher)
+            #glo.delete_all_sub_images(plot_paths)
 
 
 
