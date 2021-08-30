@@ -23,7 +23,6 @@ filename_sh = filename.split("/")[-1][:-4]
 
 run_directory = os.path.abspath(os.path.join(filename, os.pardir))
 
-print("You've selected: {}".format(filename))
 size_of_avg = int(input("How many pixels would you like to average by? - "))
 processed_dir = os.path.join(run_directory, "moving_averages_{}".format(size_of_avg))
 
@@ -44,6 +43,7 @@ os.chdir(start_dir)
 
 csv_path = os.path.join(processed_dir, "{}_avg_{}.csv".format(filename_sh, size_of_avg))
 print("Averaged Array will be saved to: {}".format(csv_path))
+
 with open(csv_path, "w+", newline='') as my_csv:
     csvWriter = csv.writer(my_csv, delimiter=',')
     csvWriter.writerows(result.tolist())

@@ -14,6 +14,7 @@ from PIL import Image, ImageTk
 import pandas as pd
 import matplotlib.pyplot as plt
 from os import path
+from scipy import ndimage
 
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -41,6 +42,8 @@ class MainApplication(tk.Frame):
         self.phi_minus_bg_csv_path = None
         self.phi_background_csv_path = None
         self.checkvar1 = 0
+        self.line_out_phi_path = None
+        self.line_out_bg_path = None
 
         self.parent = parent
 
@@ -91,27 +94,11 @@ class MainApplication(tk.Frame):
 
         self.select_background_button.grid(column=2, row=3, padx=10, pady=1, sticky="W")
 
-
         self.r_sample_label = tk.Label(self.parent, text="")
         self.r_sample_label.grid(column=2, row=2, padx=10, pady=5, sticky="W")
 
         self.r_background_label = tk.Label(self.parent, text="")
         self.r_background_label.grid(column=2, row=4, padx=10, pady=5, sticky="W")
-
-
-        # self.nonans_r_background_button = tk.Button(self.parent, text="No Nans R Background", anchor="w",
-        #                                             command=self.pick_nonans_r_bg)
-        # self.nonans_r_background_button.grid(column=2, row=9, padx=10, pady=1, sticky="W")
-        #
-        # self.nonans_r_background_label = tk.Label(self.parent, text="")
-        # self.nonans_r_background_label.grid(column=2, row=10, padx=10, pady=5, sticky="W")
-        #
-        # self.nonans_r_sample_button = tk.Button(self.parent, text="No Nans R Sample", anchor="w",
-        #                                         command=self.pick_nonans_r_sample)
-        # self.nonans_r_sample_button.grid(column=2, row=7, padx=10, pady=1, sticky="W")
-        #
-        # self.nonans_r_sample_label = tk.Label(self.parent, text="")
-        # self.nonans_r_sample_label.grid(column=2, row=8, padx=10, pady=5, sticky="W")
 
 
         """Column 3: Create Phi Matrices and PNGs"""
@@ -142,6 +129,11 @@ class MainApplication(tk.Frame):
                                                command=self.create_line_out_options)
         self.chose_line_out_button.grid(column=4, row=2, padx=5, pady=2, sticky="W")
 
+        self.radial_entry_instructions = tk.Label(self.parent, text="Enter number of lines.")
+        self.radial_entry_instructions.grid(column=4, row=3, padx=5, pady=2, sticky="W")
+        self.radial_entry = tk.Entry(self.parent)
+        self.radial_entry.grid(column=4, row=4, padx=5, pady=2, sticky="W")
+
         self.vertical_offset_label = tk.Label(self.parent, text="Set vertical offset")
         self.vertical_offset_label.grid(column=4, row=5, padx=5, pady=3, sticky='W')
         self.set_vertical_offset = tk.Entry(self.parent)
@@ -156,37 +148,17 @@ class MainApplication(tk.Frame):
         self.run.grid(column=4, row=9, padx=5, pady=3, sticky='W')
 
         """Column 5: Create Line out PNGs"""
-        # self.lineout_image_label = tk.Label(self.parent, text = "Generate Line Out Image")
-        # self.lineout_image_label.grid(column=5, row=0, padx=5, pady=10, sticky="W")
-        #
-        # self.lineout_image_button = tk.Button(self.parent, text ="do we need this button")
-        # self.png_and_csv_text2 = tk.Label(self.parent, text="Generate line out CSV and PNG")
-        # self.png_and_csv_text2.grid(column=5, row=0, padx=5, pady=10, sticky="W")
-        #
-        # self.gen_phi_csv_button2 = tk.Button(self.parent, text="Generate phi CSVs", anchor="w",
-        #                                     command=self.gen_kvaphi_matrices)
-        # self.gen_phi_csv_button2.grid(column=5, row=1, padx=10, pady=1, sticky="W")
-        #
-        # self.gen_phi_img_button2 = tk.Button(self.parent, text="Generate Phi IMGs", anchor="w",
-        #                                     command=self.gen_imgs)
-        # self.gen_phi_img_button2.grid(column=5, row=2, padx=10, pady=5, sticky="W")
 
-
-        # self.gen_kvaphi_button = tk.Button(self.parent, text="Generate phi Matrices", anchor="w",
-        #                                   command=self.gen_kvaphi_matrices)
-        # self.gen_kvaphi_button.grid(column=5, row=5, padx=10, pady=1, sticky="W")
-        #
-        # self.gen_kvaphi_label = tk.Label(self.parent, text="")
-        # self.gen_kvaphi_label.grid(column=5, row=6, padx=5, pady=1, sticky="W")
-        #
-        # self.gen_imgs_label = tk.Label(self.parent, text="")
-        # self.gen_imgs_label.grid(column=5, row=8, padx=5, pady=1, sticky="W")
-
-        """Column 6: Quit Button"""
-
-        #self.quit_button = tk.Button(self.parent, text="quit",
-                                     #command=self.kill_app)
-        #self.quit_button.grid(column=6, row=1, padx=10, pady=10)
+        self.integrate_label = tk.Label(self.parent, text="Integrate phase")
+        self.integrate_label.grid(column=5, row=0, padx=5, pady=3, sticky='W')
+        self.moving_average_label = tk.Label(self.parent, text="Moving average pixels")
+        self.run = tk.Button(self.parent, text='Run', anchor='w', command=self.integrate_phi)
+        self.run.grid(column=5, row=1, padx=5, pady=3, sticky='W')
+        self.moving_average_label.grid(column=5, row=2, padx=5, pady=3, sticky='W')
+        self.moving_average_entry = tk.Entry(self.parent)
+        self.moving_average_entry.grid(column=5, row=3, padx=5, pady=3, sticky='W')
+        self.run = tk.Button(self.parent, text='Run', anchor='w', command=self.moving_average)
+        self.run.grid(column=5, row=4, padx=5, pady=3, sticky='W')
 
     def select_analytics_directory(self):
         self.analytics_directory = askdirectory(title="Pick an analytics directory")
@@ -205,23 +177,6 @@ class MainApplication(tk.Frame):
     def pick_r_sample(self):
         self.r_sample_full_path = genphi.get_r_sample()
         self.r_sample_label.config(text=self.r_sample_full_path)
-
-    # def pick_nonans_r_bg(self):
-    #     self.r_background_full_path_nonans = askopenfilename(title='Pick r background no nans')
-    #     self.nonans_r_background_label.config(text=self.r_background_full_path_nonans)
-    #
-    # def pick_nonans_r_sample(self):
-    #     self.r_sample_full_path_nonans = askopenfilename(title='Pick r sample no nans')
-    #     self.nonans_r_sample_label.config(text=self.r_sample_full_path_nonans)
-    #
-    # def create_lineout_phi(self):
-    #     self.phi_bg_lineout, self.phi_lineout, self.phi_minus_bg_lineout = glo.create_lineout_phi(
-    #         self.r_sample_full_path_nonans,
-    #         self.r_background_full_path_nonans,
-    #         self.analytics_directory,
-    #         self.v,
-    #         self.alpha
-    #     )
 
     def gen_no_nan_files(self):
         _files_ = {
@@ -313,17 +268,6 @@ class MainApplication(tk.Frame):
         self.gen_imgs_label = tk.Label(self.parent, text="")
         self.gen_imgs_label.config(text="Phi imgs generated")
 
-        # load = Image.open("phi_minus_background.png")
-        # resize_img = load.resize((120, 120))
-        # render = ImageTk.PhotoImage(resize_img)
-        #
-        # img = tk.Label(self.parent, image=render)
-        # img.grid(column=3, row=3, padx=5, pady=5, sticky="W")
-        # img.image = render
-        #
-        # self.image_title = tk.Label(self.parent, text="Phi Minus BG PNG")
-        # self.image_title.grid(column=3, row=4, padx=10, pady=1, sticky="W")
-
     def pick_r_background(self):
         self.r_background_full_path = genphi.get_r_background()
         self.r_background_label.config(text=self.r_background_full_path)
@@ -349,22 +293,27 @@ class MainApplication(tk.Frame):
             self.calibration_directory_label.config(text="Pick a calibration run")
 
     def process_radian_values(self):
-        plot_paths = list()
         if self.line_out_option_var.get() == "Radial":
-            num_lines = int(self.radial_entry.get())
+            if self.radial_entry.get() == "":
+                num_lines = 4
+            else:
+                num_lines = int(self.radial_entry.get())
         if self.line_out_option_var.get() == "Vertical/Horizontal":
             num_lines = int(self.horivert_entry.get())
         num_lines_list = list()
         for i in range(num_lines): num_lines_list.append(i)
         angles = list()
         #print("print", self.set_vertical_offset.get())
-        vertical_offset = 0.
-        horizontal_offset = 0.
+        vertical_offset = self.set_vertical_offset.get()
+
+        horizontal_offset = self.set_horizontal_offset.get()
         files = (self.phi_csv_path, self.phi_background_csv_path)
 
         print("Starting for loop: for file in files")
         for file in files:
-            print("\tfile: ", file)
+            if vertical_offset == "": vertical_offset = 0
+            if horizontal_offset == "": horizontal_offset = 0
+            plot_paths = list()
             height_phi = int(glo.get_phi_csv_shape(file)[0])
             R_MATRIX = np.asarray(glo.gen_radial_line_outs(file))
             spiral = np.zeros(shape=(height_phi, height_phi))
@@ -377,9 +326,7 @@ class MainApplication(tk.Frame):
                 num_lines_list.append(i)
                 data_dict["line={}".format(i)] = list()
 
-            print("\tStarting For Loop: for i in range(int(num_lines)):")
             for i in range(int(num_lines)):
-                print("\tLine: i = ", i)
                 num = num_lines_list[i]
                 y = []
                 x = []
@@ -395,10 +342,10 @@ class MainApplication(tk.Frame):
 
                 # Below checks if the points will be on the phi image or not, if they are they are added to spiral_coords
                 for (delta_y, delta_x) in zip(y, x):
-                    if 0 <= center_phi + delta_y + vertical_offset <= (
-                            height_phi - 1) and 0 <= center_phi + delta_x + horizontal_offset <= (height_phi - 1):
-                        spiral_coords_y.append(center_phi + delta_y + vertical_offset)
-                        spiral_coords_x.append(center_phi + delta_x + horizontal_offset)
+                    if 0 <= center_phi + delta_y + int(vertical_offset) <= (
+                            height_phi - 1) and 0 <= center_phi + delta_x + int(horizontal_offset) <= (height_phi - 1):
+                        spiral_coords_y.append(center_phi + delta_y + int(vertical_offset))
+                        spiral_coords_x.append(center_phi + delta_x + int(horizontal_offset))
 
                 data_point_indices = []
                 r_values = []
@@ -427,37 +374,56 @@ class MainApplication(tk.Frame):
                 plot_paths.append(
                     path.join(glo.get_data_directory(file), "{}={}.png".format(file,i)))
 
-
-
-
-            # for key in data_dictionary:
-            #     print(key, len(data_dictionary[key]))
-            #run_dir = self.phi_csv_path  Commented out by IS, I believe this is causing the error
             run_dir = self.analytics_directory
-            #run_dir = file
-            print("\n\n")
-            print("One of the variables below is causing the error")
-            print("run_dir: ", run_dir)
-            print("plot_paths: ", plot_paths)
-
-            print("Let's check if run_dir exists: ")
-            print("os.path.exists(run_dir) returns: ", os.path.exists(run_dir))
-
-            print("Going to check all the plots in list plot_paths")
-            for p in plot_paths:
-                print("path: ", p)
-                print("exists? ", os.path.exists(p))
             dataset = pd.DataFrame(data_dictionary)
-            dataset.to_csv(os.path.join(glo.get_data_directory(file), file.replace(".csv", "_lineouts_by_angle.csv")))
-            # the problem is defintely in the line below, run dir and plot paths are fine
+            pathvar = os.path.join(glo.get_data_directory(file), file.replace(".csv", "_lineouts_by_angle.csv"))
+            if file == self.phi_csv_path:
+                self.line_out_phi_path = pathvar
+            else:
+                self.line_out_bg_path = pathvar
+            dataset.to_csv(pathvar)
             current_file_distinguisher = os.path.basename(os.path.normpath(file))
             _, file_extension = os.path.splitext(file)
             current_file_distinguisher = current_file_distinguisher.replace(file_extension, "")
-            print("current_file_distinguisher: ", current_file_distinguisher)
             glo.vertically_stack_all_these_images(run_dir, plot_paths, current_file_distinguisher)
-            #glo.delete_all_sub_images(plot_paths)
+            glo.delete_all_sub_images(plot_paths)
 
+    def moving_average(self):
+        """"" 
+        This does not seem to work as expected. The size goes from 901x901 to a 900x901, we lose one row.
+        Looks like we loose the entire top row.
+        
+        """""
+        for file in self.phi_csv_path,self.phi_background_csv_path:
+            csv_file = pd.read_csv(self.phi_csv_path)
+            values = csv_file.values
+            result = ndimage.uniform_filter(values,int(self.moving_average_entry.get()), mode="reflect")
+            csv_path = os.path.join(self.analytics_directory.replace(".csv",""), "{}_avg_{}.csv".format(self.phi_csv_path, str(self.moving_average_entry.get())))
 
+            with open(csv_path, "w+", newline='') as my_csv:
+                csvWriter = csv.writer(my_csv, delimiter=',')
+                csvWriter.writerows(result.tolist())
+
+    def integrate_phi(self):
+        files = (self.line_out_phi_path,self.line_out_bg_path)
+        linedict = dict()
+        for file in files:
+            df = pd.read_csv(file)
+            nparray = df.to_numpy()
+            for i in range(len(nparray[0,:])):
+                yintegrated = list()
+                y = nparray[:,int(i)]
+                tmp = y
+                for i2 in range(len(y)):
+                    var = int(i2)
+                    if i2 == 0:
+                        yintegrated.append(0)
+                    else:
+                        yintegrated. append(abs(tmp[var] - tmp[var - 1]) + yintegrated[var - 1])
+                linedict["line={}".format(i)] = yintegrated
+            pathvar2 = os.path.join(glo.get_data_directory(file), file.replace(".csv", "integrated.csv"))
+            dataframe = pd.DataFrame(linedict)
+            dataframe.to_csv(pathvar2)
 
 
 

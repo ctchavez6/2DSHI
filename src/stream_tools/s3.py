@@ -1,5 +1,6 @@
 from coregistration import find_gaussian_profile as fgp
 from image_processing import bit_depth_conversion as bdc
+from image_processing import CenterOfMass as com
 from experiment_set_up import find_previous_run as fpr
 import pickle
 import cv2
@@ -103,17 +104,21 @@ def step_three(stream, autoload_prev_static_centers=False):
         print("\t\tB Prime (Calculated)      : {}".format((int(stream.mu_b_x), int(stream.mu_b_y))))
         print("\t\tB Prime (Overwritten to A): {}".format(stream.static_center_a))
 
-        option = input("Would you like to use the \n\tcalculated gaussian center (y) "
-                       "\n\tor the overwritten gaussian center (n)  "
-                       "\n\tor a user input(new):")
+        option = input("Would you like to use the \n\tcalculated gaussian center (1) "
+                       "\n\tor the overwritten gaussian center (2)  "
+                       "\n\tor a user input(3):"
+                       "\n\tor Center of Mass(4)")
 
-        if option == "y":
+        if option == "1":
             stream.static_center_b = (int(stream.mu_b_x), int(stream.mu_b_y))  # Picking A
-        elif option == "n":
+        elif option == "2":
             stream.static_center_b = stream.static_center_a
-        elif option =="new":
+        elif option =="3":
             stream.static_center_a = int(input("ax: ")), int(input("ay: "))
             stream.static_center_b = int(input("bx: ")), int(input("by: "))
+        elif option =="4":
+            stream.static_center_a = com.centerofmass(stream.current_frame_a)
+            stream.static_center_b = com.centerofmass(stream.current_frame_b)
 
 
 
