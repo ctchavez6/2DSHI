@@ -38,8 +38,9 @@ def theoretical_calibration_curve(x, alpha, v, p, q, c):
 
 arb_alpha = 0.2
 arb_v = .96
-arb_p = 1/(2*frame_index[-1])#uses data to make the best guess at a frequency, every calibration curve will have a different frequency depending on the number of frames taken during the curve
-arb_q = .1
+# arb_p = 1/(2*frame_index[-1])#uses data to make the best guess at a frequency, every calibration curve will have a different frequency depending on the number of frames taken during the curve
+arb_p = .02
+arb_q = -.1
 arb_c = 0.2
 
 params, params_covariance = optimize.curve_fit(theoretical_calibration_curve, frame_index, r_values,
