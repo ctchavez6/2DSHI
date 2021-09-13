@@ -79,6 +79,11 @@ class MainApplication(tk.Frame):
         self.v_label = tk.Label(self.parent, text="")
         self.v_label.grid(column=1, row=8, padx=10, pady=5, sticky="W")
 
+        self.alpha_overwrite = tk.Entry(self.parent)
+        self.alpha_overwrite.grid(column=1, row=10, padx=10, pady=5, sticky="W")
+        self.alphaoverwrite_label = tk.Label(self.parent, text="Alpha overwrite")
+        self.alphaoverwrite_label.grid(column=1, row=9, padx=10, pady=5, sticky="W")
+
 
         """Column 2: R Sample and R Background"""
 
@@ -113,6 +118,12 @@ class MainApplication(tk.Frame):
         self.gen_phi_img_button = tk.Button(self.parent, text="Generate Phi IMGs", anchor="w",
                                                   command=self.gen_imgs)
         self.gen_phi_img_button.grid(column=3, row=2, padx=10, pady=5, sticky="W")
+        self.moving_average_label = tk.Label(self.parent, text="Moving average pixels")
+        self.moving_average_label.grid(column=3, row=3, padx=5, pady=3, sticky='W')
+        self.moving_average_entry = tk.Entry(self.parent)
+        self.moving_average_entry.grid(column=3, row=4, padx=5, pady=3, sticky='W')
+        self.run = tk.Button(self.parent, text='Run', anchor='w', command=self.moving_average)
+        self.run.grid(column=3, row=5, padx=5, pady=3, sticky='W')
 
         """Column 4: Line outs"""
 
@@ -151,14 +162,9 @@ class MainApplication(tk.Frame):
 
         self.integrate_label = tk.Label(self.parent, text="Integrate phase")
         self.integrate_label.grid(column=5, row=0, padx=5, pady=3, sticky='W')
-        self.moving_average_label = tk.Label(self.parent, text="Moving average pixels")
         self.run = tk.Button(self.parent, text='Run', anchor='w', command=self.integrate_phi)
         self.run.grid(column=5, row=1, padx=5, pady=3, sticky='W')
-        self.moving_average_label.grid(column=5, row=2, padx=5, pady=3, sticky='W')
-        self.moving_average_entry = tk.Entry(self.parent)
-        self.moving_average_entry.grid(column=5, row=3, padx=5, pady=3, sticky='W')
-        self.run = tk.Button(self.parent, text='Run', anchor='w', command=self.moving_average)
-        self.run.grid(column=5, row=4, padx=5, pady=3, sticky='W')
+
 
     def select_analytics_directory(self):
         self.analytics_directory = askdirectory(title="Pick an analytics directory")
@@ -214,17 +220,29 @@ class MainApplication(tk.Frame):
                 writer.writerow([key, value])
 
     def gen_kvaphi_matrices(self):
-        self.phi_csv_path, self.phi_minus_bg_csv_path, self.phi_background_csv_path = genphi.generate_kvaphi_matrices(
-            self.r_min_full_path_nonans,
-            self.r_max_full_path_nonans,
-            self.r_sample_full_path_nonans,
-            self.r_background_full_path_nonans,
-            self.analytics_directory,
-            self.v,
-            self.alpha)
 
-        self.gen_kvaphi_label = tk.Label(self.parent, text="")
-        self.gen_kvaphi_label.config(text="Phi matrices generated")
+        if self.alpha_overwrite.get() == "":
+            self.phi_csv_path, self.phi_minus_bg_csv_path, self.phi_background_csv_path = genphi.generate_kvaphi_matrices(
+                self.r_min_full_path_nonans,
+                self.r_max_full_path_nonans,
+                self.r_sample_full_path_nonans,
+                self.r_background_full_path_nonans,
+                self.analytics_directory,
+                self.v,
+                self.alpha)
+            self.gen_kvaphi_label = tk.Label(self.parent, text="")
+            self.gen_kvaphi_label.config(text="Phi matrices generated")
+        else:
+            self.phi_csv_path, self.phi_minus_bg_csv_path, self.phi_background_csv_path = genphi.generate_kvaphi_matrices(
+                self.r_min_full_path_nonans,
+                self.r_max_full_path_nonans,
+                self.r_sample_full_path_nonans,
+                self.r_background_full_path_nonans,
+                self.analytics_directory,
+                self.v,
+                float(self.alpha_overwrite.get()))
+            self.gen_kvaphi_label = tk.Label(self.parent, text="")
+            self.gen_kvaphi_label.config(text="Phi matrices generated")
 
     def create_line_out_options(self):
         """Column 4: Entry field for angles"""
@@ -303,7 +321,6 @@ class MainApplication(tk.Frame):
         num_lines_list = list()
         for i in range(num_lines): num_lines_list.append(i)
         angles = list()
-        #print("print", self.set_vertical_offset.get())
         vertical_offset = self.set_vertical_offset.get()
 
         horizontal_offset = self.set_horizontal_offset.get()
@@ -322,7 +339,7 @@ class MainApplication(tk.Frame):
             center_phi = int(height_phi/2)
 
             for i in range(num_lines):
-                angles.append(2*np.pi-(i*(2/num_lines))*np.pi)
+                angles.append(2*np.pi-(i*(2/num_lines))*np.pi+(np.pi/4))
                 num_lines_list.append(i)
                 data_dict["line={}".format(i)] = list()
 
@@ -330,10 +347,10 @@ class MainApplication(tk.Frame):
                 num = num_lines_list[i]
                 y = []
                 x = []
-                points = center_phi
+                points = int(center_phi*np.sqrt(2))
                 angle = angles[i]
 
-                for rad in np.linspace(0, center_phi-1, num=points):
+                for rad in np.linspace(0, int(center_phi*np.sqrt(2)-1), num=points):
                     r = int(rad)
                     x.append(int(r * np.cos(angle)))
                     y.append(int(r * np.sin(angle)))
@@ -392,17 +409,26 @@ class MainApplication(tk.Frame):
         """"" 
         This does not seem to work as expected. The size goes from 901x901 to a 900x901, we lose one row.
         Looks like we loose the entire top row.
-        
         """""
+        if self. moving_average_entry.get() == "":
+            newvar = 3
+        else:
+            newvar =  int(self.moving_average_entry.get())
+
         for file in self.phi_csv_path,self.phi_background_csv_path:
-            csv_file = pd.read_csv(self.phi_csv_path)
+            csv_file = pd.read_csv(self.phi_csv_path, header=None)
             values = csv_file.values
-            result = ndimage.uniform_filter(values,int(self.moving_average_entry.get()), mode="reflect")
-            csv_path = os.path.join(self.analytics_directory.replace(".csv",""), "{}_avg_{}.csv".format(self.phi_csv_path, str(self.moving_average_entry.get())))
+            result = ndimage.uniform_filter(values,newvar, mode="nearest")
+            pathvar = file.replace(".csv","")
+            csv_path = os.path.join(pathvar, "{}_avg_{}.csv".format(pathvar, str(newvar)))
 
             with open(csv_path, "w+", newline='') as my_csv:
                 csvWriter = csv.writer(my_csv, delimiter=',')
                 csvWriter.writerows(result.tolist())
+            if file == self.phi_csv_path:
+                self.phi_csv_path = csv_path
+            else:
+                self.phi_background_csv_path = csv_path
 
     def integrate_phi(self):
         files = (self.line_out_phi_path,self.line_out_bg_path)
@@ -411,8 +437,9 @@ class MainApplication(tk.Frame):
             df = pd.read_csv(file)
             nparray = df.to_numpy()
             for i in range(len(nparray[0,:])):
+                index = 10*i
                 yintegrated = list()
-                y = nparray[:,int(i)]
+                y = nparray[:,int(index)]
                 tmp = y
                 for i2 in range(len(y)):
                     var = int(i2)
@@ -424,8 +451,6 @@ class MainApplication(tk.Frame):
             pathvar2 = os.path.join(glo.get_data_directory(file), file.replace(".csv", "integrated.csv"))
             dataframe = pd.DataFrame(linedict)
             dataframe.to_csv(pathvar2)
-
-
 
     def kill_app(self):
         self.parent.quit()
@@ -445,5 +470,4 @@ from gui import app
 if __name__ == '__main__':
     app = app.App()
     app.run()
-
 """
