@@ -44,6 +44,8 @@ class MainApplication(tk.Frame):
         self.checkvar1 = 0
         self.line_out_phi_path = None
         self.line_out_bg_path = None
+        self.integrated_sample_path = None
+        self.integrated_bg_path = None
 
         self.parent = parent
 
@@ -165,7 +167,20 @@ class MainApplication(tk.Frame):
         self.run = tk.Button(self.parent, text='Run', anchor='w', command=self.integrate_phi)
         self.run.grid(column=5, row=1, padx=5, pady=3, sticky='W')
 
+        self.integrate_10_label = tk.Label(self.parent, text="Integrate phase 10")
+        self.integrate_10_label.grid(column=5, row=2, padx=5, pady=3, sticky='W')
+        self.run = tk.Button(self.parent, text='Run', anchor='w', command=self.integrate_phi_by_10)
+        self.run.grid(column=5, row=3, padx=5, pady=3, sticky='W')
 
+        self.subtract = tk.Label(self.parent, text="Subtract")
+        self.subtract.grid(column=5, row=4, padx=5, pady=3, sticky='W')
+        self.run = tk.Button(self.parent, text='Run', anchor='w', command=self.subtractz)
+        self.run.grid(column=5, row=5, padx=5, pady=3, sticky='W')
+
+
+    """""
+    popout window prompts a user to select a directory/folder to save all new data    
+    """""
     def select_analytics_directory(self):
         self.analytics_directory = askdirectory(title="Pick an analytics directory")
         self.analytics_dir_label.config(text=self.analytics_directory)
@@ -180,10 +195,23 @@ class MainApplication(tk.Frame):
         #self.no_nan_label =  tk.Label(self.parent, text="")
         #self.no_nan_label.grid(column=3, row=2, padx=10, pady=5, sticky="W")
 
+    """""
+    popout window lets you search directories for an r.csv  
+    """""
     def pick_r_sample(self):
         self.r_sample_full_path = genphi.get_r_sample()
         self.r_sample_label.config(text=self.r_sample_full_path)
 
+    """""
+    dropdown menue lets users select a bg R.csv
+    """""
+    def pick_r_background(self):
+        self.r_background_full_path = genphi.get_r_background()
+        self.r_background_label.config(text=self.r_background_full_path)
+
+    """""
+    replaces NANs with 0 for r_sample, r_bg,r_min from calibration curve, r_max from calibration curve 
+    """""
     def gen_no_nan_files(self):
         _files_ = {
             "r_sample": self.r_sample_full_path,
@@ -219,6 +247,10 @@ class MainApplication(tk.Frame):
             for key, value in _files_.items():
                 writer.writerow([key, value])
 
+    """""
+    uses calibration curve or alpha overwrite to create K,V,alpha matrices and applies a transform to take R csvs
+    and turns them to phi csvs
+    """""
     def gen_kvaphi_matrices(self):
 
         if self.alpha_overwrite.get() == "":
@@ -244,6 +276,10 @@ class MainApplication(tk.Frame):
             self.gen_kvaphi_label = tk.Label(self.parent, text="")
             self.gen_kvaphi_label.config(text="Phi matrices generated")
 
+    """""
+    dropdown menu allows users to pick lineout options radial, spiral, linear. each option has parameters the user needs
+    to specify.  
+    """""
     def create_line_out_options(self):
         """Column 4: Entry field for angles"""
 
@@ -268,6 +304,9 @@ class MainApplication(tk.Frame):
             self.horivert_entry = tk.Entry(self.parent)
             self.horivert_entry.grid(column=4, row=4, padx=5, pady=2, sticky="W")
 
+    """""
+    creates images for lineouts on both gb and sample
+    """""
     def gen_imgs2(self):
         self.phi_lineout = pd.read_csv('data_out/phi_lineouts_by_angle.csv')
         self.phi_bg_lineout = pd.read_csv('data_out/phi_bg_lineouts_by_angle.csv')
@@ -281,15 +320,17 @@ class MainApplication(tk.Frame):
         img2.grid(column=5, row=5, padx=5, pady=5, sticky="W")
         img2.image = render
 
+    """""
+    creates phase images for bg, sample and sample-bg
+    """""
     def gen_imgs(self):
         phi2png.gen_phi_imgs(self.phi_csv_path, self.phi_minus_bg_csv_path, self.phi_background_csv_path)
         self.gen_imgs_label = tk.Label(self.parent, text="")
         self.gen_imgs_label.config(text="Phi imgs generated")
 
-    def pick_r_background(self):
-        self.r_background_full_path = genphi.get_r_background()
-        self.r_background_label.config(text=self.r_background_full_path)
-
+    """""
+    uses characterize function from tools to generate K,V,alpha values from a popout window
+    """""
     def select_calibration_directory(self):
         try:
             d, a, v, min_f, max_f = ccc.characterize()
@@ -310,6 +351,9 @@ class MainApplication(tk.Frame):
         except (FileNotFoundError, FileExistsError):
             self.calibration_directory_label.config(text="Pick a calibration run")
 
+    """""
+    takes the user specified parameters (type of lineouts, nuber of lines
+    """""
     def process_radian_values(self):
         if self.line_out_option_var.get() == "Radial":
             if self.radial_entry.get() == "":
@@ -339,18 +383,19 @@ class MainApplication(tk.Frame):
             center_phi = int(height_phi/2)
 
             for i in range(num_lines):
-                angles.append(2*np.pi-(i*(2/num_lines))*np.pi+(np.pi/4))
+                angles.append((i/num_lines)*2*np.pi+(np.pi/num_lines))
                 num_lines_list.append(i)
                 data_dict["line={}".format(i)] = list()
 
+            print(angles)
             for i in range(int(num_lines)):
                 num = num_lines_list[i]
                 y = []
                 x = []
-                points = int(center_phi*np.sqrt(2))
+                points = int(center_phi)
                 angle = angles[i]
 
-                for rad in np.linspace(0, int(center_phi*np.sqrt(2)-1), num=points):
+                for rad in np.linspace(0, int(center_phi-1), num=points):
                     r = int(rad)
                     x.append(int(r * np.cos(angle)))
                     y.append(int(r * np.sin(angle)))
@@ -405,11 +450,10 @@ class MainApplication(tk.Frame):
             glo.vertically_stack_all_these_images(run_dir, plot_paths, current_file_distinguisher)
             glo.delete_all_sub_images(plot_paths)
 
+    """""
+     moving average of sample and bg phi csvs. default value is 3 pixels if prompt left empty
+     """""
     def moving_average(self):
-        """"" 
-        This does not seem to work as expected. The size goes from 901x901 to a 900x901, we lose one row.
-        Looks like we loose the entire top row.
-        """""
         if self. moving_average_entry.get() == "":
             newvar = 3
         else:
@@ -429,7 +473,10 @@ class MainApplication(tk.Frame):
                 self.phi_csv_path = csv_path
             else:
                 self.phi_background_csv_path = csv_path
-
+    """""
+    Integrates phi values of sample and bg from center outwards.
+    Two functions, one for 1 pixel at a time and another for ten pixels at a time. 
+    """""
     def integrate_phi(self):
         files = (self.line_out_phi_path,self.line_out_bg_path)
         linedict = dict()
@@ -437,20 +484,70 @@ class MainApplication(tk.Frame):
             df = pd.read_csv(file)
             nparray = df.to_numpy()
             for i in range(len(nparray[0,:])):
-                index = 10*i
+                index = i
                 yintegrated = list()
                 y = nparray[:,int(index)]
+                print(y)
                 tmp = y
                 for i2 in range(len(y)):
                     var = int(i2)
                     if i2 == 0:
                         yintegrated.append(0)
                     else:
-                        yintegrated. append(abs(tmp[var] - tmp[var - 1]) + yintegrated[var - 1])
+                        yintegrated.append(abs(tmp[var] - tmp[var - 1]) + yintegrated[var - 1])
                 linedict["line={}".format(i)] = yintegrated
             pathvar2 = os.path.join(glo.get_data_directory(file), file.replace(".csv", "integrated.csv"))
             dataframe = pd.DataFrame(linedict)
+            dataframe.to_csv(pathvar2, index = False)
+            if file == self.line_out_phi_path:
+                self.integrated_sample_path = pathvar2
+            else:
+                self.integrated_bg_path = pathvar2
+
+    def integrate_phi_by_10(self):
+        files = (self.line_out_phi_path, self.line_out_bg_path)
+        linedict = dict()
+        for file in files:
+            df = pd.read_csv(file)
+            nparray = df.to_numpy()
+            for i in range(len(nparray[0,:])):
+                index = i
+                yintegrated = list()
+                y = nparray[:, int(index)]
+                tmp = y
+                step = int(len(y)/10)
+                for i2 in range(step):
+                    var = int(i2)*10
+                    if i2 == 0:
+                        yintegrated.append(0)
+                    elif 0<i2<int(len(y)):
+                        yintegrated.append(abs(tmp[var] - tmp[var - 10]) + yintegrated[i2 - 1])
+                    else:
+                        break
+
+                linedict["line={}".format(i)] = yintegrated
+            pathvar2 = os.path.join(glo.get_data_directory(file), file.replace(".csv", "integrated_by_10.csv"))
+            dataframe = pd.DataFrame(linedict)
             dataframe.to_csv(pathvar2)
+            if file == self.line_out_phi_path:
+                self.integrated_sample_path = pathvar2
+            else:
+                self.integrated_bg_path = pathvar2
+
+    """""
+    subtracts integrated values to give (sample+bg) - bg = sample delta phi
+    """""
+    def subtractz(self):
+        files = (self.integrated_sample_path, self.integrated_bg_path)
+        sample = pd.read_csv(files[0]).values
+        bg = pd.read_csv(files[1]).values
+        subtracted = np.subtract(sample,bg)
+        sub_path = os.path.join(self.analytics_directory, "SUBTRACTED.csv")
+        print(sub_path)
+
+        with open(sub_path, "w+", newline='') as f:
+            csvWriter = csv.writer(f, delimiter=',')
+            csvWriter.writerows(subtracted.tolist())
 
     def kill_app(self):
         self.parent.quit()

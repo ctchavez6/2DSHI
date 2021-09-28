@@ -88,13 +88,11 @@ class App(threading.Thread):
         label = tk.Label(self.root, text="Sigma")
         label.pack()
 
-
         if self.slider_maximum > 1.00:
-            self.sigma_slider = tk.Scale(from_=1.00, to=self.slider_maximum, tickinterval=0.0001, resolution = 0.25, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange)
-
+            self.sigma_slider = tk.Scale(from_=1.00, to=self.slider_maximum, tickinterval=0.0001, resolution=0.25, digits=3, orient=tk.HORIZONTAL, command=self.scale_onChange)
 
         else:
-            self.sigma_slider = tk.Scale(from_=1.00, to=1.00, tickinterval=0.0001, resolution = 0.25, digits = 3,orient=tk.HORIZONTAL, command=self.scale_onChange)
+            self.sigma_slider = tk.Scale(from_=1.00, to=1.00, tickinterval=0.0001, resolution=0.25, digits=3, orient=tk.HORIZONTAL, command=self.scale_onChange)
 
         self.sigma_slider.set(self.foo)
         self.sigma_slider.pack()
