@@ -13,7 +13,8 @@ def get_latest_run_direc(path_override=False, path_to_exclude=None):
                                         "System Volume Information",
                                         "BaslerCameraData",
                                         ".tmp.drivedownload",
-                                        "Recovery"]])
+                                        "Recovery"
+                                        "WindowsImageBackup"]])
 
     if path_to_exclude is not None:
         filtered = [x for x in all_runs if path_to_exclude not in x]
@@ -31,7 +32,8 @@ def get_latest_run():
                                         "System Volume Information",
                                         "BaslerCameraData",
                                         ".tmp.drivedownload",
-                                        "Recovery"]])
+                                        "Recovery"
+                                        "WindowsImageBackup"]])
 
     all_params_dict = dict()
 

@@ -23,7 +23,6 @@ df = pd.DataFrame(abs_dst)
 df.to_csv("lineouts.csv")
 
 
-
 imageName2 = os.path.join("D:", '2021_08_31__10_53\subtest\phi_bg.png')
 src2 = cv.imread(cv.samples.findFile(imageName2), cv.IMREAD_COLOR) # Load an image
 if src2 is None:
@@ -35,8 +34,6 @@ src_gray2 = cv.cvtColor(src2, cv.COLOR_BGR2GRAY)
 dst2 = cv.Laplacian(src_gray2, ddepth, ksize=kernel_size)
 abs_dst2 = cv.convertScaleAbs(dst2)
 df2 = pd.DataFrame(abs_dst2)
-
-
 
 
 # Read data from a csv

@@ -85,7 +85,7 @@ def process_radian_values(file_main):
 
 
 
-    def integrate_phi(self):
+def integrate_phi(self):
         files = (self.line_out_phi_path,self.line_out_bg_path)
         linedict = dict()
         for file in files:

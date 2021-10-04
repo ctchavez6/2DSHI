@@ -47,6 +47,9 @@ class MainApplication(tk.Frame):
         self.integrated_sample_path = None
         self.integrated_bg_path = None
 
+        self.phi_image_array = None
+        self.phi_bg_image_array = None
+
         self.parent = parent
 
         """Column 1: Calibration Parameters"""
@@ -324,7 +327,9 @@ class MainApplication(tk.Frame):
     creates phase images for bg, sample and sample-bg
     """""
     def gen_imgs(self):
-        phi2png.gen_phi_imgs(self.phi_csv_path, self.phi_minus_bg_csv_path, self.phi_background_csv_path)
+        paths = phi2png.gen_phi_imgs(self.phi_csv_path, self.phi_minus_bg_csv_path, self.phi_background_csv_path)
+        self.phi_image_array = paths[0]
+        self.phi_bg_image_array = paths[1]
         self.gen_imgs_label = tk.Label(self.parent, text="")
         self.gen_imgs_label.config(text="Phi imgs generated")
 
@@ -377,10 +382,11 @@ class MainApplication(tk.Frame):
             plot_paths = list()
             height_phi = int(glo.get_phi_csv_shape(file)[0])
             R_MATRIX = np.asarray(glo.gen_radial_line_outs(file))
-            spiral = np.zeros(shape=(height_phi, height_phi))
+            # spiral = np.zeros(shape=(height_phi, height_phi))
             data_dictionary = dict()
             data_dict = dict()
             center_phi = int(height_phi/2)
+            arrays = self.phi_image_array, self.phi_bg_image_array
 
             for i in range(num_lines):
                 angles.append((i/num_lines)*2*np.pi+(np.pi/num_lines))
@@ -392,7 +398,7 @@ class MainApplication(tk.Frame):
                 num = num_lines_list[i]
                 y = []
                 x = []
-                points = int(center_phi)
+                points = int(center_phi)*np.sqrt(2)
                 angle = angles[i]
 
                 for rad in np.linspace(0, int(center_phi-1), num=points):
@@ -416,14 +422,18 @@ class MainApplication(tk.Frame):
                 count1 = 0
                 for (cord_y, cord_x) in zip(spiral_coords_y, spiral_coords_x):
                     # print(cord_x,cord_y)
+                    for array in arrays:
+                        array[cord_y,cord_x] = 255
                     count1 += 1
                     # print("Count1 = {0}, len(r_values) = {1}".format(count1, len(r_values)))
-
-                    spiral[int(cord_y), int(cord_x)] = 255
+                    # spiral[int(cord_y), int(cord_x)] = 255
                     data_point_indices.append(count1)
                     r_values.append(R_MATRIX[int(cord_y), int(cord_x)])
                 data_dictionary["line={}".format(num)] = r_values
-
+                markedimage1 = Image.fromarray(self.phi_image_array.astype('uint8'), 'RGB')
+                markedimage1.save(file.replace(".csv","_marked.png"))
+                markedimage2 = Image.fromarray(self.phi_bg_image_array.astype('uint8'), 'RGB')
+                markedimage2.save(file.replace(".csv","_marked.png"))
                 fig = plt.figure()
                 plt.plot(data_point_indices, r_values)
                 current_file_distinguisher_test = os.path.basename(os.path.normpath(file))
@@ -460,19 +470,20 @@ class MainApplication(tk.Frame):
             newvar =  int(self.moving_average_entry.get())
 
         for file in self.phi_csv_path,self.phi_background_csv_path:
-            csv_file = pd.read_csv(self.phi_csv_path, header=None)
+            csv_file = pd.read_csv(file, header=None)
             values = csv_file.values
             result = ndimage.uniform_filter(values,newvar, mode="nearest")
             pathvar = file.replace(".csv","")
             csv_path = os.path.join(pathvar, "{}_avg_{}.csv".format(pathvar, str(newvar)))
 
+
             with open(csv_path, "w+", newline='') as my_csv:
                 csvWriter = csv.writer(my_csv, delimiter=',')
                 csvWriter.writerows(result.tolist())
-            if file == self.phi_csv_path:
-                self.phi_csv_path = csv_path
-            else:
-                self.phi_background_csv_path = csv_path
+                if file == self.phi_csv_path:
+                    self.phi_csv_path = csv_path
+                elif file == self.phi_background_csv_path:
+                    self.phi_background_csv_path = csv_path
     """""
     Integrates phi values of sample and bg from center outwards.
     Two functions, one for 1 pixel at a time and another for ten pixels at a time. 
@@ -487,7 +498,7 @@ class MainApplication(tk.Frame):
                 index = i
                 yintegrated = list()
                 y = nparray[:,int(index)]
-                print(y)
+                # print(y)
                 tmp = y
                 for i2 in range(len(y)):
                     var = int(i2)
@@ -542,6 +553,8 @@ class MainApplication(tk.Frame):
         sample = pd.read_csv(files[0]).values
         bg = pd.read_csv(files[1]).values
         subtracted = np.subtract(sample,bg)
+        subtracted = np.delete(subtracted,0,1)
+        subtracted = np.delete(subtracted,1,0)
         sub_path = os.path.join(self.analytics_directory, "SUBTRACTED.csv")
         print(sub_path)
 

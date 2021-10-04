@@ -8,6 +8,7 @@ ignored_states = np.seterr(**old_err_state)
 
 
 def gen_phi_imgs(phi_fp, phi_no_bg_fp, phi_background_fp):
+    arrays = list()
     for filename_phi_sample in [phi_fp, phi_no_bg_fp, phi_background_fp]:
         filename_sh_phi_sample = filename_phi_sample.split("/")[-1][:-4]
 
@@ -29,9 +30,10 @@ def gen_phi_imgs(phi_fp, phi_no_bg_fp, phi_background_fp):
         DISPLAYABLE_PHI_MATRIX[:, :, 0] = np.where(SIN_PHI_MATRIX > 0.00, abs(SIN_PHI_MATRIX * (2 ** 8 - 1)),
                                                  DISPLAYABLE_PHI_MATRIX[:, :, 0])
 
-
+        arrays.append(DISPLAYABLE_PHI_MATRIX)
         image = Image.fromarray(DISPLAYABLE_PHI_MATRIX.astype('uint8'), 'RGB')
         image.save(filename_phi_sample.replace(".csv", ".png"))
+    return arrays
 
 def gen_phi_imgs2(phi_fp, phi_background_fp):
     for filename_phi_sample in [phi_fp, phi_background_fp]:
