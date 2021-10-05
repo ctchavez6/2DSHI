@@ -1,16 +1,17 @@
 #Use Tkinter for python 2, tkinter for python 3
 import tkinter as tk
-from toolsformatt import characterize_calibration_curve as ccc
-from toolsformatt import create_k_v_a_phi_matrices as genphi
-from toolsformatt import replace_nans as rn
-from toolsformatt import gen_phi_from_csv as phi2png
-from toolsformatt import gen_line_outs as glo
+from src.toolsformatt import characterize_calibration_curve as ccc
+from src.toolsformatt import create_k_v_a_phi_matrices as genphi
+from src.toolsformatt import replace_nans as rn
+from src.toolsformatt import gen_phi_from_csv as phi2png
+from src.toolsformatt import gen_line_outs as glo
 from tkinter.filedialog import askdirectory, askopenfilename
 import os
 import csv
 import sys
 import numpy as np
-from PIL import Image, ImageTk
+import PIL
+from PIL import Image
 import pandas as pd
 import matplotlib.pyplot as plt
 from os import path
@@ -22,6 +23,7 @@ class MainApplication(tk.Frame):
         self.r_stats_full_path = None
         self.r_min_full_path = None
         self.r_max_full_path = None
+        self.pre_calibration_path = None
         self.calibration_directory = None
         self.analytics_directory = None
         self.alpha = None
@@ -33,6 +35,8 @@ class MainApplication(tk.Frame):
         self.r_max_full_path_nonans = None
         self.r_sample_full_path_nonans = None
         self.r_background_full_path_nonans = None
+        self.min_f = None
+        self.max_f = None
 
         self.phi_bg_lineout = None
         self.phi_lineout = None
@@ -58,36 +62,43 @@ class MainApplication(tk.Frame):
                                                                    text="Add Calibration Curve and Analytics Directory")
         self.analytics_directory_and_calib_curve_inputs.grid(column=1, row=0, padx=5, pady=10, sticky="W")
 
+        self.pre_calibration_button = tk.Button(self.parent, text="Use A Previous Calibration", anchor="w",
+                                              command=self.select_pre_calibration_file)
+        self.pre_calibration_button.grid(column=1, row=1, padx=10, pady=1, sticky="W")
+
+        self.pre_calibration_label = tk.Label(self.parent, text="")
+        self.pre_calibration_label.grid(column=1, row=2, padx=10, pady=5, sticky="W")
+
         self.analytics_dir_button = tk.Button(self.parent, text="Select An Analytics Directory", anchor="w",
                                               command=self.select_analytics_directory)
-        self.analytics_dir_button.grid(column=1, row=1, padx=10, pady=1, sticky="W")
+        self.analytics_dir_button.grid(column=1, row=3, padx=10, pady=1, sticky="W")
 
         self.analytics_dir_label = tk.Label(self.parent, text="")
-        self.analytics_dir_label.grid(column=1, row=2, padx=10, pady=5, sticky="W")
+        self.analytics_dir_label.grid(column=1, row=4, padx=10, pady=5, sticky="W")
 
         self.cal_curve_button = tk.Button(self.parent, text="Select Calibration Curve", anchor="w",
                                           command=self.select_calibration_directory)
-        self.cal_curve_button.grid(column=1, row=3, padx=10, pady=10, sticky="W")
+        self.cal_curve_button.grid(column=1, row=5, padx=10, pady=10, sticky="W")
 
         self.calibration_directory_label = tk.Label(self.parent, text="")
-        self.calibration_directory_label.grid(column=1, row=4, padx=5, pady=5, sticky="W")
+        self.calibration_directory_label.grid(column=1, row=6, padx=5, pady=5, sticky="W")
 
         self.r_min_label = tk.Label(self.parent, text="")
-        self.r_min_label.grid(column=1, row=5, padx=10, pady=5, sticky="W")
+        self.r_min_label.grid(column=1, row=7, padx=10, pady=5, sticky="W")
 
         self.r_max_label = tk.Label(self.parent, text="")
-        self.r_max_label.grid(column=1, row=6, padx=10, pady=5, sticky="W")
+        self.r_max_label.grid(column=1, row=8, padx=10, pady=5, sticky="W")
 
         self.alpha_label = tk.Label(self.parent, text="")
-        self.alpha_label.grid(column=1, row=7, padx=10, pady=5, sticky="W")
+        self.alpha_label.grid(column=1, row=9, padx=10, pady=5, sticky="W")
 
         self.v_label = tk.Label(self.parent, text="")
-        self.v_label.grid(column=1, row=8, padx=10, pady=5, sticky="W")
+        self.v_label.grid(column=1, row=10, padx=10, pady=5, sticky="W")
 
         self.alpha_overwrite = tk.Entry(self.parent)
-        self.alpha_overwrite.grid(column=1, row=10, padx=10, pady=5, sticky="W")
+        self.alpha_overwrite.grid(column=1, row=12, padx=10, pady=5, sticky="W")
         self.alphaoverwrite_label = tk.Label(self.parent, text="Alpha overwrite")
-        self.alphaoverwrite_label.grid(column=1, row=9, padx=10, pady=5, sticky="W")
+        self.alphaoverwrite_label.grid(column=1, row=11, padx=10, pady=5, sticky="W")
 
 
         """Column 2: R Sample and R Background"""
@@ -220,7 +231,8 @@ class MainApplication(tk.Frame):
             "r_sample": self.r_sample_full_path,
             "r_background": self.r_background_full_path,
             "r_min": self.r_min_full_path,
-            "r_max": self.r_max_full_path
+            "r_max": self.r_max_full_path,
+            "pre_calibration": self.pre_calibration_path
         }
 
         for _file_ in _files_:
@@ -236,11 +248,12 @@ class MainApplication(tk.Frame):
             elif _file_ == "r_max":
                 self.r_max_full_path_nonans = new_full_path
 
-            print("Generating NoNans Version of {0}".format(_file_))
-            print("Source File: {0}".format(_files_[_file_]))
-            print("NoNan Version: {0}\n\n".format(new_full_path))
-            rn.replace_nans_in_file(_files_[_file_], save_to=new_full_path)
-            self.no_nan_label.config(text="completed")
+            if _file_ != "pre_calibration":
+                print("Generating NoNans Version of {0}".format(_file_))
+                print("Source File: {0}".format(_files_[_file_]))
+                print("NoNan Version: {0}\n\n".format(new_full_path))
+                rn.replace_nans_in_file(_files_[_file_], save_to=new_full_path)
+                self.no_nan_label.config(text="completed")
 
         # Saving data sources
         _files_["r_matrices_stats"] = self.r_stats_full_path
@@ -249,6 +262,93 @@ class MainApplication(tk.Frame):
             writer = csv.writer(csv_file)
             for key, value in _files_.items():
                 writer.writerow([key, value])
+
+        if _file_ == "pre_calibration":
+            print("Generating Pre-calibration Version of this run")
+            print("Source File: {0}".format(_files_[_file_]))
+            calib_list = [("analytics_directory", self.analytics_directory),
+                          ("calibration_curve", self.calibration_directory),
+                          ("r_sample", self.r_sample_full_path),
+                          ("r_background", self.r_background_full_path),
+                          ("r_sample_noNaNs", self.r_sample_full_path_nonans),
+                          ("r_background_noNaNs", self.r_background_full_path_nonans),
+                          ("r_min_path", self.r_min_full_path),
+                          ("r_max_path", self.r_max_full_path),
+                          ("r_min_path_noNaNs", self.r_min_full_path_nonans),
+                          ("r_max_path_noNaNs", self.r_max_full_path_nonans),
+                          ("r_stats_full_path", self.r_stats_full_path),
+                          ("alpha", self.alpha),
+                          ("alpha_overwrite", self.alpha_overwrite),
+                          ("v", self.v),
+                          ("min_f", self.min_f),
+                          ("max_f", self.max_f)]
+            with open(os.path.join(os.getcwd(), 'last_calibration.csv'), 'w') as csv_file:
+                writer = csv.writer(csv_file)
+                for key, value in calib_list:
+                    writer.writerow([key, value])
+
+
+    def readKeyValues(self):
+        # input file reader
+        infile = open(self.pre_calibration_path, "r")
+        read = csv.reader(infile)
+
+        returnDict = {}
+
+        # for each row
+        for row in read:
+            key = row[0]
+            value = row[1]
+            # Add to list
+            returnDict[key] = value
+        return returnDict
+
+
+    """""
+    popout window prompts a user to select a previous calibration csv file
+    """""
+    def select_pre_calibration_file(self):
+        self.pre_calibration_path = genphi.get_r_sample()
+        self.pre_calibration_label.config(text=self.pre_calibration_path)
+        calibration_list = self.readKeyValues()
+        # input analytics directory
+        self.analytics_directory = calibration_list["analytics_directory"]
+        self.analytics_dir_label.config(text=self.analytics_directory)
+        # input calibration curve
+        self.r_stats_full_path = calibration_list["r_stats_full_path"]
+        self.calibration_directory = calibration_list["calibration_curve"]
+        self.r_min_full_path = calibration_list["r_min_path"]
+        self.r_max_full_path = calibration_list["r_max_path"]
+        self.alpha = calibration_list["alpha"]
+        self.v = calibration_list["v"]
+        self.min_f = calibration_list["min_f"]
+        self.max_f = calibration_list["max_f"]
+        self.r_min_label.config(text="Min: Frame " + str(self.min_f))
+        self.r_max_label.config(text="Max: Frame " + str(self.max_f))
+        self.calibration_directory_label.config(text="" + self.calibration_directory)
+        self.alpha_label.config(text="alpha: " + str(calibration_list["alpha"]))
+        self.v_label.config(text="v: " + str(calibration_list["v"]))
+        # input alpha overwrite (if any)
+        self.alpha_overwrite = calibration_list["alpha_overwrite"]
+        # input sample
+        self.r_sample_full_path = calibration_list["r_sample"]
+        self.r_sample_label.config(text=self.r_sample_full_path)
+        # input background
+        self.r_background_full_path = calibration_list["r_background"]
+        self.r_background_label.config(text=self.r_background_full_path)
+        # input noNaNs
+        self.r_max_full_path_nonans = calibration_list["r_max_path_noNaNs"]
+        self.r_min_full_path_nonans = calibration_list["r_min_path_noNaNs"]
+        self.r_sample_full_path_nonans = calibration_list["r_sample_noNaNs"]
+        self.r_background_full_path_nonans = calibration_list["r_background_noNaNs"]
+        # create noNaNs button
+        self.no_nan_button = tk.Button(self.parent, text="Generate No NaN Files", anchor="w",
+                                          command=self.gen_no_nan_files)
+        self.no_nan_button.grid(column=2, row=5, padx=10, pady=1, sticky="W")
+
+        self.no_nan_label = tk.Label(self.parent, text="Complete")
+        self.no_nan_label.grid(column=2, row=6, padx=10, pady=1, sticky="W")
+
 
     """""
     uses calibration curve or alpha overwrite to create K,V,alpha matrices and applies a transform to take R csvs
@@ -317,7 +417,7 @@ class MainApplication(tk.Frame):
         phi2png.gen_phi_imgs2(self.phi_lineout, self.phi_bg_lineout)
         load = Image.open('data_out\phi_lineouts_by_angle.csv')
         resize_img = load.resize(120, 120)
-        render = ImageTk.PhotoImage(resize_img)
+        render = PIL.ImageTk.PhotoImage(resize_img)
 
         img2 = tk.Label(self.parent, image=render)
         img2.grid(column=5, row=5, padx=5, pady=5, sticky="W")
@@ -347,6 +447,8 @@ class MainApplication(tk.Frame):
             self.r_max_full_path = d.replace("r_matrices_stats", "r_matrix_{0}".format(max_f))
             self.alpha = float(a)
             self.v = float(v)
+            self.min_f = min_f
+            self.max_f = max_f
 
             self.r_min_label .config(text="Min: Frame " + str(min_f))
             self.r_max_label .config(text="Max: Frame " + str(max_f))
