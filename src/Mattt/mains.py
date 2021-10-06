@@ -1,10 +1,10 @@
 #Use Tkinter for python 2, tkinter for python 3
 import tkinter as tk
-from src.toolsformatt import characterize_calibration_curve as ccc
-from src.toolsformatt import create_k_v_a_phi_matrices as genphi
-from src.toolsformatt import replace_nans as rn
-from src.toolsformatt import gen_phi_from_csv as phi2png
-from src.toolsformatt import gen_line_outs as glo
+from toolsformatt import characterize_calibration_curve as ccc
+from toolsformatt import create_k_v_a_phi_matrices as genphi
+from toolsformatt import replace_nans as rn
+from toolsformatt import gen_phi_from_csv as phi2png
+from toolsformatt import gen_line_outs as glo
 from tkinter.filedialog import askdirectory, askopenfilename
 import os
 import csv
@@ -282,7 +282,7 @@ class MainApplication(tk.Frame):
                           ("v", self.v),
                           ("min_f", self.min_f),
                           ("max_f", self.max_f)]
-            with open(os.path.join(os.getcwd(), 'last_calibration.csv'), 'w') as csv_file:
+            with open(os.path.join(os.getcwd(), 'last_calibration.csv'), 'w', newline='') as csv_file:
                 writer = csv.writer(csv_file)
                 for key, value in calib_list:
                     writer.writerow([key, value])
@@ -477,7 +477,7 @@ class MainApplication(tk.Frame):
         horizontal_offset = self.set_horizontal_offset.get()
         files = (self.phi_csv_path, self.phi_background_csv_path)
 
-        print("Starting for loop: for file in files")
+        # print("Starting for loop: for file in files")
         for file in files:
             if vertical_offset == "": vertical_offset = 0
             if horizontal_offset == "": horizontal_offset = 0
@@ -495,12 +495,12 @@ class MainApplication(tk.Frame):
                 num_lines_list.append(i)
                 data_dict["line={}".format(i)] = list()
 
-            print(angles)
+            # print(angles)
             for i in range(int(num_lines)):
                 num = num_lines_list[i]
                 y = []
                 x = []
-                points = int(center_phi)*np.sqrt(2)
+                points = int(center_phi*np.sqrt(2))
                 angle = angles[i]
 
                 for rad in np.linspace(0, int(center_phi-1), num=points):
