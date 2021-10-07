@@ -96,9 +96,11 @@ class MainApplication(tk.Frame):
         self.v_label.grid(column=1, row=10, padx=10, pady=5, sticky="W")
 
         self.alpha_overwrite = tk.Entry(self.parent)
+        #if self.alpha_overwrite.get() != '':
+            #self.alpha_overwrite = float(self.alpha_overwrite.get())
         self.alpha_overwrite.grid(column=1, row=12, padx=10, pady=5, sticky="W")
-        self.alphaoverwrite_label = tk.Label(self.parent, text="Alpha overwrite")
-        self.alphaoverwrite_label.grid(column=1, row=11, padx=10, pady=5, sticky="W")
+        self.alpha_overwrite_label = tk.Label(self.parent, text="Alpha overwrite")
+        self.alpha_overwrite_label.grid(column=1, row=11, padx=10, pady=5, sticky="W")
 
 
         """Column 2: R Sample and R Background"""
@@ -278,7 +280,7 @@ class MainApplication(tk.Frame):
                           ("r_max_path_noNaNs", self.r_max_full_path_nonans),
                           ("r_stats_full_path", self.r_stats_full_path),
                           ("alpha", self.alpha),
-                          ("alpha_overwrite", self.alpha_overwrite),
+                          ("alpha_overwrite", float(self.alpha_overwrite.get())),
                           ("v", self.v),
                           ("min_f", self.min_f),
                           ("max_f", self.max_f)]
@@ -308,7 +310,7 @@ class MainApplication(tk.Frame):
     popout window prompts a user to select a previous calibration csv file
     """""
     def select_pre_calibration_file(self):
-        self.pre_calibration_path = genphi.get_r_sample()
+        self.pre_calibration_path = genphi.get_pre_calibration()
         self.pre_calibration_label.config(text=self.pre_calibration_path)
         calibration_list = self.readKeyValues()
         # input analytics directory
@@ -329,7 +331,9 @@ class MainApplication(tk.Frame):
         self.alpha_label.config(text="alpha: " + str(calibration_list["alpha"]))
         self.v_label.config(text="v: " + str(calibration_list["v"]))
         # input alpha overwrite (if any)
-        self.alpha_overwrite = calibration_list["alpha_overwrite"]
+        self.alpha_overwrite.setvar(calibration_list["alpha_overwrite"])
+        if self.alpha_overwrite != '':
+            self.alpha_overwrite.insert(0, calibration_list["alpha_overwrite"])
         # input sample
         self.r_sample_full_path = calibration_list["r_sample"]
         self.r_sample_label.config(text=self.r_sample_full_path)

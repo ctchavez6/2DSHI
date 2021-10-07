@@ -1,4 +1,5 @@
 from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import Open
 import os
 import sys
 import pandas
@@ -7,6 +8,14 @@ import csv
 
 old_err_state = np.seterr(divide='raise')
 ignored_states = np.seterr(**old_err_state)
+
+
+def get_pre_calibration():
+    if os.path.isfile("./last_calibration.csv") == True:
+        return os.path.abspath("last_calibration.csv")
+    filename_cali = askopenfilename(
+        title='Pick a Calibration csv file')  # show an "Open" dialog box and return the path to the selected file
+    return filename_cali
 
 
 def get_r_sample():
