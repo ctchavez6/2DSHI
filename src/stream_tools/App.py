@@ -9,7 +9,9 @@ class App(threading.Thread):
     def __init__(self, stream_object=None):
         threading.Thread.__init__(self)
 
-        self.slider_maximum = stream_object.max_n_sigma
+        #self.slider_maximum = stream_object.max_n_sigma
+        self.slider_maximum = 1.0 #stream_object.max_n_sigma
+
         prev_n_sigma_path = os.path.join(stream_object.prv_run_dir, "n_sigma.p")
         prev_n_sigma_exists = os.path.exists(prev_n_sigma_path)
 

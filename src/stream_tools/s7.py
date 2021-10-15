@@ -338,4 +338,4 @@ def step_seven(stream, run_folder, app, figs, histograms, lines, histograms_alg,
         s8_frame_count += 1
 
     cv2.destroyAllWindows()
-    tk_app.attempt_to_quit(app)
+    #tk_app.attempt_to_quit(app)

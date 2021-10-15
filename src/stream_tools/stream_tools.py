@@ -410,6 +410,8 @@ class Stream:
 
         while calibration_success is not True:
             try:
+                app = tk_app.App(self)
+                self.tkapp = app
                 if self.jump_level <= 1:
                     s1.step_one(self, histogram, continue_stream)
 
@@ -442,6 +444,8 @@ class Stream:
 
             except Exception as e:
                 print("Exception occurred somewhere along the script")
+                self.tkapp.destroy()
+
                 raise e
                 """
                 retry_calibration = uiv.yes_no_quit(sd.RETRY_CALIBRATION.value)
@@ -449,9 +453,9 @@ class Stream:
                     print("Okay: Exiting program.")
                     sys.exit(0)
                 """
+            finally:
+                pass
 
-        app = tk_app.App(self)
-        self.tkapp = app
         figs, histograms, lines = hgs.initialize_histograms_rois()
         figs_alg, histograms_alg, lines_alg = hgs.initialize_histograms_algebra()
         figs_r, histograms_r, lines_r = hgs.initialize_histograms_r()
@@ -476,6 +480,8 @@ class Stream:
         self.a_images = list()
         self.b_prime_images = list()
 
+
+
         if self.jump_level <= 7:
             s7.step_seven(self, run_folder, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                histograms_r, lines_r, figs_r)
@@ -487,3 +493,5 @@ class Stream:
         if self.all_cams.IsGrabbing():
             self.all_cams.StopGrabbing()
         s9.step_nine(run_folder)
+
+        #sys.exit(0)
