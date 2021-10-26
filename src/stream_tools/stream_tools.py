@@ -445,7 +445,7 @@ class Stream:
             except Exception as e:
                 print("Exception occurred somewhere along the script")
                 self.tkapp.destroy()
-
+                #tk_app.attempt_to_quit(self.tkapp)
                 raise e
                 """
                 retry_calibration = uiv.yes_no_quit(sd.RETRY_CALIBRATION.value)
@@ -486,6 +486,7 @@ class Stream:
             s7.step_seven(self, run_folder, app, figs, histograms, lines, histograms_alg, lines_alg, figs_alg,
                histograms_r, lines_r, figs_r)
 
+
         if self.jump_level <= 8:
             s8.step_eight(self, self.start_writing_at, self.end_writing_at, run_folder, self.a_images, self.s8_full_a_frames,
                          self.b_prime_images, self.s8_full_b_frames, self.stats)
@@ -493,5 +494,6 @@ class Stream:
         if self.all_cams.IsGrabbing():
             self.all_cams.StopGrabbing()
         s9.step_nine(run_folder)
-
+        tk_app.attempt_to_quit(self.tkapp)
+        print("Command line made it here")
         #sys.exit(0)
