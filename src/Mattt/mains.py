@@ -504,10 +504,10 @@ class MainApplication(tk.Frame):
                 num = num_lines_list[i]
                 y = []
                 x = []
-                points = int(center_phi*np.sqrt(2))
+                points = int(center_phi)
                 angle = angles[i]
 
-                for rad in np.linspace(0, int(center_phi-1), num=points):
+                for rad in np.linspace(0, int(np.sqrt(2)*(center_phi-1)), num=points):
                     r = int(rad)
                     x.append(int(r * np.cos(angle)))
                     y.append(int(r * np.sin(angle)))

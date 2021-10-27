@@ -12,7 +12,7 @@ def normalize_2d(matrix):
     norm = matrix/max
     sized = norm*np.pi/2
     return sized
-path = pl.Path("C:/Users/fwessel/Desktop/2m_lens")
+path = pl.Path("C:/Users/fwessel/Desktop/10m_data")
 values  = pd.read_csv(os.path.join(path,"phi_avg_40.csv")),\
           pd.read_csv(os.path.join(path, "phi_bg_avg_40.csv"))
 

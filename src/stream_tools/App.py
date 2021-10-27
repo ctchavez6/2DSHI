@@ -7,9 +7,12 @@ import pickle
 class App(threading.Thread):
 
     def __init__(self, stream_object=None):
-        threading.Thread.__init__(self)
 
-        self.slider_maximum = stream_object.max_n_sigma
+        self.tref = threading.Thread.__init__(self)
+
+        #self.slider_maximum = stream_object.max_n_sigma
+        self.slider_maximum = 1.0 #stream_object.max_n_sigma
+
         prev_n_sigma_path = os.path.join(stream_object.prv_run_dir, "n_sigma.p")
         prev_n_sigma_exists = os.path.exists(prev_n_sigma_path)
 
@@ -127,6 +130,13 @@ class App(threading.Thread):
     def disable_offsets(self):
         self.sigma_slider.configure(state='disabled')
 
+    def join_thread(self):
+        if self.tref is not None:
+            self.tref.join()
+
+    def get_thread(self):
+        return self.tref
+
 def kill_app(app):
     try:
         if app:
@@ -134,6 +144,7 @@ def kill_app(app):
                 app.bring_to_front()
     except Exception:
         pass
+
 
     try:
         app.callback()
@@ -143,6 +154,16 @@ def kill_app(app):
     except Exception as e:
         print("Error while calling app.callback() or app.destroy()")
         traceback.print_exc()
+
+    t = app.get_thread()
+    if t is not None:
+        try:
+            t.join()
+            print(t)
+            print(t.type)
+        except Exception as the_roof:
+            print("Error occured trying to join thread")
+            raise the_roof
 
 
 def bring_to_front(app):
@@ -156,3 +177,4 @@ def bring_to_front(app):
 def attempt_to_quit(app):
     bring_to_front(app)
     kill_app(app)
+
