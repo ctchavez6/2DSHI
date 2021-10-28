@@ -5,6 +5,7 @@ from experiment_set_up import find_previous_run as fpr
 import pickle
 import cv2
 import os
+from stream_tools import crossHairs
 from experiment_set_up import user_input_validation as uiv
 from constants import STEP_DESCRIPTIONS as sd
 from matplotlib import pyplot
@@ -45,7 +46,8 @@ def step_three(stream, autoload_prev_static_centers=False):
         while continue_stream:
             stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
 
-
+            # coords_frame_a = crossHairs.run(stream)
+            # coords_frame_b = crossHairs.run(stream)
 
             y_gridlines = [99, 199, 299, 399,499,599,699,799,899,999,1099,1199,1299,1399,1499,1599,1699,1799,1899]
             x_gridlines = [99, 199, 299, 399,499,599,699,799,899,999,1099,1199]

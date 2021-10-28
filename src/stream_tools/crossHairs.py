@@ -32,8 +32,10 @@ from numpy import asarray, savetxt
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-coords = None
-frame = None
+coordsA = None
+coordsB = None
+frameA = None
+frameB = None
 
 
 def grab_frame(cap):
@@ -41,73 +43,98 @@ def grab_frame(cap):
     return cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
 
 
-def run():
+def run(stream):
     '''
     Main function of curve digitizer
     '''
 
     pixelCoord = None
-    global frame, coords
+    global frameA, frameB, coordsA, coordsB
     # open the dialog box
     # first hide the root window
     root = Tk()
     root.withdraw()
     root.config(cursor="tcross")
 
-    cam = cv2.VideoCapture(0)  # camera index (default = 0) (added based on Randyr's comment).
-
-    print('cam has image : %s' % cam.read()[0])  # True = got image captured.
-    # False = no pics for you to shoot at.
-
-    # Lets check start/open your cam!
-    if cam.read() == False:
-        cam.open()
-
-    if not cam.isOpened():
-        print('Cannot open camera')
-    else:
-        while True:
-            ret, frame = cam.read()
-            if coords != None:
-                windSize = cv2.getWindowImageRect('webcam')
-                window_name = frame
-                start_point1 = (0, coords[1])
-                end_point1 = (windSize[2], coords[1])
-                start_point2 = (coords[0], 0)
-                end_point2 = (coords[0], windSize[3])
-                color = (250, 250, 250)
-                thick = 1
-                cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
-                cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
-                cv2.imshow('webcam', cross1)
-                cv2.imshow('webcam', cross2)
-                font = cv2.FONT_HERSHEY_SIMPLEX
-                cv2.putText(cross1, str(coords[0]) + ', ' +
-                            str(coords[1]), (coords[0] + 10, coords[1] - 20), font,
-                            1, (250, 250, 250), 1)
-                cv2.imshow('webcam', cross1)
-            else:
-                cv2.imshow('webcam', frame)
-            cv2.setMouseCallback('webcam', streamClicker)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+    # cam = stream  # camera index (default = 0) (added based on Randyr's comment).
+    #
+    # # print('cam has image : %s' % cam.read()[0])  # True = got image captured.
+    # # False = no pics for you to shoot at.
+    #
+    # # Lets check start/open your cam!
+    # if stream.read() == False:
+    #     stream.open()
+    #
+    # if not stream.isOpened():
+    #     print('Cannot open cameras')
+    # else:
+    #     print('Cameras open')
+    continue_stream = True
+    while continue_stream == True:
+        frameA = stream.current_frame_a
+        frameB = stream.current_frame_b
+        if coordsA != None:
+            windSize = cv2.getWindowImageRect('camA')
+            window_name = frameA
+            start_point1 = (0, coordsA[1])
+            end_point1 = (windSize[2], coordsA[1])
+            start_point2 = (coordsA[0], 0)
+            end_point2 = (coordsA[0], windSize[3])
+            color = (250, 250, 250)
+            thick = 1
+            cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
+            cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
+            cv2.imshow('camA', cross1)
+            cv2.imshow('camA', cross2)
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            cv2.putText(cross1, str(coordsA[0]) + ', ' +
+                        str(coordsA[1]), (coordsA[0] + 10, coordsA[1] - 20), font,
+                        1, (250, 250, 250), 1)
+            cv2.imshow('camA', cross1)
+        else:
+            cv2.imshow('camA', frameA)
+        if coordsB != None:
+            windSize = cv2.getWindowImageRect('camB')
+            window_name = frameB
+            start_point1 = (0, coordsB[1])
+            end_point1 = (windSize[2], coordsB[1])
+            start_point2 = (coordsB[0], 0)
+            end_point2 = (coordsB[0], windSize[3])
+            color = (250, 250, 250)
+            thick = 1
+            cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
+            cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
+            cv2.imshow('camB', cross1)
+            cv2.imshow('camB', cross2)
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            cv2.putText(cross1, str(coordsB[0]) + ', ' +
+                        str(coordsB[1]), (coordsB[0] + 10, coordsB[1] - 20), font,
+                        1, (250, 250, 250), 1)
+            cv2.imshow('camB', cross1)
+        else:
+            cv2.imshow('camB', frameB)
+        cv2.setMouseCallback('camA', streamClickerA)
+        cv2.setMouseCallback('camB', streamClickerB)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+        continue_stream = stream.keep_streaming()
     cv2.destroyAllWindows()
 
-def streamClicker(event, x, y, flags, param):
-    global frame, coords
+def streamClickerA(event, x, y, flags, param):
+    global frameA, coordsA
     # get the center reference point
     if event == cv2.EVENT_LBUTTONDOWN:
         print(x, ' ', y)
-        coords = (x, y)
+        coordsA = (x, y)
         # display coordinates on stream window
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame, str(x) + ', ' +
+        cv2.putText(frameA, str(x) + ', ' +
                     str(y), (x + 10, y - 20), font,
                     1, (255, 0, 0), 2)
-        cv2.imshow('webcam', frame)
+        cv2.imshow('camA', frameA)
     if event == cv2.EVENT_MOUSEMOVE:
-        windSize = cv2.getWindowImageRect('webcam')
-        window_name = frame
+        windSize = cv2.getWindowImageRect('camA')
+        window_name = frameA
         start_point1 = (0, y)
         end_point1 = (windSize[2], y)
         start_point2 = (x, 0)
@@ -116,8 +143,35 @@ def streamClicker(event, x, y, flags, param):
         thick = 1
         cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
         cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
-        cv2.imshow('webcam', cross1)
-        cv2.imshow('webcam', cross2)
+        cv2.imshow('camA', cross1)
+        cv2.imshow('camA', cross2)
+
+
+def streamClickerB(event, x, y, flags, param):
+    global frameB, coordsB
+    # get the center reference point
+    if event == cv2.EVENT_LBUTTONDOWN:
+        print(x, ' ', y)
+        coordsB = (x, y)
+        # display coordinates on stream window
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(frameB, str(x) + ', ' +
+                    str(y), (x + 10, y - 20), font,
+                    1, (255, 0, 0), 2)
+        cv2.imshow('camB', frameB)
+    if event == cv2.EVENT_MOUSEMOVE:
+        windSize = cv2.getWindowImageRect('camB')
+        window_name = frameB
+        start_point1 = (0, y)
+        end_point1 = (windSize[2], y)
+        start_point2 = (x, 0)
+        end_point2 = (x, windSize[3])
+        color = (250 , 250, 250)
+        thick = 1
+        cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
+        cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
+        cv2.imshow('camB', cross1)
+        cv2.imshow('camB', cross2)
 
 
 if __name__ == "__main__":
