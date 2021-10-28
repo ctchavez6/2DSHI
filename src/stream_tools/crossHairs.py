@@ -71,6 +71,7 @@ def run(stream):
     #     print('Cameras open')
     continue_stream = True
     while continue_stream == True:
+        stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
         frameA = stream.current_frame_a
         frameB = stream.current_frame_b
         if coordsA != None:
