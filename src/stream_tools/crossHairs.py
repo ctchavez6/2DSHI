@@ -73,10 +73,10 @@ def run(stream):
     continue_stream = True
     while continue_stream:
         stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
+        stream.current_frame_a = cv2.cvtColor(frameA, cv2.COLOR_GRAY2BGR)
+        stream.current_frame_b = cv2.cvtColor(frameB, cv2.COLOR_GRAY2BGR)
         a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
         b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
-        frameA = cv2.cvtColor(frameA, cv2.COLOR_GRAY2BGR)
-        frameB = cv2.cvtColor(frameB, cv2.COLOR_GRAY2BGR)
         frameA = a_as_16bit
         frameB = b_as_16bit
         if coordsA != None:
@@ -139,7 +139,7 @@ def streamClickerA(event, x, y, flags, param):
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frameA, str(x) + ', ' +
                     str(y), (x + 10, y - 20), font,
-                    1, (250, 250, 250), 2)
+                    1, (0, 250, 250), 2)
         cv2.imshow('camA', frameA)
     if event == cv2.EVENT_MOUSEMOVE:
         windSize = cv2.getWindowImageRect('camA')
@@ -148,7 +148,7 @@ def streamClickerA(event, x, y, flags, param):
         end_point1 = (windSize[2], y)
         start_point2 = (x, 0)
         end_point2 = (x, windSize[3])
-        color = (250 , 250, 250)
+        color = (0 , 250, 250)
         thick = 1
         cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
         cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
@@ -166,7 +166,7 @@ def streamClickerB(event, x, y, flags, param):
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frameB, str(x) + ', ' +
                     str(y), (x + 10, y - 20), font,
-                    1, (250, 250, 250), 2)
+                    1, (0, 250, 250), 2)
         cv2.imshow('camB', frameB)
     if event == cv2.EVENT_MOUSEMOVE:
         windSize = cv2.getWindowImageRect('camB')
@@ -175,7 +175,7 @@ def streamClickerB(event, x, y, flags, param):
         end_point1 = (windSize[2], y)
         start_point2 = (x, 0)
         end_point2 = (x, windSize[3])
-        color = (250 , 250, 250)
+        color = (0 , 250, 250)
         thick = 1
         cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
         cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
