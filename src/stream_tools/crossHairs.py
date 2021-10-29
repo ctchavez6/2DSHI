@@ -28,6 +28,7 @@ import os
 matplotlib.use('TkAgg')
 
 from numpy import asarray, savetxt
+from image_processing import bit_depth_conversion as bdc
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -70,10 +71,12 @@ def run(stream):
     # else:
     #     print('Cameras open')
     continue_stream = True
-    while continue_stream == True:
+    while continue_stream:
         stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
-        frameA = stream.current_frame_a
-        frameB = stream.current_frame_b
+        a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
+        b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
+        frameA = a_as_16bit
+        frameB = b_as_16bit
         if coordsA != None:
             windSize = cv2.getWindowImageRect('camA')
             window_name = frameA
@@ -81,7 +84,7 @@ def run(stream):
             end_point1 = (windSize[2], coordsA[1])
             start_point2 = (coordsA[0], 0)
             end_point2 = (coordsA[0], windSize[3])
-            color = (250, 250, 250)
+            color = (150, 100, 0)
             thick = 1
             cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
             cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
@@ -90,7 +93,7 @@ def run(stream):
             font = cv2.FONT_HERSHEY_SIMPLEX
             cv2.putText(cross1, str(coordsA[0]) + ', ' +
                         str(coordsA[1]), (coordsA[0] + 10, coordsA[1] - 20), font,
-                        1, (250, 250, 250), 1)
+                        1, color, 1)
             cv2.imshow('camA', cross1)
         else:
             cv2.imshow('camA', frameA)
@@ -101,7 +104,7 @@ def run(stream):
             end_point1 = (windSize[2], coordsB[1])
             start_point2 = (coordsB[0], 0)
             end_point2 = (coordsB[0], windSize[3])
-            color = (250, 250, 250)
+            color = (150, 100, 0)
             thick = 1
             cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
             cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
@@ -110,7 +113,7 @@ def run(stream):
             font = cv2.FONT_HERSHEY_SIMPLEX
             cv2.putText(cross1, str(coordsB[0]) + ', ' +
                         str(coordsB[1]), (coordsB[0] + 10, coordsB[1] - 20), font,
-                        1, (250, 250, 250), 1)
+                        1, color, 1)
             cv2.imshow('camB', cross1)
         else:
             cv2.imshow('camB', frameB)
@@ -119,7 +122,10 @@ def run(stream):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
         continue_stream = stream.keep_streaming()
+    # cv2.destroyWindow('camA')
+    # cv2.destroyWindow('camB')
     cv2.destroyAllWindows()
+    return coordsA, coordsB
 
 def streamClickerA(event, x, y, flags, param):
     global frameA, coordsA
@@ -131,7 +137,7 @@ def streamClickerA(event, x, y, flags, param):
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frameA, str(x) + ', ' +
                     str(y), (x + 10, y - 20), font,
-                    1, (255, 0, 0), 2)
+                    1, (150, 100, 0), 2)
         cv2.imshow('camA', frameA)
     if event == cv2.EVENT_MOUSEMOVE:
         windSize = cv2.getWindowImageRect('camA')
@@ -140,7 +146,7 @@ def streamClickerA(event, x, y, flags, param):
         end_point1 = (windSize[2], y)
         start_point2 = (x, 0)
         end_point2 = (x, windSize[3])
-        color = (250 , 250, 250)
+        color = (150 , 100, 0)
         thick = 1
         cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
         cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
@@ -158,7 +164,7 @@ def streamClickerB(event, x, y, flags, param):
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frameB, str(x) + ', ' +
                     str(y), (x + 10, y - 20), font,
-                    1, (255, 0, 0), 2)
+                    1, (150, 100, 0), 2)
         cv2.imshow('camB', frameB)
     if event == cv2.EVENT_MOUSEMOVE:
         windSize = cv2.getWindowImageRect('camB')
@@ -167,7 +173,7 @@ def streamClickerB(event, x, y, flags, param):
         end_point1 = (windSize[2], y)
         start_point2 = (x, 0)
         end_point2 = (x, windSize[3])
-        color = (250 , 250, 250)
+        color = (150 , 100, 0)
         thick = 1
         cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
         cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
