@@ -73,12 +73,12 @@ def run(stream):
     continue_stream = True
     while continue_stream:
         stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
-        stream.current_frame_a = cv2.cvtColor(frameA, cv2.COLOR_GRAY2BGR)
-        stream.current_frame_b = cv2.cvtColor(frameB, cv2.COLOR_GRAY2BGR)
+        # stream.current_frame_a = cv2.cvtColor(stream.current_frame_a, cv2.COLOR_GRAY2BGR)
+        # stream.current_frame_b = cv2.cvtColor(stream.current_frame_b, cv2.COLOR_GRAY2BGR)
         a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
         b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
-        frameA = a_as_16bit
-        frameB = b_as_16bit
+        frameA = cv2.cvtColor(a_as_16bit, cv2.COLOR_GRAY2BGR)
+        frameB = cv2.cvtColor(b_as_16bit, cv2.COLOR_GRAY2BGR)
         if coordsA != None:
             windSize = cv2.getWindowImageRect('camA')
             window_name = frameA
@@ -86,8 +86,8 @@ def run(stream):
             end_point1 = (windSize[2], coordsA[1])
             start_point2 = (coordsA[0], 0)
             end_point2 = (coordsA[0], windSize[3])
-            color = (0, 250, 250)
-            thick = 1
+            color = (0, 250*256, 250*256)
+            thick = 2
             cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
             cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
             cv2.imshow('camA', cross1)
@@ -106,8 +106,8 @@ def run(stream):
             end_point1 = (windSize[2], coordsB[1])
             start_point2 = (coordsB[0], 0)
             end_point2 = (coordsB[0], windSize[3])
-            color = (0, 250, 250)
-            thick = 1
+            color = (0, 250*256, 250*256)
+            thick = 2
             cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
             cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
             cv2.imshow('camB', cross1)
@@ -139,7 +139,7 @@ def streamClickerA(event, x, y, flags, param):
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frameA, str(x) + ', ' +
                     str(y), (x + 10, y - 20), font,
-                    1, (0, 250, 250), 2)
+                    1, (0, 250*256, 250*256), 2)
         cv2.imshow('camA', frameA)
     if event == cv2.EVENT_MOUSEMOVE:
         windSize = cv2.getWindowImageRect('camA')
@@ -148,7 +148,7 @@ def streamClickerA(event, x, y, flags, param):
         end_point1 = (windSize[2], y)
         start_point2 = (x, 0)
         end_point2 = (x, windSize[3])
-        color = (0 , 250, 250)
+        color = (0, 250*256, 250*256)
         thick = 1
         cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
         cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
@@ -166,7 +166,7 @@ def streamClickerB(event, x, y, flags, param):
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frameB, str(x) + ', ' +
                     str(y), (x + 10, y - 20), font,
-                    1, (0, 250, 250), 2)
+                    1, (0, 250*256, 250*256), 2)
         cv2.imshow('camB', frameB)
     if event == cv2.EVENT_MOUSEMOVE:
         windSize = cv2.getWindowImageRect('camB')
@@ -175,7 +175,7 @@ def streamClickerB(event, x, y, flags, param):
         end_point1 = (windSize[2], y)
         start_point2 = (x, 0)
         end_point2 = (x, windSize[3])
-        color = (0 , 250, 250)
+        color = (0, 250*256, 250*256)
         thick = 1
         cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
         cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)

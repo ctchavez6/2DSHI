@@ -43,11 +43,10 @@ def step_three(stream, autoload_prev_static_centers=False):
     if freestream_ is True:
         continue_stream = True
 
+        coords_frame_a, coords_frame_b = crossHairs.run(stream)
+
         while continue_stream:
             stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
-
-            # coords_frame_a = crossHairs.run(stream)
-            # coords_frame_b = crossHairs.run(stream)
 
             y_gridlines = [99, 199, 299, 399,499,599,699,799,899,999,1099,1199,1299,1399,1499,1599,1699,1799,1899]
             x_gridlines = [99, 199, 299, 399,499,599,699,799,899,999,1099,1199]

@@ -1,4 +1,5 @@
 import cv2
+from stream_tools.curveDigitizer import run as runCurve
 from experiment_set_up import user_input_validation as uiv
 from constants import STEP_DESCRIPTIONS as sd
 
@@ -37,3 +38,7 @@ def step_one(stream, histogram, continue_stream):
         continue_stream = stream.keep_streaming()
 
     cv2.destroyAllWindows()  # Upon leaving stream, we want to close any CV2 windows.
+
+    # testing the curve digitizer
+    coordsListA, coordsListB = runCurve(stream)
+
