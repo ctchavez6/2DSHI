@@ -18,7 +18,12 @@ SOFTWARE.
 '''
 
 from tkinter import Tk, messagebox
+
+import scipy.optimize
+import numpy as np
+
 from image_processing import bit_depth_conversion as bdc
+from matplotlib import pyplot as plt
 import tkinter
 import time
 import cv2
@@ -109,20 +114,11 @@ def run(stream):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             #  final calculations and saving coordinates
             # DO NOT use filedialog in this function. There is a bug that will SEGFAULT the program
-            # savePath = messagebox.askyesno("Is this path okay?",
-            #                     "/home/andrew/Documents/digitizationTest")
-            # if savePath:
-                # csvDigit = ah.csv_data_curveDigit(coords, "/home/andrew/Documents/digitizationTest")
-                # if csvDigit == 1:
-                #     print("curve data saved")
-                # else:
-                #     print("curve data failed to save")
             reply = messagebox.askyesno("Finished?",
                                         "Continue choosing points?")
             if not reply:
                 setLoop = False
                 frame = None
-                time.sleep(2)
     # digitize curves until stopped by the user
     cv2.destroyWindow('webcamA')
     cv2.destroyWindow('webcamB')
@@ -186,4 +182,3 @@ def streamClickerB(event, x, y, flags, param):
         cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
         cv2.imshow('webcamB', cross1)
         cv2.imshow('webcamB', cross2)
-
