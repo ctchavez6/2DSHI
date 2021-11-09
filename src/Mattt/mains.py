@@ -321,8 +321,8 @@ class MainApplication(tk.Frame):
         self.calibration_directory = calibration_list["calibration_curve"]
         self.r_min_full_path = calibration_list["r_min_path"]
         self.r_max_full_path = calibration_list["r_max_path"]
-        self.alpha = calibration_list["alpha"]
-        self.v = calibration_list["v"]
+        self.alpha = float(calibration_list["alpha"])
+        self.v = float(calibration_list["v"])
         self.min_f = calibration_list["min_f"]
         self.max_f = calibration_list["max_f"]
         self.r_min_label.config(text="Min: Frame " + str(self.min_f))

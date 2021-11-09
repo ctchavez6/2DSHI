@@ -17,6 +17,7 @@ from image_processing import bit_depth_conversion as bdc
 from path_management import image_management as im
 from datetime import datetime
 
+
 # Create an instance of an ArgumentParser Object
 parser = argparse.ArgumentParser()
 
