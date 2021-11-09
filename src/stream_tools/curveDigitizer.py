@@ -18,12 +18,7 @@ SOFTWARE.
 '''
 
 from tkinter import Tk, messagebox
-
-import scipy.optimize
-import numpy as np
-
-from image_processing import bit_depth_conversion as bdc
-from matplotlib import pyplot as plt
+from src.image_processing import bit_depth_conversion as bdc
 import tkinter
 import time
 import cv2
@@ -53,6 +48,10 @@ def run(stream):
     line = []
     setLoop = True
     reply = True
+    yellow = (0, 250 * 256, 250 * 256)
+    red = (0, 10 * 256, 255 * 256)
+    blue = (255 * 256, 10 * 256, 0)
+    font = cv2.FONT_HERSHEY_SIMPLEX
     while setLoop:
         i = 1
         # open the dialog
@@ -63,45 +62,60 @@ def run(stream):
         b_as_16bit = bdc.to_16_bit(stream.current_frame_b)
         frameA = a_as_16bit
         frameB = b_as_16bit
+
+        if len(coordsA) > 0:
+            lineFrame = cv2.circle(frameA, (coordsA[0][0], coordsA[0][1]), 4, red, thickness=1, lineType=8, shift=0)
+            cv2.putText(lineFrame,
+                        str(coordsA[0][0]) + ', ' + str(coordsA[0][1]),
+                        (coordsA[0][0] + 10, coordsA[0][1] - 20),
+                        font,
+                        0.6,
+                        blue,
+                        1)
         if len(coordsA) > 1:
             if i < len(coordsA):
                 window_name = frameA
                 start_point1 = (coordsA[i-1][0], coordsA[i-1][1])
                 end_point1 = (coordsA[i][0], coordsA[i][1])
-                color = (0, 250*256, 250*256)
                 thick = 1
                 line.append([start_point1, end_point1])
                 while i < len(coordsA):
-                    lineFrame = cv2.line(window_name, coordsA[i-1], coordsA[i], color, thick)
+                    lineFrame = cv2.line(window_name, coordsA[i-1], coordsA[i], red, thick)
                     cv2.imshow('webcamA', lineFrame)
-                    font = cv2.FONT_HERSHEY_SIMPLEX
                     cv2.putText(lineFrame,
                                 str(coordsA[i][0]) + ', ' + str(coordsA[i][1]),
                                 (coordsA[i][0] + 10, coordsA[i][1] - 20),
                                 font,
                                 0.6,
-                                color,
+                                blue,
                                 1)
                     cv2.imshow('webcamA', lineFrame)
                     i += 1
+        if len(coordsB) > 0:
+            lineFrame = cv2.circle(frame, (coordsB[0][0], coordsB[0][1]), 4, red, thickness=1, lineType=8, shift=0)
+            cv2.putText(lineFrame,
+                        str(coordsB[0][0]) + ', ' + str(coordsB[0][1]),
+                        (coordsB[0][0] + 10, coordsB[0][1] - 20),
+                        font,
+                        0.6,
+                        blue,
+                        1)
         if len(coordsB) > 1:
             if i < len(coordsB):
                 window_name = frameB
                 start_point1 = (coordsB[i-1][0], coordsB[i-1][1])
                 end_point1 = (coordsB[i][0], coordsB[i][1])
-                color = (0, 250*256, 250*256)
                 thick = 1
                 line.append([start_point1, end_point1])
                 while i < len(coordsB):
-                    lineFrame = cv2.line(window_name, coordsB[i-1], coordsB[i], color, thick)
+                    lineFrame = cv2.line(window_name, coordsB[i-1], coordsB[i], red, thick)
                     cv2.imshow('webcamB', lineFrame)
-                    font = cv2.FONT_HERSHEY_SIMPLEX
                     cv2.putText(lineFrame,
                                 str(coordsB[i][0]) + ', ' + str(coordsB[i][1]),
                                 (coordsB[i][0] + 10, coordsB[i][1] - 20),
                                 font,
                                 0.6,
-                                color,
+                                blue,
                                 1)
                     cv2.imshow('webcamB', lineFrame)
                     i += 1
@@ -119,6 +133,7 @@ def run(stream):
             if not reply:
                 setLoop = False
                 frame = None
+                time.sleep(2)
     # digitize curves until stopped by the user
     cv2.destroyWindow('webcamA')
     cv2.destroyWindow('webcamB')
@@ -128,16 +143,13 @@ def run(stream):
 
 def streamClickerA(event, x, y, flags, param):
     global frameA, coordsA
+    yellow = (0, 250 * 256, 250 * 256)
+    red = (0, 10 * 256, 255 * 256)
+    blue = (255 * 256, 10 * 256, 0)
     # get the center reference point
     if event == cv2.EVENT_LBUTTONDOWN:
-        print(x, ' ', y)
+        print('Cam A: ', x, ' ', y)
         coordsA.append([x, y])
-        # display coordinates on stream window
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frameA, str(x) + ', ' +
-                    str(y), (x + 10, y - 20), font,
-                    1, (0, 250*256, 250*256), 2)
-        cv2.imshow('webcamA', frameA)
     if event == cv2.EVENT_RBUTTONDOWN:
         coordsA.pop()
     if event == cv2.EVENT_MOUSEMOVE:
@@ -147,26 +159,22 @@ def streamClickerA(event, x, y, flags, param):
         end_point1 = (windSize[2], y)
         start_point2 = (x, 0)
         end_point2 = (x, windSize[3])
-        color = (0, 250*256, 250*256)
         thick = 1
-        cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
-        cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
+        cross1 = cv2.line(window_name, start_point1, end_point1, blue, thick)
+        cross2 = cv2.line(window_name, start_point2, end_point2, blue, thick)
         cv2.imshow('webcamA', cross1)
         cv2.imshow('webcamA', cross2)
 
 
 def streamClickerB(event, x, y, flags, param):
     global frameB, coordsB
+    yellow = (0, 250 * 256, 250 * 256)
+    red = (0, 10 * 256, 255 * 256)
+    blue = (255 * 256, 10 * 256, 0)
     # get the center reference point
     if event == cv2.EVENT_LBUTTONDOWN:
-        print(x, ' ', y)
+        print('Cam B: ', x, ' ', y)
         coordsB.append([x, y])
-        # display coordinates on stream window
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frameB, str(x) + ', ' +
-                    str(y), (x + 10, y - 20), font,
-                    1, (0, 250*256, 250*256), 2)
-        cv2.imshow('webcamB', frameB)
     if event == cv2.EVENT_RBUTTONDOWN:
         coordsB.pop()
     if event == cv2.EVENT_MOUSEMOVE:
@@ -176,9 +184,9 @@ def streamClickerB(event, x, y, flags, param):
         end_point1 = (windSize[2], y)
         start_point2 = (x, 0)
         end_point2 = (x, windSize[3])
-        color = (0, 250*256, 250*256)
         thick = 1
-        cross1 = cv2.line(window_name, start_point1, end_point1, color, thick)
-        cross2 = cv2.line(window_name, start_point2, end_point2, color, thick)
+        cross1 = cv2.line(window_name, start_point1, end_point1, blue, thick)
+        cross2 = cv2.line(window_name, start_point2, end_point2, blue, thick)
         cv2.imshow('webcamB', cross1)
         cv2.imshow('webcamB', cross2)
+
