@@ -18,7 +18,7 @@ SOFTWARE.
 '''
 
 from tkinter import Tk, messagebox
-from src.image_processing import bit_depth_conversion as bdc
+from image_processing import bit_depth_conversion as bdc
 import tkinter
 import time
 import cv2
@@ -157,6 +157,26 @@ def run(stream):
                         (angleCoordB[1][0], angleCoordB[1][1] + 20), font, 0.6, red, 1)
             cv2.putText(frameB, str(xypB[0]) + ', ' + str(xypB[1]),
                         (xypB[0], xypB[1] + 20), font, 0.6, red, 1)
+            # create angle coordinates for A
+        if len(angleCoordA) == 3:
+            cross1 = cv2.line(frameA, angleCoordA[0], angleCoordA[2], blue, 1)
+            cross2 = cv2.line(frameA, angleCoordA[1], angleCoordA[2], blue, 1)
+            cv2.putText(frameA, str(angleCoordA[0][0]) + ', ' + str(angleCoordA[0][1]),
+                        (angleCoordA[0][0], angleCoordA[0][1] + 20), font, 0.6, red, 1)
+            cv2.putText(frameA, str(angleCoordA[1][0]) + ', ' + str(angleCoordA[1][1]),
+                        (angleCoordA[1][0], angleCoordA[1][1] + 20), font, 0.6, red, 1)
+            cv2.putText(frameA, str(angleCoordA[2][0]) + ', ' + str(angleCoordA[2][1]),
+                        (angleCoordA[2][0], angleCoordA[2][1] + 20), font, 0.6, red, 1)
+        # create angle coordinates for B
+        if len(angleCoordB) == 3:
+            cross1 = cv2.line(frameB, angleCoordB[0], angleCoordB[2], blue, 1)
+            cross2 = cv2.line(frameB, angleCoordB[1], angleCoordB[2], blue, 1)
+            cv2.putText(frameB, str(angleCoordB[0][0]) + ', ' + str(angleCoordB[0][1]),
+                        (angleCoordB[0][0], angleCoordB[0][1] + 20), font, 0.6, red, 1)
+            cv2.putText(frameB, str(angleCoordB[1][0]) + ', ' + str(angleCoordB[1][1]),
+                        (angleCoordB[1][0], angleCoordB[1][1] + 20), font, 0.6, red, 1)
+            cv2.putText(frameB, str(angleCoordB[2][0]) + ', ' + str(angleCoordB[2][1]),
+                        (angleCoordB[2][0], angleCoordB[2][1] + 20), font, 0.6, red, 1)
         # show the fully written frame for both A and B
         cv2.imshow('webcamA', frameA)
         cv2.imshow('webcamB', frameB)
@@ -178,9 +198,6 @@ def run(stream):
 
 def streamClickerA(event, x, y, flags, param):
     global frameA, coordsA, angleCoordA, xypA
-    yellow = (0, 250 * 256, 250 * 256)
-    red = (0, 10 * 256, 255 * 256)
-    blue = (255 * 256, 10 * 256, 0)
     # get the center reference point
     if event == cv2.EVENT_LBUTTONDOWN:
         print('Cam A: ', x, ' ', y)
@@ -190,7 +207,7 @@ def streamClickerA(event, x, y, flags, param):
     if event == cv2.EVENT_MOUSEMOVE:
         xypA = (x, y)
     if event == cv2.EVENT_MBUTTONDOWN:
-        if len(angleCoordA) == 2:
+        if len(angleCoordA) == 3:
             angleCoordA = []
         else:
             angleCoordA.append([x, y])
@@ -198,9 +215,6 @@ def streamClickerA(event, x, y, flags, param):
 
 def streamClickerB(event, x, y, flags, param):
     global frameB, coordsB, angleCoordB, xypB
-    yellow = (0, 250 * 256, 250 * 256)
-    red = (0, 10 * 256, 255 * 256)
-    blue = (255 * 256, 10 * 256, 0)
     # get the center reference point
     if event == cv2.EVENT_LBUTTONDOWN:
         print('Cam B: ', x, ' ', y)
@@ -210,7 +224,7 @@ def streamClickerB(event, x, y, flags, param):
     if event == cv2.EVENT_MOUSEMOVE:
         xypB = (x, y)
     if event == cv2.EVENT_MBUTTONDOWN:
-        if len(angleCoordB) == 2:
+        if len(angleCoordB) == 3:
             angleCoordB = []
         else:
             angleCoordB.append([x, y])
