@@ -2,7 +2,7 @@ import os
 import sys
 from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
-
+import numpy.polynomial.polynomial as poly
 import numpy as np
 import pandas as pd
 from lmfit import Model
@@ -36,7 +36,7 @@ arb_c = 1
 arb_d = 1
 
 
-def poly(x,a,b,c,d):
+def polyfits(x,a,b,c,d):
     return a*x**2+b*x**4+c*x**6+d*x**8
 
 
@@ -50,16 +50,20 @@ def theoretical_curve2(x,offset):
 
 def fitline(x,arg):
     return arg[8]+arg[7]*x+arg[6]*x**2+arg[5]*x**3+arg[4]*x**4+arg[3]*x**5+arg[2]*x**6+arg[1]*x**7+arg[0]*x**8
-fitlines = list()
 
-fit = np.polyfit(frame_index,r_values,8)
 
-for p in range(len(frame_index)):
-    fitlines.append(fitline(p, fit))
-print(fit)
-plt.plot(frame_index,fitlines)
+
+coefs = poly.polyfit(frame_index,r_values,12)
+ffit = poly.polyval(frame_index,coefs)
+# for p in range(len(frame_index)):
+#     fitlines.append(fitline(p, coefs))
+# print(coefs)
+# plt.plot(frame_index,fitlines)
 plt.plot(frame_index,r_values)
+plt.plot(frame_index,ffit)
 plt.show()
+print(len(ffit))
+print(coefs)
 # model = Model(theoretical_curve, independent_vars=['x'])
 # result = model.fit(r_values, x=frame_index, r = arb_r,const = arb_const, offset = arb_offset)
 #

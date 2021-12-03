@@ -433,7 +433,7 @@ class MainApplication(tk.Frame):
     def gen_imgs(self):
         paths = phi2png.gen_phi_imgs(self.phi_csv_path, self.phi_minus_bg_csv_path, self.phi_background_csv_path)
         self.phi_image_array = paths[0]
-        self.phi_bg_image_array = paths[1]
+        self.phi_bg_image_array = paths[0]
         self.gen_imgs_label = tk.Label(self.parent, text="")
         self.gen_imgs_label.config(text="Phi imgs generated")
 
