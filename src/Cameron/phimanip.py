@@ -9,6 +9,11 @@ from os import path
 def process_radian_values(file_main):
     num_lines = 4
     angles = list()
+    angles.append(np.pi/4)
+    angles.append(3*np.pi / 4)
+    angles.append(5*np.pi / 4)
+    angles.append(7*np.pi / 4)
+
 
     files = (file_main)
 
@@ -23,19 +28,19 @@ def process_radian_values(file_main):
         num_lines_list = list()
 
         for i in range(num_lines):
-            angles.append((i / num_lines) * 2 * np.pi + (np.pi / num_lines))
+            # angles.append((i / num_lines) * 2 * np.pi + np.pi/8)
             num_lines_list.append(i)
             data_dict["line={}".format(i)] = list()
 
-        print(angles)
+        # print(angles)
         for i in range(int(num_lines)):
             num = num_lines_list[i]
             y = []
             x = []
-            points = int(center_phi)
+            points = int(center_phi-1)
             angle = angles[i]
 
-            for rad in np.linspace(0, int(center_phi - 1), num=points):
+            for rad in np.linspace(0, int(center_phi * np.sqrt(2)-2), num=points):
                 r = int(rad)
                 x.append(int(r * np.cos(angle)))
                 y.append(int(r * np.sin(angle)))
@@ -111,3 +116,7 @@ def integrate_phi(self):
                 self.integrated_sample_path = pathvar2
             else:
                 self.integrated_bg_path = pathvar2
+
+
+
+process_radian_values("fftavg-avg.csv")

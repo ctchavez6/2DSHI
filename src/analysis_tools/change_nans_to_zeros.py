@@ -29,5 +29,6 @@ for file in csv_files:
     with open(adj_file, "w+", newline='') as my_csv:
         csvWriter = csv.writer(my_csv, delimiter=',')
         csvWriter.writerows(values_r_sample.tolist())
+print("finished")
 
 
