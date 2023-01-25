@@ -221,8 +221,6 @@ class Stream:
                     return False
         return True
 
-
-
     def find_centers(self, frame_a_16bit, frame_b_16bit):
 
         x_a, y_a = fgp.get_coordinates_of_maximum(frame_a_16bit)
@@ -230,15 +228,15 @@ class Stream:
 
         return (x_a, y_a), (x_b, y_b)
 
-
     def grab_frames(self, warp_matrix=None, s8=False):
         if self.continuous:
             try:
-                timeout_ms = 1200000
+                timeout_ms = 3600000
                 grab_result_a = self.cam_a.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
                 grab_result_b = self.cam_b.RetrieveResult(timeout_ms, pylon.TimeoutHandling_ThrowException)
 
                 if grab_result_a.GrabSucceeded() and grab_result_b.GrabSucceeded():
+
                     a, b = grab_result_a.GetArray(), grab_result_b.GetArray()
                     grab_result_a.Release()
                     grab_result_b.Release()
@@ -405,7 +403,8 @@ class Stream:
 
         calibration_success = False
         continue_stream = False
-        run_folder = os.path.join("D:", "\\" + self.current_run)
+        cwd = os.getcwd()
+        run_folder = os.path.join(cwd + "\\"+self.current_run)
         self.prv_run_dir = fpr.get_latest_run_direc(path_override=True, path_to_exclude=self.current_run)
 
         while calibration_success is not True:

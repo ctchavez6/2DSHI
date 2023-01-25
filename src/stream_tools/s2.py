@@ -107,8 +107,7 @@ def step_two(stream, continue_stream, autoload_prev_wm1=False):
 
         matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
         matches = matcher.match(descriptors1, descriptors2, None)
-        matches.sort(key=lambda x: x.distance, reverse=False)
-
+        # matches.sort(key=lambda x: x.distance, reverse=False)
         # BFMatcher with default params
         bf = cv2.BFMatcher()
         knn_matches = bf.knnMatch(descriptors1, descriptors2, k=2)

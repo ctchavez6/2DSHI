@@ -12,17 +12,17 @@ from constants import STEP_DESCRIPTIONS as sd
 
  _______________________________________________________
 |                     Input Image                      |
-|                      800 x 1200                      |
+|                     1920 x 1200                      |
 |                                                      |
 |                      - - - -                         |
-|                    /        \\                       | 800
-|                   |  ( x, y)   |                       |
+|                    /        \\                       | 1200
+|                   |  ( x, y)   |                     |
 |                   \\  - - - /                        |
 |                                                      |
 |                                                      |
 |                                                      |
 |______________________________________________________|
-                       1200
+                       1920
 
 
                   _______________   
@@ -102,34 +102,10 @@ def step_six(stream, app, figs, histograms, lines, histograms_alg, lines_alg, fi
                      x_b + int(n_sigma * stream.static_sigmas_x + 1) + stream.h_offset
                      ]
 
-        """
-        CENTER_B_DP = int(stream.roi_b.shape[1] * 0.5), int(stream.roi_b.shape[0] * 0.5)
 
-        x_a, y_a = CENTER_B_DP
-        x_b, y_b = CENTER_B_DP
-        """
-
-
-
-
-
-        """
-        stream.roi_a = stream.roi_a[
-                       int(v_offset + y_a - n_sigma * stream.static_sigmas_y):
-                       int(v_offset + y_a + n_sigma * stream.static_sigmas_y + 1),
-                       int(h_offset + x_a - n_sigma * stream.static_sigmas_x):
-                       int(h_offset + x_a + n_sigma * stream.static_sigmas_x + 1)]
-
-        stream.roi_b = stream.roi_b[
-                       int(v_offset + y_b - n_sigma * stream.static_sigmas_y):
-                       int(v_offset + y_b + n_sigma * stream.static_sigmas_y + 1),
-                       int(h_offset + x_b - n_sigma * stream.static_sigmas_x):
-                       int(h_offset + x_b + n_sigma * stream.static_sigmas_x + 1)]
-        """
-
-        h = stream.roi_b.shape[0]
-        w = stream.roi_b.shape[1]
-
+        #h = stream.roi_b.shape[0]
+        #w = stream.roi_b.shape[1]
+        h, w = 300, 300
         #print("Shape ROI A: ", stream.roi_a.shape)
         #print("Shape ROI B: ", stream.roi_a.shape)
         hgs.update_histogram(histograms, lines, "a", 4096, stream.roi_a)
@@ -145,16 +121,15 @@ def step_six(stream, app, figs, histograms, lines, histograms_alg, lines_alg, fi
         hist_img_a = bdc.to_16_bit(cv2.resize(hist_img_a, (w, h), interpolation=cv2.INTER_AREA), 8)
         hist_img_b = bdc.to_16_bit(cv2.resize(hist_img_b, (w, h), interpolation=cv2.INTER_AREA), 8)
 
-        #roi_a_disp = cv2.cvtColor(stream.roi_a * 16, cv2.COLOR_GRAY2BGR)
-        #a_hist_disp = cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR)
 
-        #cv2.imshow("roi_a_disp", roi_a_disp)
-        #cv2.imshow("a_hist_disp", a_hist_disp)
+
+        roi_a_resized = cv2.resize(stream.roi_a, (w, h), interpolation=cv2.INTER_AREA)
+        roi_b_resized = cv2.resize(stream.roi_b, (w, h), interpolation=cv2.INTER_AREA)
 
         ROI_A_WITH_HISTOGRAM = np.concatenate(
-            (cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR), cv2.cvtColor(stream.roi_a * 16, cv2.COLOR_GRAY2BGR)), axis=1)
+            (cv2.cvtColor(hist_img_a, cv2.COLOR_RGB2BGR), cv2.cvtColor(roi_a_resized * 16, cv2.COLOR_GRAY2BGR)), axis=1)
         ROI_B_WITH_HISTOGRAM = np.concatenate(
-            (cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR), cv2.cvtColor(stream.roi_b * 16, cv2.COLOR_GRAY2BGR)), axis=1)
+            (cv2.cvtColor(hist_img_b, cv2.COLOR_RGB2BGR), cv2.cvtColor(roi_b_resized * 16, cv2.COLOR_GRAY2BGR)), axis=1)
 
         A_ON_B = np.concatenate((ROI_A_WITH_HISTOGRAM, ROI_B_WITH_HISTOGRAM), axis=0)
 
@@ -192,8 +167,11 @@ def step_six(stream, app, figs, histograms, lines, histograms_alg, lines_alg, fi
         hist_img_plus = hist_img_plus.reshape(figs_alg["plus"].canvas.get_width_height()[::-1] + (3,))
         hist_img_plus = cv2.resize(hist_img_plus, (w, h), interpolation=cv2.INTER_AREA)
         hist_img_plus = bdc.to_16_bit(cv2.resize(hist_img_plus, (w, h), interpolation=cv2.INTER_AREA), 8)
+
+        displayable_plus_resized = cv2.resize(displayable_plus, (w, h), interpolation=cv2.INTER_AREA)
+
         PLUS_WITH_HISTOGRAM = np.concatenate(
-            (cv2.cvtColor(hist_img_plus, cv2.COLOR_RGB2BGR), cv2.cvtColor(displayable_plus, cv2.COLOR_GRAY2BGR)),
+            (cv2.cvtColor(hist_img_plus, cv2.COLOR_RGB2BGR), cv2.cvtColor(displayable_plus_resized, cv2.COLOR_GRAY2BGR)),
             axis=1)
 
         figs_alg["minus"].canvas.draw()  # Draw updates subplots in interactive mode
@@ -202,13 +180,16 @@ def step_six(stream, app, figs, histograms, lines, histograms_alg, lines_alg, fi
         hist_img_minus = hist_img_minus.reshape(figs_alg["minus"].canvas.get_width_height()[::-1] + (3,))
         hist_img_minus = cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA)
         hist_img_minus = bdc.to_16_bit(cv2.resize(hist_img_minus, (w, h), interpolation=cv2.INTER_AREA), 8)
+
+        displayable_minus_resized = cv2.resize(displayable_minus, (w, h), interpolation=cv2.INTER_AREA)
+
         MINUS_WITH_HISTOGRAM = np.concatenate(
-            (cv2.cvtColor(hist_img_minus, cv2.COLOR_RGB2BGR), cv2.cvtColor(displayable_minus, cv2.COLOR_GRAY2BGR)),
+            (cv2.cvtColor(hist_img_minus, cv2.COLOR_RGB2BGR), cv2.cvtColor(displayable_minus_resized, cv2.COLOR_GRAY2BGR)),
             axis=1)
 
         ALGEBRA = np.concatenate((PLUS_WITH_HISTOGRAM, MINUS_WITH_HISTOGRAM), axis=0)
         DASHBOARD = np.concatenate((A_ON_B, ALGEBRA), axis=1)
-        DASHBOARD = cv2.resize(DASHBOARD, (DASHBOARD_WIDTH, DASHBOARD_HEIGHT))
+        #DASHBOARD = cv2.resize(DASHBOARD, (DASHBOARD_WIDTH, DASHBOARD_HEIGHT))
         cv2.imshow("Dashboard", DASHBOARD)
 
         R_MATRIX = np.divide(minus_, plus_)
@@ -285,15 +266,27 @@ def step_six(stream, app, figs, histograms, lines, histograms_alg, lines_alg, fi
         color = 'rgb(0, 0, 0)'  # black color
         draw.text((x, y), message, fill=color, font=font)
         R_VALUES = np.array(R_VALUES)
-        VALUES_W_HIST = np.concatenate((R_VALUES * (2 ** 8), np.array(R_HIST)), axis=1)
+
+        R_VALUES_resized = cv2.resize(R_VALUES, (w, h), interpolation=cv2.INTER_AREA)
+
+
+        VALUES_W_HIST = np.concatenate((R_VALUES_resized * (2 ** 8), np.array(R_HIST)), axis=1)
         R_MATRIX_DISPLAYABLE_FINAL = image
         R_MATRIX_DISPLAYABLE_FINAL = np.array(R_MATRIX_DISPLAYABLE_FINAL * (2 ** 8), dtype='uint16')
 
+        #print("concat first arg, VALUES_W_HIST, size:", VALUES_W_HIST.shape)
+        #print("concat first arg, R_MATRIX_DISPLAYABLE_FINAL, size:", R_MATRIX_DISPLAYABLE_FINAL.shape)
 
-        cv2.imshow("R_MATRIX", cv2.resize(
-                   np.concatenate((VALUES_W_HIST, R_MATRIX_DISPLAYABLE_FINAL), axis=1)
-                   , (R_VIS_WIDTH, R_VIS_HEIGHT))
+        R_MATRIX_DISPLAYABLE_FINAL_resized = cv2.resize(R_MATRIX_DISPLAYABLE_FINAL, (w*2, h), interpolation=cv2.INTER_AREA)
+
+        cv2.imshow("R_MATRIX",
+                   np.concatenate((VALUES_W_HIST, R_MATRIX_DISPLAYABLE_FINAL_resized), axis=1)
                    )
+
+        #cv2.imshow("R_MATRIX", cv2.resize(
+        #           np.concatenate((VALUES_W_HIST, R_MATRIX_DISPLAYABLE_FINAL), axis=1)
+        #           , (R_VIS_WIDTH, R_VIS_HEIGHT))
+        #           )
 
         if last_frame:
             continue_stream = True

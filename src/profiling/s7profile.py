@@ -4,14 +4,13 @@ import pickle
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 import traceback
-from pypylon import pylon  # Import relevant pypylon packages/modules
+from src.pypylon import pylon  # Import relevant pypylon packages/modules
 from image_processing import bit_depth_conversion as bdc
 from coregistration import find_gaussian_profile as fgp
 from stream_tools import App as tk_app
 from stream_tools import histograms as hgs
-from stream_tools import s1, s2, s3, s4, s5, s6, s7, s8, s9, s10
+from stream_tools import s1, s2, s3, s4, s5, s6, s7
 from experiment_set_up import user_input_validation as uiv
-from stream_tools import store_params as sp
 
 twelve_bit_max = (2 ** 12) - 1
 eight_bit_max = (2 ** 8) - 1

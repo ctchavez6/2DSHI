@@ -2,10 +2,13 @@ import os
 
 def get_latest_run_direc(path_override=False, path_to_exclude=None):
     if not path_override:
-        data_directory = os.path.join("D:")  # Windows PC @ Franks' House
-    else:
-        data_directory = os.path.abspath(os.path.join(os.path.join("D:"), os.pardir))
+        data_directory = os.getcwd()  # Windows PC @ Franks' House
 
+    else:
+        # data_directory = os.path.abspath(os.path.join(os.path.join("D:"), os.pardir))
+        data_directory = os.getcwd()
+
+    # print(os.listdir(data_directory))
     all_runs = sorted([os.path.join(data_directory, path) for path in os.listdir(data_directory)
                        if os.path.isdir(os.path.join(data_directory, path))
 
@@ -14,7 +17,31 @@ def get_latest_run_direc(path_override=False, path_to_exclude=None):
                                         "BaslerCameraData",
                                         ".tmp.drivedownload",
                                         "Recovery"
-                                        "WindowsImageBackup"]])
+                                        "WindowsImageBackup",
+                                        "venv",
+                                        "toolsformatt"]
+
+                      and path not in ['.DS_Store',
+                                       'analysis_tools',
+                                       'camera_configuration_files',
+                                       'Cameron',
+                                       'constants',
+                                       'coregistration',
+                                       'exceptions',
+                                       'experiment_set_up',
+                                       'gui',
+                                       'histocam',
+                                       'image_processing',
+                                       'last.exe.stackdump',
+                                       'Mattt',
+                                       'path_management',
+                                       'profiling',
+                                       'stream_tools',
+                                       'test',
+                                       'toolsformatt',
+                                       'venv']
+                      ]
+                      )
 
     if path_to_exclude is not None:
         filtered = [x for x in all_runs if path_to_exclude not in x]
@@ -24,7 +51,8 @@ def get_latest_run_direc(path_override=False, path_to_exclude=None):
 
 
 def get_latest_run():
-    data_directory = os.path.join("D:", "")  # Windows PC @ Franks' House
+    data_directory = os.getcwd()
+    # data_directory = os.path.join("C:", "")  # Windows Laptop
 
     all_runs = sorted([os.path.join(data_directory, path) for path in os.listdir(data_directory)
                        if os.path.isdir(os.path.join(data_directory, path))
@@ -34,7 +62,7 @@ def get_latest_run():
                                         ".tmp.drivedownload",
                                         "Recovery"
                                         "WindowsImageBackup"]])
-
+    print(all_runs)
     all_params_dict = dict()
 
     if len(all_runs) < 1:

@@ -43,8 +43,9 @@ if __name__ == "__main__":
         args = uiv.update_previous_params(prev_run)
 
     current_datetime = datetime.now().strftime("%Y_%m_%d__%H_%M")
-
-    run_directory = os.path.join("D:", "\\" + current_datetime)
+    current_direc = os.getcwd()
+    run_directory = ''
+    run_directory = os.path.join(run_directory, current_direc, current_datetime)
 
     if not os.path.exists(run_directory):
         os.mkdir(run_directory)

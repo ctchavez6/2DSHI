@@ -2,13 +2,26 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import pyvisa as pvisa
 import pandas as pd
-sds_addresses = ['TCPIP0::192.168.2.10::inst0::INSTR', 'TCPIP0::192.168.2.20::inst0::INSTR']
+import os
+from playsound import playsound # import required module
+# sds_addresses = ['TCPIP0::192.168.2.10::inst0::INSTR', 'TCPIP0::192.168.2.20::inst0::INSTR', 'TCPIP0::192.168.2.30::inst0::INSTR']
+# sds_addresses = ['TCPIP0::192.168.2.30::inst0::INSTR']
+# sds_addresses = ['TCPIP0::192.168.2.20::inst0::INSTR', 'TCPIP0::192.168.2.30::inst0::INSTR']
+# sds_addresses = ['TCPIP0::10.0.0.5::inst0::INSTR', 'TCPIP0::10.0.0.6::inst0::INSTR', 'TCPIP0::10.0.0.7::inst0::INSTR']
+sds_addresses = ['TCPIP0::192.168.2.20::inst0::INSTR', 'TCPIP0::192.168.2.30::inst0::INSTR']
+
+path = os.path.join("C:/Users/Zap/Desktop","ScopeGrabs")
+
+
+
 
 
 
 def main():
 
     for sds_address in sds_addresses:
+        time_of_grab_a = datetime.now().strftime('%y-%m-%d-%H-%M-%S')
+        time_of_grab_b = time_of_grab_a + ".bmp"
 
         channel_data = {
             "1": {"time": None, "voltage": None},
@@ -71,42 +84,16 @@ def main():
 
         }
         df = pd.DataFrame(df_as_dict)
-        df.to_csv("4chnl_%s.csv" %datetime.now().strftime('%y-%m-%d-%H-%M-%S'))
+        df.to_csv(os.path.join(path,"4chnl_%s.csv" %time_of_grab_a))
 
-        x = df_as_dict['ch1_time']
-        y4 = df_as_dict['ch4_voltage']
-        y3 = df_as_dict['ch3_voltage']
-        y2 = df_as_dict['ch2_voltage']
-        y1 = df_as_dict['ch1_voltage']
+        files = os.path.join(path, time_of_grab_b)
+        sds.write("SCDP")
+        result_str = sds.read_raw()
+        f = open(files,"wb")
+        f.write(result_str)
+        f.flush()
+        f.close()
+    playsound('C:/Windows/Media/tada.wav')
+    quit()
 
-        figure, axis = plt.subplots(2,2)
-        plot = False
-        scatter = False if plot else True
-
-        if plot:
-            axis[0, 0].plot(x,y1)
-            axis[0, 0].set_title("Channel 1")
-            axis[0, 1].plot(x, y2)
-            axis[0, 1].set_title("Channel 2")
-            axis[1, 0].plot(x, y3)
-            axis[1, 0].set_title("Channel 3")
-            axis[1, 1].plot(x, y4)
-            axis[1, 1].set_title("Channel 4")
-            plt.tight_layout(h_pad=5, w_pad=5)
-        elif scatter:
-            axis[0, 0].scatter(x,y1, s=.01)
-            axis[0, 0].set_title("Channel 1")
-            axis[0, 1].scatter(x, y2, s=.01)
-            axis[0, 1].set_title("Channel 2")
-            axis[1, 0].scatter(x, y3, s=.01)
-            axis[1, 0].set_title("Channel 3")
-            axis[1, 1].scatter(x, y4, s=.01)
-            axis[1, 1].set_title("Channel 4")
-            plt.tight_layout(h_pad=5, w_pad=5)
-
-
-        plt.savefig("4chnl_%s_plot" %datetime.now().strftime('%y-%m-%d-%H-%M-%S'))
-
-
-if __name__ == '__main__':
-    main()
+main()

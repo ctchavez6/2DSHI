@@ -12,7 +12,7 @@ def document_run(all_experimental_parameters, run):
     """
 
     current_working_directory = os.getcwd()
-    run_directory = os.path.join("D:", run)
+    run_directory = os.path.join(current_working_directory, run)
 
     if not os.path.exists(run_directory):
         os.mkdir(run_directory)

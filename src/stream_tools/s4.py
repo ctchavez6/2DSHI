@@ -36,6 +36,7 @@ def step_four(stream, continue_stream, autoload_roi=False):
 
     """
     previous_run_directory = fpr.get_latest_run_direc(path_override=True, path_to_exclude=stream.current_run)
+    # print(previous_run_directory)
 
     prev_sigma_x_path = os.path.join(previous_run_directory, "static_sigma_x.p")
     prev_sigma_x_exist = os.path.exists(prev_sigma_x_path)
@@ -65,18 +66,20 @@ def step_four(stream, continue_stream, autoload_roi=False):
     step_description = sd.S04_DESC.value
     find_rois_ = uiv.yes_no_quit(step_description)
     failed_frame_count = 0
-
+    print("2")
     if find_rois_ is True:
         continue_stream = True
-
+    print("3")
     while continue_stream:
         stream.frame_count += 1
         stream.current_frame_a, stream.current_frame_b = stream.grab_frames(warp_matrix=stream.warp_matrix)
 
         #n_sigma = 1
-        n_sigmas_to_attempt = [1, 1.25, 1.50, 1.75, 2.0, 2.25, 2.5]
+        # n_sigmas_to_attempt = [1, 1.25, 1.50, 1.75, 2.0, 2.25, 2.5]
+        n_sigmas_to_attempt = [1]
         last_successful_index = -1
         try:
+            print("4")
             max_n_sigma = 1
             for n_sigma in n_sigmas_to_attempt:  # , , 1.75, 2.00, 2.50]:
                 #print("Attempting n_sigma = ", n_sigma)
@@ -113,6 +116,7 @@ def step_four(stream, continue_stream, autoload_roi=False):
                     stream.current_frame_b[int(stream.static_center_b[1]) - int(stream.sigma_b_y * n_sigma), :] = 4095
 
                     last_successful_index += 1
+                    print(last_successful_index)
 
 
             a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
@@ -123,6 +127,7 @@ def step_four(stream, continue_stream, autoload_roi=False):
 
             s5_frame_count += 1
             continue_stream = stream.keep_streaming()
+            print("5")
         except cre.BeamNotGaussianException:
             a_as_16bit = bdc.to_16_bit(stream.current_frame_a)
             b_as_16bit = bdc.to_16_bit(stream.current_frame_b)

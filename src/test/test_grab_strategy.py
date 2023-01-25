@@ -1,5 +1,4 @@
-from pypylon import pylon
-import numpy as np
+from src.pypylon import pylon
 import cv2
 from image_processing import bit_depth_conversion as bdc
 import os
